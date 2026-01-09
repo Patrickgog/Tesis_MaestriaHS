@@ -6,6 +6,7 @@ import os
 import sys
 from datetime import datetime
 from typing import Dict, Any, List, Optional
+from config.settings import AppSettings
 
 # --- INICIO: Bloque de diagnóstico ---
 print("--- DIAGNÓSTICO DE ENTORNO ---")
@@ -862,11 +863,11 @@ def configurar_gemini_api(api_key: str, model_name: str = 'gemini-2.5-flash') ->
 def cargar_api_key_desde_secrets():
     """Carga la primera clave API disponible desde st.secrets o el archivo secrets"""
     try:
-        # 1. Intentar desde st.secrets (Streamlit Cloud)
-        if 'GEMINI_API_KEY' in st.secrets:
+        # 1. Intentar desde st.secrets (Streamlit Cloud) - Solo en modo desarrollador
+        if AppSettings.SHOW_DEVELOPER_SECTION and 'GEMINI_API_KEY' in st.secrets:
             return st.secrets['GEMINI_API_KEY']
             
-        # 2. Intentar desde archivo local
+        # 2. Intentar desde archivo local (útil para desarrollo local)
         if os.path.exists('secrets'):
             with open('secrets', 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -883,8 +884,8 @@ def cargar_todas_api_keys_desde_secrets():
     """Carga todas las claves API desde st.secrets y el archivo secrets"""
     api_keys = []
     try:
-        # 1. De st.secrets
-        if 'GEMINI_API_KEY' in st.secrets:
+        # 1. De st.secrets - Solo en modo desarrollador
+        if AppSettings.SHOW_DEVELOPER_SECTION and 'GEMINI_API_KEY' in st.secrets:
             api_keys.append(st.secrets['GEMINI_API_KEY'])
             
         # 2. De archivo local
@@ -1022,8 +1023,27 @@ def render_ai_sidebar():
         if ai_enabled:
             st.info("✅ Análisis IA activado. La pestaña '🤖 Análisis IA' ya está disponible.")
             
+            # En la versión pública, pedir el API Key directamente
+            if not AppSettings.SHOW_DEVELOPER_SECTION and not st.session_state.get('api_key'):
+                st.warning("⚠️ Se requiere una Clave API de Gemini para usar esta función.")
+                api_key_public = st.text_input(
+                    "Ingresa tu API Key de Gemini:", 
+                    type="password",
+                    help="Obtén una clave gratis en Google AI Studio (aistudio.google.com)"
+                )
+                if st.button("Configurar Clave", key="set_public_api_key"):
+                    if api_key_public:
+                        model_to_use = st.session_state.get('selected_model', 'gemini-2.5-flash')
+                        if configurar_gemini_api(api_key_public, model_to_use):
+                            st.success("✅ Clave configurada correctamente")
+                            st.rerun()
+                        else:
+                            st.error("❌ Error: Clave inválida o error de conexión")
+                    else:
+                        st.error("Por favor ingresa una clave")
+            
             # Subpanel Configuración API
-            with st.expander("🔑 Configuración API", expanded=False):
+            with st.expander("⚙️ Configuración Avanzada API", expanded=False):
                 # Selector de modelo
                 modelos_disponibles = [
                     "gemini-2.5-flash",      # Modelo rápido y económico (recomendado)
