@@ -860,45 +860,45 @@ def configurar_gemini_api(api_key: str, model_name: str = 'gemini-2.5-flash') ->
         return False
 
 def cargar_api_key_desde_secrets():
-    """Carga la primera clave API disponible desde el archivo secrets"""
+    """Carga la primera clave API disponible desde st.secrets o el archivo secrets"""
     try:
-        # Leer desde archivo secrets
-        with open('secrets', 'r', encoding='utf-8') as f:
-            content = f.read()
-            # Buscar todas las líneas con GEMINI_API_KEY
-            api_keys = []
-            for line in content.split('\n'):
-                if line.startswith('GEMINI_API_KEY='):
-                    api_key = line.split('=', 1)[1].strip()
-                    if api_key and api_key.strip():
-                        api_keys.append(api_key)
+        # 1. Intentar desde st.secrets (Streamlit Cloud)
+        if 'GEMINI_API_KEY' in st.secrets:
+            return st.secrets['GEMINI_API_KEY']
             
-            # Retornar la primera clave disponible
-            return api_keys[0] if api_keys else None
-        
-    except Exception as e:
-        st.error(f"Error al cargar API key: {e}")
+        # 2. Intentar desde archivo local
+        if os.path.exists('secrets'):
+            with open('secrets', 'r', encoding='utf-8') as f:
+                content = f.read()
+                for line in content.split('\n'):
+                    if line.startswith('GEMINI_API_KEY='):
+                        api_key = line.split('=', 1)[1].strip()
+                        if api_key:
+                            return api_key
+        return None
+    except Exception:
         return None
 
 def cargar_todas_api_keys_desde_secrets():
-    """Carga todas las claves API desde el archivo secrets"""
+    """Carga todas las claves API desde st.secrets y el archivo secrets"""
+    api_keys = []
     try:
-        # Leer desde archivo secrets
-        with open('secrets', 'r', encoding='utf-8') as f:
-            content = f.read()
-            # Buscar todas las líneas con GEMINI_API_KEY
-            api_keys = []
-            for line in content.split('\n'):
-                if line.startswith('GEMINI_API_KEY='):
-                    api_key = line.split('=', 1)[1].strip()
-                    if api_key and api_key.strip():
-                        api_keys.append(api_key)
+        # 1. De st.secrets
+        if 'GEMINI_API_KEY' in st.secrets:
+            api_keys.append(st.secrets['GEMINI_API_KEY'])
             
-            return api_keys
-        
-    except Exception as e:
-        st.error(f"Error al cargar API keys: {e}")
-        return []
+        # 2. De archivo local
+        if os.path.exists('secrets'):
+            with open('secrets', 'r', encoding='utf-8') as f:
+                content = f.read()
+                for line in content.split('\n'):
+                    if line.startswith('GEMINI_API_KEY='):
+                        api_key = line.split('=', 1)[1].strip()
+                        if api_key and api_key not in api_keys:
+                            api_keys.append(api_key)
+    except Exception:
+        pass
+    return api_keys
 
 def guardar_api_key_en_secrets(api_key: str):
     """Guarda la clave API en el archivo secrets (evita duplicados)"""

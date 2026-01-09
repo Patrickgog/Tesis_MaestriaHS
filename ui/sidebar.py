@@ -510,14 +510,27 @@ def render_developer_sidebar():
             with col1:
                 if st.button("✅ Verificar", key="verify_password"):
                     try:
-                        with open('secrets', 'r', encoding='utf-8') as f:
-                            content = f.read()
-                            for line in content.split('\n'):
-                                if line.startswith('DEVELOPER_PASSWORD='):
-                                    correct_password = line.split('=', 1)[1].strip()
-                                    break
-                            else:
-                                correct_password = 'patto25'
+                        correct_password = None
+                        
+                        # 1. Intentar desde st.secrets (Streamlit Cloud)
+                        if 'DEVELOPER_PASSWORD' in st.secrets:
+                            correct_password = st.secrets['DEVELOPER_PASSWORD']
+                            
+                        # 2. Intentar desde archivo local (si existe)
+                        if not correct_password:
+                            try:
+                                with open('secrets', 'r', encoding='utf-8') as f:
+                                    content = f.read()
+                                    for line in content.split('\n'):
+                                        if line.startswith('DEVELOPER_PASSWORD='):
+                                            correct_password = line.split('=', 1)[1].strip()
+                                            break
+                            except FileNotFoundError:
+                                pass
+                        
+                        # 3. Valor por defecto
+                        if not correct_password:
+                            correct_password = 'patto25'
                         
                         if password == correct_password:
                             st.session_state.developer_mode = True
