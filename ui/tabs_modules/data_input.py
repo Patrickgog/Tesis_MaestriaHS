@@ -19,7 +19,7 @@ from ui.tabs_modules.common import calcular_caudal_por_bomba
 
 def render_data_input_tab():
     """Renderiza la pestaña de datos de entrada completa basada en app.py"""
-    from ui.sidebar import render_sidebar
+    # from ui.sidebar import render_sidebar  # ELIMINADO: Ya no se usa aquí
     from ui.accessories import render_accessories_panel
     from data.project_manager import (
         save_project_state, load_project_state, load_project_from_upload,
@@ -91,8 +91,8 @@ def render_data_input_tab():
             if key in st.session_state:
                 del st.session_state[key]
 
-    # Renderizar sidebar (solo en tab1)
-    render_sidebar()
+    # Renderizar sidebar (solo en tab1) - ELIMINADO: Ya se llama desde main.py
+    # render_sidebar()  # COMENTADO para evitar duplicación
 
     def callback_seleccionar_bomba(bomba_data, marca):
         """Callback para cargar curvas de bomba sin conflicto de session_state"""
