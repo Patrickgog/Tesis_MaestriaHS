@@ -1,0 +1,14 @@
+{
+    "tema": "Altura_Dinamica",
+    "descripcion": "Análisis de la altura dinámica total (ADT) y validación del punto de operación",
+    "preguntas": [
+        "Desglosa el cálculo de ADT paso a paso: altura estática + pérdidas succión + pérdidas impulsión + pérdidas accesorios. Verifica cada término",
+        "Compara la ADT calculada con la altura que proporciona la bomba en el punto de intersección. ¿Coinciden dentro del 5%? Si no, identifica la discrepancia",
+        "Analiza la curva del sistema H vs Q. ¿Es típicamente cuadrática (pérdidas por fricción dominantes) o la altura estática tiene peso significativo?",
+        "Identifica el término dominante en la ADT: ¿altura estática, pérdidas en succión, o pérdidas en impulsión? ¿Dónde optimizar primero?",
+        "Si se instala VFD y se reduce el caudal a 75% del nominal, calcula cómo cambia la ADT requerida. ¿El ahorro energético justifica el variador?",
+        "Evalúa sensibilidad de ADT a errores de diseño: (a) C Hazen-Williams 10% menor, (b) accesorios no contabilizados, (c) rugosidad aumenta por envejecimiento. ¿Cuál impacta más?",
+        "Proporciona análisis de incertidumbre considerando tolerancias en diámetros, rugosidades y coeficientes K. ¿Cuál es el rango de ADT (mín-máx)? ¿El punto de operación es seguro?",
+        "Compara ADT de este diseño vs diseño alternativo con 2 bombas en paralelo al 50% c/u. ¿Mejora eficiencia? ¿Hay ventajas operativas (redundancia)?"
+    ]
+}

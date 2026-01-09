@@ -1,0 +1,14 @@
+{
+    "tema": "Succion",
+    "descripcion": "Análisis técnico de la línea de succión: geometría, pérdidas, velocidades y riesgo de cavitación",
+    "preguntas": [
+        "Dame el rango de diámetros comerciales que puedo usar para que la velocidad de succión esté en el rango óptimo (0.6-0.9 m/s) considerando el caudal actual",
+        "Calcula las longitudes equivalentes totales de todos los accesorios en succión y compáralas con la longitud real. Indica el porcentaje que representan las pérdidas secundarias",
+        "Proporciona una tabla con los accesorios de succión y sus respectivas longitudes equivalentes. Incluye el total calculado al final",
+        "Analiza el riesgo de cavitación en este diseño considerando: altura de succión, pérdidas totales, presión de vapor y NPSH disponible. ¿Existen puntos críticos?",
+        "Evalúa cómo cambiaría el NPSH disponible si se cambia el material de tubería de PVC a Acero. ¿Se justifica económicamente el cambio?",
+        "Identifica posibles problemas operativos en la succión: bolsas de aire, puntos bajos con sedimentación, válvulas faltantes. Propón mejoras concretas",
+        "Si la altura de succión es positiva, ¿es necesario un pie de succión con válvula de retención? Justifica técnicamente tu respuesta",
+        "Crea una tabla comparativa de 3 diámetros comerciales cercanos mostrando: velocidad, pérdidas de carga, NPSH disponible y costo relativo. Recomienda el óptimo"
+    ]
+}

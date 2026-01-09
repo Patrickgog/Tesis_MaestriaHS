@@ -1,0 +1,14 @@
+{
+    "tema": "NPSH_Disponible",
+    "descripcion": "Análisis crítico del NPSH disponible vs requerido y prevención de cavitación",
+    "preguntas": [
+        "Calcula el NPSH disponible paso a paso mostrando cada término: presión atmosférica (corregida por elevación), presión de vapor (a temp. del líquido), altura de succión y pérdidas. Verifica si el cálculo es correcto",
+        "Compara el NPSH disponible con el NPSH requerido de la bomba. Indica el margen de seguridad actual. ¿Es suficiente (mínimo 0.5m, ideal >1m)?",
+        "Analiza cómo variaría el NPSH disponible en 3 escenarios: (a) temperatura aumenta +10°C, (b) sitio a mayor elevación (+500m), (c) pérdidas en succión se duplican. ¿Cuál es más crítico?",
+        "Si el NPSH disponible es insuficiente, propón 3 soluciones técnicas viables con estimación de costo: (1) reconfiguración de succión, (2) cambio de bomba, (3) sistema presurizado",
+        "Lista los síntomas de cavitación que podrían aparecer: ruido, vibración, erosión, caída de rendimiento. ¿Cómo monitorearlos preventivamente?",
+        "Verifica si la presión de vapor utilizada en el cálculo es correcta para la temperatura del líquido. Consulta tablas y corrige si es necesario",
+        "Si el sistema opera con VFD (variación de caudal), ¿cómo afecta al NPSH en condiciones transitorias? ¿Se requiere mayor margen de seguridad?",
+        "Genera un gráfico conceptual (descripción) de NPSH disponible vs NPSH requerido en función del caudal (0-150% nominal). Identifica la zona segura de operación"
+    ]
+}

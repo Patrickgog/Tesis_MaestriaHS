@@ -1,0 +1,14 @@
+{
+    "tema": "Curvas_100_RPM",
+    "descripcion": "Análisis de las curvas características a 100% RPM: H-Q, eficiencia, potencia y NPSH",
+    "preguntas": [
+        "Analiza el punto de operación identificado. ¿Cae dentro de la zona de eficiencia óptima (80-110% del BEP)? Si no, propón corrección",
+        "Evalúa la eficiencia de la bomba en el punto de operación. ¿Es >70% (mín aceptable), >75% (buena), >80% (excelente)? Compara con estándares",
+        "Verifica si el punto de operación está alejado del BEP. Si ΔQ > 20% respecto a Q_BEP, analiza riesgos: desgaste, vibración, ruido, baja eficiencia",
+        "Analiza la curva de potencia. ¿La potencia en punto de operación está por debajo de la potencia máxima (non-overloading)? ¿El motor maneja toda la curva?",
+        "Revisa NPSH requerido en punto de operación. ¿Se cumple NPSH_disp > NPSH_req + 0.5m? ¿Hay margen para variaciones operativas?",
+        "Compara con una bomba de mayor/menor cabeza ajustando número de etapas. ¿Habría una bomba más eficiente para este punto específico?",
+        "Analiza estabilidad de curva H-Q. ¿Es monótonamente decreciente o tiene zona de pendiente positiva (inestabilidad)? ¿Puede causar problemas?",
+        "Analiza TODO el rango de operación: si caudal varía ±20% (válvula regula), ¿cómo varían H, η, P y NPSH_req? ¿Hay zonas peligrosas?"
+    ]
+}

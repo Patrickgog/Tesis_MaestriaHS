@@ -1,0 +1,58 @@
+{
+  "hierro_fundido": {
+    "clase_150": {
+      "clase": "Clase 150",
+      "pfa_bar": 15,
+      "pma_bar": 22.5,
+      "descripcion": "Clase 150 (PFA = 15 bar) - Sistemas de presión estándar",
+      "tuberias": [
+        {"dn_mm": 50, "de_mm": 66, "espesor_mm": 5.5, "di_mm": 55, "peso_kg_m": 6.8},
+        {"dn_mm": 80, "de_mm": 95, "espesor_mm": 6.5, "di_mm": 82, "peso_kg_m": 11.8},
+        {"dn_mm": 100, "de_mm": 118, "espesor_mm": 7.2, "di_mm": 103.6, "peso_kg_m": 16.5},
+        {"dn_mm": 150, "de_mm": 170, "espesor_mm": 8.8, "di_mm": 152.4, "peso_kg_m": 29.5},
+        {"dn_mm": 200, "de_mm": 222, "espesor_mm": 10.4, "di_mm": 201.2, "peso_kg_m": 45.5},
+        {"dn_mm": 250, "de_mm": 274, "espesor_mm": 11.9, "di_mm": 250.2, "peso_kg_m": 63.2},
+        {"dn_mm": 300, "de_mm": 326, "espesor_mm": 13.4, "di_mm": 299.2, "peso_kg_m": 85.1},
+        {"dn_mm": 400, "de_mm": 428, "espesor_mm": 16.1, "di_mm": 395.8, "peso_kg_m": 136.5},
+        {"dn_mm": 500, "de_mm": 532, "espesor_mm": 18.6, "di_mm": 494.8, "peso_kg_m": 197.8},
+        {"dn_mm": 600, "de_mm": 635, "espesor_mm": 21.1, "di_mm": 592.8, "peso_kg_m": 268.4}
+      ]
+    },
+    "clase_125": {
+      "clase": "Clase 125",
+      "pfa_bar": 12.5,
+      "pma_bar": 18.8,
+      "descripcion": "Clase 125 (PFA = 12.5 bar) - Sistemas de presión media",
+      "tuberias": [
+        {"dn_mm": 50, "de_mm": 66, "espesor_mm": 4.9, "di_mm": 56.2, "peso_kg_m": 6.1},
+        {"dn_mm": 80, "de_mm": 95, "espesor_mm": 5.8, "di_mm": 83.4, "peso_kg_m": 10.5},
+        {"dn_mm": 100, "de_mm": 118, "espesor_mm": 6.4, "di_mm": 105.2, "peso_kg_m": 14.7},
+        {"dn_mm": 150, "de_mm": 170, "espesor_mm": 7.9, "di_mm": 154.2, "peso_kg_m": 26.5},
+        {"dn_mm": 200, "de_mm": 222, "espesor_mm": 9.3, "di_mm": 203.4, "peso_kg_m": 40.8},
+        {"dn_mm": 250, "de_mm": 274, "espesor_mm": 10.7, "di_mm": 252.6, "peso_kg_m": 56.9},
+        {"dn_mm": 300, "de_mm": 326, "espesor_mm": 12.1, "di_mm": 301.8, "peso_kg_m": 76.8},
+        {"dn_mm": 400, "de_mm": 428, "espesor_mm": 14.6, "di_mm": 398.8, "peso_kg_m": 123.9},
+        {"dn_mm": 500, "de_mm": 532, "espesor_mm": 16.9, "di_mm": 498.2, "peso_kg_m": 179.8},
+        {"dn_mm": 600, "de_mm": 635, "espesor_mm": 19.2, "di_mm": 596.6, "peso_kg_m": 244.2}
+      ]
+    },
+    "clase_100": {
+      "clase": "Clase 100",
+      "pfa_bar": 10,
+      "pma_bar": 15,
+      "descripcion": "Clase 100 (PFA = 10 bar) - Sistemas de baja presión",
+      "tuberias": [
+        {"dn_mm": 50, "de_mm": 66, "espesor_mm": 4.3, "di_mm": 57.4, "peso_kg_m": 5.4},
+        {"dn_mm": 80, "de_mm": 95, "espesor_mm": 5.1, "di_mm": 84.8, "peso_kg_m": 9.3},
+        {"dn_mm": 100, "de_mm": 118, "espesor_mm": 5.7, "di_mm": 106.6, "peso_kg_m": 13.1},
+        {"dn_mm": 150, "de_mm": 170, "espesor_mm": 7.0, "di_mm": 156.0, "peso_kg_m": 23.6},
+        {"dn_mm": 200, "de_mm": 222, "espesor_mm": 8.3, "di_mm": 205.4, "peso_kg_m": 36.5},
+        {"dn_mm": 250, "de_mm": 274, "espesor_mm": 9.6, "di_mm": 254.8, "peso_kg_m": 51.1},
+        {"dn_mm": 300, "de_mm": 326, "espesor_mm": 10.9, "di_mm": 304.2, "peso_kg_m": 69.2},
+        {"dn_mm": 400, "de_mm": 428, "espesor_mm": 13.2, "di_mm": 401.6, "peso_kg_m": 112.1},
+        {"dn_mm": 500, "de_mm": 532, "espesor_mm": 15.3, "di_mm": 501.4, "peso_kg_m": 162.9},
+        {"dn_mm": 600, "de_mm": 635, "espesor_mm": 17.4, "di_mm": 600.2, "peso_kg_m": 221.4}
+      ]
+    }
+  }
+}

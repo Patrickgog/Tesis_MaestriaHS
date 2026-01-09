@@ -1,0 +1,53 @@
+{
+  "valvulas": [
+    {"singularidad": "Válvula de Compuerta", "tipo": "Completamente Abierta", "k": 0.17, "lc_d": 9, "lc_d_medio": 9, "descripcion": "Válvula de Compuerta Completamente Abierta Lc/D=9"},
+    {"singularidad": "Válvula de Compuerta", "tipo": "3/4 Abierta", "k": 0.9, "lc_d": 45, "lc_d_medio": 45, "descripcion": "Válvula de Compuerta 3/4 Abierta Lc/D=45"},
+    {"singularidad": "Válvula de Compuerta", "tipo": "1/2 Abierta", "k": 4.5, "lc_d": 235, "lc_d_medio": 235, "descripcion": "Válvula de Compuerta 1/2 Abierta Lc/D=235"},
+    {"singularidad": "Válvula de Compuerta", "tipo": "1/4 Abierta", "k": 24, "lc_d": 1288, "lc_d_medio": 1288, "descripcion": "Válvula de Compuerta 1/4 Abierta Lc/D=1288"},
+    {"singularidad": "Válvula de Globo", "tipo": "Completamente Abierta", "k": 6, "lc_d": 300, "lc_d_medio": 300, "descripcion": "Válvula de Globo Completamente Abierta Lc/D=300"},
+    {"singularidad": "Válvula de Globo", "tipo": "1/2 Abierta", "k": 9.5, "lc_d": 475, "lc_d_medio": 475, "descripcion": "Válvula de Globo 1/2 Abierta Lc/D=475"},
+    {"singularidad": "Globo Válvula, asiento completo", "tipo": "Completamente Abierta", "k": 6, "lc_d": 300, "lc_d_medio": 300, "descripcion": "Globo Válvula, asiento completo Completamente Abierta Lc/D=300"},
+    {"singularidad": "Globo Válvula, asiento completo", "tipo": "1/2 Abierta", "k": 8.5, "lc_d": 425, "lc_d_medio": 425, "descripcion": "Globo Válvula, asiento completo 1/2 Abierta Lc/D=425"},
+    {"singularidad": "Válvula Mariposa", "tipo": "Completamente Abierta", "k": 0.2, "lc_d": 12, "lc_d_medio": 12, "descripcion": "Válvula Mariposa Completamente Abierta Lc/D=12"},
+    {"singularidad": "Válvula Mariposa", "tipo": "0≤5′0≤5′", "k": 0.24, "lc_d": 12, "lc_d_medio": 12, "descripcion": "Válvula Mariposa 0≤5′0≤5′ Lc/D=12"},
+    {"singularidad": "Válvula Mariposa", "tipo": "0≤10′0≤10′", "k": 0.52, "lc_d": 26, "lc_d_medio": 26, "descripcion": "Válvula Mariposa 0≤10′0≤10′ Lc/D=26"},
+    {"singularidad": "Válvula Mariposa", "tipo": "0≤20′0≤20′", "k": 1.54, "lc_d": 77, "lc_d_medio": 77, "descripcion": "Válvula Mariposa 0≤20′0≤20′ Lc/D=77"},
+    {"singularidad": "Válvula Mariposa", "tipo": "0≤40′0≤40′", "k": 10.8, "lc_d": 540, "lc_d_medio": 540, "descripcion": "Válvula Mariposa 0≤40′0≤40′ Lc/D=540"},
+    {"singularidad": "Válvula Mariposa", "tipo": "0≤60′0≤60′", "k": 118, "lc_d": 5900, "lc_d_medio": 5900, "descripcion": "Válvula Mariposa 0≤60′0≤60′ Lc/D=5900"},
+    {"singularidad": "Válvula de Ángulo", "tipo": "Completamente Abierta", "k": 2, "lc_d": 100, "lc_d_medio": 100, "descripcion": "Válvula de Ángulo Completamente Abierta Lc/D=100"},
+    {"singularidad": "Válvula Check", "tipo": "Resorte", "k": 2, "lc_d": 100, "lc_d_medio": 100, "descripcion": "Válvula Check Resorte Lc/D=100"},
+    {"singularidad": "Válvula Check", "tipo": "Disco", "k": 10, "lc_d": 500, "lc_d_medio": 500, "descripcion": "Válvula Check Disco Lc/D=500"},
+    {"singularidad": "Válvula Check", "tipo": "Dala", "k": 70, "lc_d": 2500, "lc_d_medio": 2500, "descripcion": "Válvula Check Dala Lc/D=2500"},
+    {"singularidad": "Válvula de pie", "tipo": "Disco", "k": 15, "lc_d": 750, "lc_d_medio": 750, "descripcion": "Válvula de pie Disco Lc/D=750"},
+    {"singularidad": "Válvula de Aire (Ventosa)", "tipo": "Orificio grande, Flujo pasante", "k": 0.125, "lc_d": 6.25, "lc_d_medio": 5, "descripcion": "Para entrada/salida de aire"},
+    {"singularidad": "Válvula de Purga (Vaciado)", "tipo": "Válvula de Bola (paso completo)", "k": 0.05, "lc_d": 2.5, "lc_d_medio": 2.5, "descripcion": "Válbula de purga típica"}
+  ],
+  "accesorios": [
+    {"singularidad": "Codo Estándar (r/D = 1)-90", "tipo": "90°", "k": 0.9, "lc_d": 45, "lc_d_medio": 45, "descripcion": "Codo Estándar (r/D = 1)-90 90° Lc/D=45"},
+    {"singularidad": "Codo Estándar (r/D = 1)-45", "tipo": "45°", "k": 0.42, "lc_d": 21, "lc_d_medio": 21, "descripcion": "Codo Estándar (r/D = 1)-45 45° Lc/D=21"},
+    {"singularidad": "Codo Estándar (r/D = 1)-22.5", "tipo": "22.5°", "k": 0.2, "lc_d": 10, "lc_d_medio": 10, "descripcion": "Codo Estándar (r/D = 1)-22.5 22.5° Lc/D=10"},
+    {"singularidad": "Codo de Radio Largo (r/D = 2)", "tipo": "90°", "k": 0.45, "lc_d": 22, "lc_d_medio": 22, "descripcion": "Codo de Radio Largo (r/D = 2) 90° Lc/D=22"},
+    {"singularidad": "Codo de Radio Largo (r/D = 2)", "tipo": "45°", "k": 0.24, "lc_d": 12, "lc_d_medio": 12, "descripcion": "Codo de Radio Largo (r/D = 2) 45° Lc/D=12"},
+    {"singularidad": "Codo Roscado (radio corto)-90", "tipo": "90°", "k": 1.5, "lc_d": 75, "lc_d_medio": 75, "descripcion": "Codo Roscado (radio corto)-90 90° Lc/D=75"},
+    {"singularidad": "Codo Roscado (radio corto)-45", "tipo": "45°", "k": 0.7, "lc_d": 35, "lc_d_medio": 35, "descripcion": "Codo Roscado (radio corto)-45 45° Lc/D=35"},
+    {"singularidad": "Tee (Flujo en Línea Recta)", "tipo": "Derivación Cerrada", "k": 0.7, "lc_d": 10, "lc_d_medio": 10, "descripcion": "Tee (Flujo en Línea Recta) Derivación Cerrada Lc/D=10"},
+    {"singularidad": "Tee (Cambio de Dirección)", "tipo": "Renal en 90°", "k": 0.8, "lc_d": 40, "lc_d_medio": 40, "descripcion": "Tee (Cambio de Dirección) Renal en 90° Lc/D=40"},
+    {"singularidad": "Tee (Cambio de Dirección)", "tipo": "Línea a derivación", "k": 1.4, "lc_d": 70, "lc_d_medio": 70, "descripcion": "Tee (Cambio de Dirección) Línea a derivación Lc/D=70"},
+    {"singularidad": "Reducción Conc./Exc.-30", "tipo": "Ángulo 30°", "k": 0.05, "lc_d": 2.5, "lc_d_medio": 2.5, "descripcion": "Reducción Conc./Exc.-30 Ángulo 30° Lc/D=2.5"},
+    {"singularidad": "Reducción Conc./Exc.-45", "tipo": "Ángulo 45°", "k": 0.1, "lc_d": 5, "lc_d_medio": 5, "descripcion": "Reducción Conc./Exc.-45 Ángulo 45° Lc/D=5"},
+    {"singularidad": "Reducción Conc./Exc.-60", "tipo": "Ángulo 60°", "k": 0.15, "lc_d": 7.5, "lc_d_medio": 7.5, "descripcion": "Reducción Conc./Exc.-60 Ángulo 60° Lc/D=7.5"},
+    {"singularidad": "Unión de Caucho (Junta de Expansión)", "tipo": "Axial / Lateral", "k": 0.2, "lc_d": 10, "lc_d_medio": 10, "descripcion": "Absorbe movimiento, baja pérdida si el flujo es recto."},
+    {"singularidad": "Unión Mecánica (tipo Gibault, etc.)", "tipo": "Conexión estándar", "k": 0.15, "lc_d": 7.5, "lc_d_medio": 7.5, "descripcion": "Unión por compresión con sello, baja pérdida."},
+    {"singularidad": "Filtro en Y (Colador)", "tipo": "Con malla gruesa, limpio", "k": 150, "lc_d": 150, "lc_d_medio": 150, "descripcion": "La pérdida varía mucho con la limpieza y el tipo de malla."}
+  ],
+  "medidores": [
+    {"singularidad": "Medidor de Caudal1", "tipo": "Pistón", "k": 7, "lc_d": 350, "lc_d_medio": 350, "descripcion": "Medidor de Caudal1 Pistón Lc/D=350"},
+    {"singularidad": "Medidor de Caudal2", "tipo": "Rotacional", "k": 10, "lc_d": 500, "lc_d_medio": 500, "descripcion": "Medidor de Caudal2 Rotacional Lc/D=500"},
+    {"singularidad": "Medidor de Caudal3", "tipo": "Turbina", "k": 6, "lc_d": 300, "lc_d_medio": 300, "descripcion": "Medidor de Caudal3 Turbina Lc/D=300"},
+    {"singularidad": "Manómetro", "tipo": "Conexión a línea principal", "k": 0.03, "lc_d": 1.5, "lc_d_medio": 1, "descripcion": "Pérdida mínima"},
+    {"singularidad": "Disco de taponamiento", "tipo": "Completamente Abierto", "k": 9, "lc_d": 450, "lc_d_medio": 450, "descripcion": "Disco de taponamiento Completamente Abierto Lc/D=450"},
+    {"singularidad": "Disco de taponamiento", "tipo": "3/4 Abierto", "k": 13, "lc_d": 650, "lc_d_medio": 650, "descripcion": "Disco de taponamiento 3/4 Abierto Lc/D=650"},
+    {"singularidad": "Disco de taponamiento", "tipo": "1/2 Abierto", "k": 36, "lc_d": 1800, "lc_d_medio": 1800, "descripcion": "Disco de taponamiento 1/2 Abierto Lc/D=1800"},
+    {"singularidad": "Disco de taponamiento", "tipo": "1/4 Abierto", "k": 112, "lc_d": 5600, "lc_d_medio": 5600, "descripcion": "Disco de taponamiento 1/4 Abierto Lc/D=5600"}
+  ]
+}

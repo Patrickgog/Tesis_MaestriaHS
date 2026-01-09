@@ -1,0 +1,14 @@
+{
+    "tema": "Motor_Bomba",
+    "descripcion": "Análisis de selección de motor eléctrico y acoplamiento con bomba",
+    "preguntas": [
+        "Verifica que la potencia del motor seleccionado cubre la potencia requerida más un margen de seguridad (10-20%). ¿El motor está correctamente dimensionado?",
+        "Analiza si el factor de servicio del motor es adecuado. ¿Se requiere FS estándar (1.15) o mayor (1.25) por condiciones especiales de operación?",
+        "Calcula la eficiencia del conjunto motor-bomba en el punto de operación. ¿Ambos operan en zona de máxima eficiencia (>85% motor, >70% bomba)?",
+        "Evalúa si se justifica un motor de alta eficiencia IE3/IE4 vs motor estándar IE2. Calcula el retorno de inversión considerando ahorro energético",
+        "Analiza el tipo de arranque necesario: ¿directo, estrella-triángulo, softstart? Considera corriente de arranque y golpe de presión inicial",
+        "Revisa la curva de potencia de la bomba vs capacidad del motor. ¿Existe riesgo de sobrecarga si la bomba opera a mayor caudal que el nominal?",
+        "Si se usa VFD, verifica compatibilidad del motor: aislamiento clase F mínimo, rodamientos aislados si >30HP. ¿Se requieren filtros adicionales?",
+        "Crea tabla comparativa de 3 opciones: (1) Motor estándar + arranque directo, (2) Motor IE3 + softstart, (3) Motor + VFD. Compara: costo inicial, costo operación 10 años, eficiencia. Recomienda"
+    ]
+}

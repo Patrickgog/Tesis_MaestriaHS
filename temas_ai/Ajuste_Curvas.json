@@ -1,0 +1,14 @@
+{
+    "tema": "Ajuste_Curvas",
+    "preguntas": [
+        "Analiza si el tipo de ajuste seleccionado (lineal, cuadrático, cúbico) es físicamente adecuado para una bomba centrífuga. Justifica tu respuesta",
+        "Calcula el coeficiente de determinación R² del ajuste. ¿Es >0.98? Si es menor, propón mejoras: agregar puntos o cambiar grado del polinomio",
+        "Verifica la distribución de puntos de la curva. ¿Están bien espaciados cubriendo 50-120% Q_BEP, o concentrados en una zona?",
+        "Compara ajuste cuadrático vs cúbico. ¿El cúbico mejora significativamente R² (>0.02), o el cuadrático es suficiente y más robusto?",
+        "Analiza los coeficientes del polinomio ajustado. ¿Son físicamente coherentes? (coef. cuadrático negativo, ordenada = altura shutoff)",
+        "Evalúa la extrapolación fuera del rango de puntos. ¿El polinomio se comporta bien a Q=0 y Q muy alto, o diverge peligrosamente?",
+        "Si solo hay 3 puntos de catálogo, ¿es confiable extrapolar a rangos no cubiertos (50% Q_nominal)? ¿Se debe solicitar más datos al fabricante?",
+        "Genera gráfico conceptual: puntos reales vs curva ajustada vs envolvente de incertidumbre (±5%). ¿El punto de operación cae en zona confiable?",
+        "Analiza las curvas del actual diseño, tanto al 100% y usando VDF. \nQue pasa con el Punto de operación"
+    ]
+}

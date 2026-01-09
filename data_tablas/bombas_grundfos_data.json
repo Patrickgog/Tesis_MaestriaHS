@@ -1,0 +1,630 @@
+{
+    "categorias": [
+        {
+            "categoria": "Bombas Centrífugas Verticales - Rango Muy Bajo",
+            "tipo": "Vertical",
+            "rango_caudal_min_lps": 0.5,
+            "rango_caudal_max_lps": 4.5,
+            "rango_altura_min_m": 10,
+            "rango_altura_max_m": 150,
+            "bombas": [
+                {
+                    "codigo": "CR 1-15 A-FGJ-A-E-HQQE",
+                    "modelo": "CR 1-15",
+                    "serie": "CR",
+                    "tipo_bomba": "Vertical multietapa",
+                    "potencia_hp": 1.5,
+                    "potencia_kw": 1.1,
+                    "rpm": 2900,
+                    "etapas": 15,
+                    "peso_kg": 25,
+                    "costo_estimado_usd": 2800,
+                    "material_impulsor": "Acero inoxidable AISI 304",
+                    "temperatura_max_c": 120,
+                    "presion_max_bar": 25,
+                    "rango_caudal_optimo_lps": [
+                        0.25,
+                        0.6
+                    ],
+                    "rango_altura_optima_m": [
+                        65.0,
+                        85.0
+                    ],
+                    "url_ficha_tecnica": "https://product-selection.grundfos.com/",
+                    "curvas": {
+                        "h_q": {
+                            "descripcion": "Curva Característica H-Q",
+                            "caudales_lps": [
+                                0.1,
+                                0.2,
+                                0.3,
+                                0.4,
+                                0.5,
+                                0.6
+                            ],
+                            "alturas_m": [
+                                102.0,
+                                98.0,
+                                92.0,
+                                84.0,
+                                75.0,
+                                65.0
+                            ]
+                        },
+                        "eta_q": {
+                            "descripcion": "Curva de Rendimiento η-Q",
+                            "caudales_lps": [
+                                0.1,
+                                0.2,
+                                0.3,
+                                0.4,
+                                0.5,
+                                0.6
+                            ],
+                            "eficiencias_porcentaje": [
+                                35,
+                                42,
+                                48,
+                                52,
+                                50,
+                                45
+                            ]
+                        },
+                        "pbhp_q": {
+                            "descripcion": "Curva de Potencia al Freno P-Q",
+                            "caudales_lps": [
+                                0.1,
+                                0.2,
+                                0.3,
+                                0.4,
+                                0.5,
+                                0.6
+                            ],
+                            "potencias_kw": [
+                                0.3,
+                                0.4,
+                                0.5,
+                                0.6,
+                                0.7,
+                                0.8
+                            ]
+                        },
+                        "npshr_q": {
+                            "descripcion": "Curva de NPSH Requerido",
+                            "caudales_lps": [
+                                0.1,
+                                0.2,
+                                0.3,
+                                0.4,
+                                0.5,
+                                0.6
+                            ],
+                            "npsh_requerido_m": [
+                                1.2,
+                                1.4,
+                                1.6,
+                                1.8,
+                                2.0,
+                                2.2
+                            ]
+                        }
+                    }
+                },
+                {
+                    "codigo": "CR 3-15 A-FGJ-A-E-HQQE (60Hz)",
+                    "modelo": "CR 3-15",
+                    "serie": "CR",
+                    "tipo_bomba": "Vertical multietapa",
+                    "potencia_hp": 5.0,
+                    "potencia_kw": 3.7,
+                    "rpm": 3500,
+                    "etapas": 15,
+                    "peso_kg": 48,
+                    "costo_estimado_usd": 5200,
+                    "material_impulsor": "Acero inoxidable AISI 304",
+                    "temperatura_max_c": 120,
+                    "presion_max_bar": 25,
+                    "rango_caudal_optimo_lps": [
+                        0.8,
+                        1.4
+                    ],
+                    "rango_altura_optima_m": [
+                        220,
+                        260
+                    ],
+                    "url_ficha_tecnica": "https://product-selection.grundfos.com/",
+                    "curvas": {
+                        "h_q": {
+                            "descripcion": "Curva Característica H-Q (60Hz)",
+                            "caudales_lps": [
+                                0,
+                                0.33,
+                                0.67,
+                                1.0,
+                                1.33
+                            ],
+                            "alturas_m": [
+                                315,
+                                305,
+                                285,
+                                245,
+                                175
+                            ]
+                        },
+                        "eta_q": {
+                            "descripcion": "Curva de Rendimiento η-Q",
+                            "caudales_lps": [
+                                0.33,
+                                0.67,
+                                1.0,
+                                1.33
+                            ],
+                            "eficiencias_porcentaje": [
+                                50,
+                                68,
+                                75,
+                                65
+                            ]
+                        },
+                        "pbhp_q": {
+                            "descripcion": "Curva de Potencia al Freno P-Q",
+                            "caudales_lps": [
+                                0,
+                                0.33,
+                                0.67,
+                                1.0,
+                                1.33
+                            ],
+                            "potencias_kw": [
+                                1.2,
+                                2.0,
+                                2.8,
+                                3.5,
+                                4.2
+                            ]
+                        },
+                        "npshr_q": {
+                            "descripcion": "Curva de NPSH Requerido",
+                            "caudales_lps": [
+                                0,
+                                0.33,
+                                0.67,
+                                1.0,
+                                1.33
+                            ],
+                            "npsh_requerido_m": [
+                                1.5,
+                                1.8,
+                                2.3,
+                                3.0,
+                                4.5
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "categoria": "Bombas Centrífugas Verticales - Rango Bajo",
+            "tipo": "Vertical",
+            "rango_caudal_min_lps": 1,
+            "rango_caudal_max_lps": 15,
+            "rango_altura_min_m": 20,
+            "rango_altura_max_m": 250,
+            "bombas": [
+                {
+                    "codigo": "CR 10-9 A-A-A-E-HQQE",
+                    "modelo": "CR 10-9",
+                    "serie": "CR",
+                    "tipo_bomba": "Vertical multietapa",
+                    "potencia_hp": 10.0,
+                    "potencia_kw": 7.5,
+                    "rpm": 2900,
+                    "etapas": 9,
+                    "peso_kg": 85,
+                    "costo_estimado_usd": 6500,
+                    "material_impulsor": "Acero inoxidable AISI 304",
+                    "temperatura_max_c": 120,
+                    "presion_max_bar": 16,
+                    "rango_caudal_optimo_lps": [
+                        2.2,
+                        3.8
+                    ],
+                    "rango_altura_optima_m": [
+                        80.0,
+                        110.0
+                    ],
+                    "url_ficha_tecnica": "https://product-selection.grundfos.com/",
+                    "curvas": {
+                        "h_q": {
+                            "descripcion": "Curva Característica H-Q",
+                            "caudales_lps": [
+                                0,
+                                1.0,
+                                2.0,
+                                3.0,
+                                4.0,
+                                5.0
+                            ],
+                            "alturas_m": [
+                                115.0,
+                                112.0,
+                                105.0,
+                                92.0,
+                                75.0,
+                                50.0
+                            ]
+                        },
+                        "eta_q": {
+                            "descripcion": "Curva de Rendimiento η-Q",
+                            "caudales_lps": [
+                                1.0,
+                                2.0,
+                                3.0,
+                                4.0,
+                                5.0
+                            ],
+                            "eficiencias_porcentaje": [
+                                52,
+                                68,
+                                78,
+                                81,
+                                75
+                            ]
+                        },
+                        "pbhp_q": {
+                            "descripcion": "Curva de Potencia al Freno P-Q",
+                            "caudales_lps": [
+                                0,
+                                1.0,
+                                2.0,
+                                3.0,
+                                4.0,
+                                5.0
+                            ],
+                            "potencias_kw": [
+                                1.5,
+                                2.5,
+                                4.0,
+                                5.8,
+                                7.5,
+                                9.0
+                            ]
+                        },
+                        "npshr_q": {
+                            "descripcion": "Curva de NPSH Requerido",
+                            "caudales_lps": [
+                                0,
+                                1.0,
+                                2.0,
+                                3.0,
+                                4.0,
+                                5.0
+                            ],
+                            "npsh_requerido_m": [
+                                1.8,
+                                2.0,
+                                2.5,
+                                3.5,
+                                5.0,
+                                7.5
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "categoria": "Bombas Centrífugas Verticales - Rango Medio",
+            "tipo": "Vertical",
+            "rango_caudal_min_lps": 10,
+            "rango_caudal_max_lps": 40,
+            "rango_altura_min_m": 30,
+            "rango_altura_max_m": 200,
+            "bombas": [
+                {
+                    "codigo": "CR 20-7 A-A-A-E-HQQE",
+                    "modelo": "CR 20-7",
+                    "serie": "CR",
+                    "tipo_bomba": "Vertical multietapa",
+                    "potencia_hp": 20.0,
+                    "potencia_kw": 15.0,
+                    "rpm": 2900,
+                    "etapas": 7,
+                    "peso_kg": 145,
+                    "costo_estimado_usd": 12000,
+                    "material_impulsor": "Acero inoxidable AISI 304",
+                    "temperatura_max_c": 120,
+                    "presion_max_bar": 16,
+                    "rango_caudal_optimo_lps": [
+                        4.0,
+                        8.0
+                    ],
+                    "rango_altura_optima_m": [
+                        75.0,
+                        105.0
+                    ],
+                    "url_ficha_tecnica": "https://product-selection.grundfos.com/",
+                    "curvas": {
+                        "h_q": {
+                            "descripcion": "Curva Característica H-Q",
+                            "caudales_lps": [
+                                0,
+                                3.0,
+                                6.0,
+                                9.0,
+                                12.0
+                            ],
+                            "alturas_m": [
+                                112.0,
+                                108.0,
+                                95.0,
+                                75.0,
+                                45.0
+                            ]
+                        },
+                        "eta_q": {
+                            "descripcion": "Curva de Rendimiento η-Q",
+                            "caudales_lps": [
+                                3.0,
+                                6.0,
+                                9.0,
+                                12.0
+                            ],
+                            "eficiencias_porcentaje": [
+                                62,
+                                79,
+                                83,
+                                75
+                            ]
+                        },
+                        "pbhp_q": {
+                            "descripcion": "Curva de Potencia al Freno P-Q",
+                            "caudales_lps": [
+                                0,
+                                3.0,
+                                6.0,
+                                9.0,
+                                12.0
+                            ],
+                            "potencias_kw": [
+                                4.5,
+                                7.5,
+                                11.0,
+                                15.0,
+                                18.0
+                            ]
+                        },
+                        "npshr_q": {
+                            "descripcion": "Curva de NPSH Requerido",
+                            "caudales_lps": [
+                                0,
+                                3.0,
+                                6.0,
+                                9.0,
+                                12.0
+                            ],
+                            "npsh_requerido_m": [
+                                2.2,
+                                2.5,
+                                3.2,
+                                4.5,
+                                7.0
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "categoria": "Bombas Centrífugas Verticales - Gran Caudal (Industrial)",
+            "tipo": "Vertical",
+            "rango_caudal_min_lps": 20,
+            "rango_caudal_max_lps": 80,
+            "rango_altura_min_m": 40,
+            "rango_altura_max_m": 250,
+            "bombas": [
+                {
+                    "codigo": "CR 125-5 A-F-A-E-HQQE (60Hz)",
+                    "modelo": "CR 125-5",
+                    "serie": "CR",
+                    "tipo_bomba": "Vertical multietapa",
+                    "potencia_hp": 100.0,
+                    "potencia_kw": 75.0,
+                    "rpm": 3500,
+                    "etapas": 5,
+                    "peso_kg": 480,
+                    "costo_estimado_usd": 38000,
+                    "material_impulsor": "Acero inoxidable AISI 304",
+                    "temperatura_max_c": 120,
+                    "presion_max_bar": 25,
+                    "rango_caudal_optimo_lps": [
+                        28.0,
+                        45.0
+                    ],
+                    "rango_altura_optima_m": [
+                        150,
+                        185
+                    ],
+                    "url_ficha_tecnica": "https://product-selection.grundfos.com/",
+                    "curvas": {
+                        "h_q": {
+                            "descripcion": "Curva Característica H-Q (60Hz)",
+                            "caudales_lps": [
+                                0,
+                                13.9,
+                                27.8,
+                                34.7,
+                                41.7,
+                                50.0
+                            ],
+                            "alturas_m": [
+                                195,
+                                192,
+                                180,
+                                165,
+                                150,
+                                92
+                            ]
+                        },
+                        "eta_q": {
+                            "descripcion": "Curva de Rendimiento η-Q",
+                            "caudales_lps": [
+                                13.9,
+                                27.8,
+                                34.7,
+                                41.7,
+                                50.0
+                            ],
+                            "eficiencias_porcentaje": [
+                                60,
+                                78,
+                                82,
+                                80,
+                                70
+                            ]
+                        },
+                        "pbhp_q": {
+                            "descripcion": "Curva de Potencia al Freno P-Q",
+                            "caudales_lps": [
+                                0,
+                                13.9,
+                                27.8,
+                                34.7,
+                                41.7,
+                                50.0
+                            ],
+                            "potencias_kw": [
+                                25,
+                                45,
+                                62,
+                                75,
+                                85,
+                                95
+                            ]
+                        },
+                        "npshr_q": {
+                            "descripcion": "Curva de NPSH Requerido",
+                            "caudales_lps": [
+                                0,
+                                13.9,
+                                27.8,
+                                34.7,
+                                41.7,
+                                50.0
+                            ],
+                            "npsh_requerido_m": [
+                                3.5,
+                                4.2,
+                                5.8,
+                                7.5,
+                                9.8,
+                                13.5
+                            ]
+                        }
+                    }
+                },
+                {
+                    "codigo": "CR 155-4-1 A-F-A-E-HQQE (60Hz)",
+                    "modelo": "CR 155-4-1",
+                    "serie": "CR",
+                    "tipo_bomba": "Vertical multietapa",
+                    "potencia_hp": 125.0,
+                    "potencia_kw": 93.0,
+                    "rpm": 3500,
+                    "etapas": 4,
+                    "peso_kg": 550,
+                    "costo_estimado_usd": 45000,
+                    "material_impulsor": "Acero inoxidable AISI 304",
+                    "temperatura_max_c": 120,
+                    "presion_max_bar": 25,
+                    "rango_caudal_optimo_lps": [
+                        35.0,
+                        55.0
+                    ],
+                    "rango_altura_optima_m": [
+                        140,
+                        170
+                    ],
+                    "url_ficha_tecnica": "https://product-selection.grundfos.com/",
+                    "curvas": {
+                        "h_q": {
+                            "descripcion": "Curva Característica H-Q (60Hz)",
+                            "caudales_lps": [
+                                0,
+                                22.2,
+                                33.3,
+                                43.1,
+                                52.8,
+                                61.1
+                            ],
+                            "alturas_m": [
+                                176,
+                                172,
+                                164,
+                                148,
+                                125,
+                                80
+                            ]
+                        },
+                        "eta_q": {
+                            "descripcion": "Curva de Rendimiento η-Q",
+                            "caudales_lps": [
+                                22.2,
+                                33.3,
+                                43.1,
+                                52.8,
+                                61.1
+                            ],
+                            "eficiencias_porcentaje": [
+                                65,
+                                80,
+                                84,
+                                82,
+                                75
+                            ]
+                        },
+                        "pbhp_q": {
+                            "descripcion": "Curva de Potencia al Freno P-Q",
+                            "caudales_lps": [
+                                0,
+                                22.2,
+                                33.3,
+                                43.1,
+                                52.8,
+                                61.1
+                            ],
+                            "potencias_kw": [
+                                30,
+                                55,
+                                78,
+                                93,
+                                110,
+                                125
+                            ]
+                        },
+                        "npshr_q": {
+                            "descripcion": "Curva de NPSH Requerido",
+                            "caudales_lps": [
+                                0,
+                                22.2,
+                                33.3,
+                                43.1,
+                                52.8,
+                                61.1
+                            ],
+                            "npsh_requerido_m": [
+                                4.0,
+                                5.5,
+                                7.8,
+                                10.5,
+                                14.5,
+                                19.5
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
