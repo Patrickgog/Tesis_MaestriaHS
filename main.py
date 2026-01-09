@@ -20,6 +20,9 @@ def main():
     st.title("Tesis de Maestría Hidrosanitaria")
     st.header("Diseño de Sistemas de Bombeo")
     
+    # Renderizar configuración general
+    render_sidebar()
+    
     # Renderizar panel de IA en sidebar (Centralizado en ai_module.py)
     render_ai_sidebar()
     
