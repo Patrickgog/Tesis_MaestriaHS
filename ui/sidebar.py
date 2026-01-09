@@ -6,6 +6,29 @@ from typing import Dict, Any, List
 def render_sidebar():
     """Renderiza la barra lateral con configuración general (solo en tab1)"""
     
+    # Indicador visual de modo desarrollador
+    from config.settings import AppSettings
+    if AppSettings.SHOW_DEVELOPER_SECTION:
+        st.sidebar.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    text-align: center; 
+                    margin-bottom: 15px;">
+            <h3 style="color: white; margin: 0;">🔧 MODO DESARROLLADOR</h3>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("""
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    text-align: center; 
+                    margin-bottom: 15px;">
+            <h3 style="color: white; margin: 0;">🌐 VERSIÓN PÚBLICA</h3>
+        </div>
+        """, unsafe_allow_html=True)
+    
     st.sidebar.title("Configuración General")
     
     # Configuración de tipo de ajuste de curva
