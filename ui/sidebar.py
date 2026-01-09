@@ -103,7 +103,150 @@ def render_sidebar():
         # Limpiar el valor cargado después de usarlo
         if '_loaded_flow_unit' in st.session_state:
             del st.session_state['_loaded_flow_unit']
+
+def render_common_sidebar_options():
+    """Renderiza opciones de sidebar comunes para todos los usuarios (no requieren modo desarrollador)"""
     
+    # 1. Resumen Proyecto
+    with st.sidebar.expander("📋 Resumen Proyecto", expanded=False):
+        if 'json_viewer_enabled' not in st.session_state:
+            st.session_state.json_viewer_enabled = False
+        
+        json_enabled = st.checkbox(
+            "Activar Resumen", 
+            value=st.session_state.json_viewer_enabled,
+            key="json_checkbox",
+            help="Activa la pestaña de resumen del proyecto en la interfaz principal"
+        )
+        
+        st.session_state.json_viewer_enabled = json_enabled
+        
+        if json_enabled:
+            st.success("✅ Resumen activado")
+        else:
+            st.info("ℹ️ Resumen desactivado")
+    
+    # 2. Reportes
+    with st.sidebar.expander("📄 Reportes", expanded=False):
+        if 'informes_enabled' not in st.session_state:
+            st.session_state.informes_enabled = False
+        
+        informes_enabled = st.checkbox(
+            "Activar Reportes", 
+            value=st.session_state.informes_enabled,
+            key="informes_checkbox",
+            help="Activa la pestaña de Reportes en la interfaz principal"
+        )
+        
+        st.session_state.informes_enabled = informes_enabled
+        
+        if informes_enabled:
+            st.success("✅ Reportes activado")
+        else:
+            st.info("ℹ️ Reportes desactivado")
+    
+    # 3. Método de Cálculo de Pérdidas
+    with st.sidebar.expander("🧮 Método de Cálculo de Pérdidas", expanded=False):
+        # Inicializar si no existe
+        if 'metodo_calculo' not in st.session_state:
+            st.session_state.metodo_calculo = 'Hazen-Williams'
+        
+        metodo = st.radio(
+            "Seleccione el método:",
+            options=['Hazen-Williams', 'Darcy-Weisbach'],
+            index=0 if st.session_state.metodo_calculo == 'Hazen-Williams' else 1,
+            key='metodo_calculo_selector',
+            help="""
+            **Hazen-Williams**: Empírico, solo agua a 5-25°C, rápido
+            **Darcy-Weisbach**: Teórico universal, más preciso, considera Reynolds y rugosidad
+            """
+        )
+        
+        st.session_state.metodo_calculo = metodo
+        
+        # Indicador visual del método seleccionado
+        if metodo == 'Hazen-Williams':
+            st.info("📘 **Método Empírico**: Usa coef. C según material")
+        else:
+            st.success("📐 **Método Teórico**: Calcula factor f (Re + rugosidad)")
+            st.caption("⚙️ Requiere temperatura del fluido (ver Parámetros Físicos)")
+    
+    # 4. Tablas de Configuración
+    with st.sidebar.expander("📊 Tablas de Configuración", expanded=False):
+        if 'tables_enabled' not in st.session_state:
+            st.session_state.tables_enabled = False
+        
+        tables_enabled = st.checkbox(
+            "Activar Tablas", 
+            value=st.session_state.tables_enabled,
+            key="tables_checkbox",
+            help="Activa la pestaña de tablas de configuración del sistema"
+        )
+        
+        st.session_state.tables_enabled = tables_enabled
+        
+        if tables_enabled:
+            st.success("✅ Tablas activadas")
+        else:
+            st.info("ℹ️ Tablas desactivadas")
+    
+    # 5. Teoría y Fundamentos
+    with st.sidebar.expander("📚 Teoría y Fundamentos", expanded=False):
+        if 'theory_enabled' not in st.session_state:
+            st.session_state.theory_enabled = False
+        
+        theory_enabled = st.checkbox(
+            "Activar Teoría y Fundamentos", 
+            value=st.session_state.theory_enabled,
+            key="theory_checkbox",
+            help="Activa la pestaña de teoría y fundamentos hidráulicos"
+        )
+        
+        st.session_state.theory_enabled = theory_enabled
+        
+        if theory_enabled:
+            st.success("✅ Teoría activada")
+        else:
+            st.info("ℹ️ Teoría desactivada")
+    
+    # 6. Optimización IA (Genetic Algorithms)
+    with st.sidebar.expander("🎯 Optimización IA (GA)", expanded=False):
+        if 'optimization_enabled' not in st.session_state:
+            st.session_state.optimization_enabled = False
+        
+        opt_enabled = st.checkbox(
+            "Activar Optimización IA", 
+            value=st.session_state.optimization_enabled,
+            key="optimization_checkbox",
+            help="Activa la pestaña de optimización de diámetros mediante Algoritmos Genéticos"
+        )
+        
+        st.session_state.optimization_enabled = opt_enabled
+        
+        if opt_enabled:
+            st.success("✅ Optimización activada")
+        else:
+            st.info("ℹ️ Optimización desactivada")
+            
+    # 7. Selección de Diámetros (Análisis Técnico)
+    with st.sidebar.expander("📏 Selección de Diámetros", expanded=False):
+        if 'selection_enabled' not in st.session_state:
+            st.session_state.selection_enabled = True
+        
+        sel_enabled = st.checkbox(
+            "Activar Selección Técnica", 
+            value=st.session_state.selection_enabled,
+            key="selection_checkbox",
+            help="Activa la pestaña de análisis detallado de diámetros (NPSH, Pérdidas, Cavitación)"
+        )
+        
+        st.session_state.selection_enabled = sel_enabled
+        
+        if sel_enabled:
+            st.success("✅ Selección activada")
+        else:
+            st.info("ℹ️ Selección desactivada")
+
 # Funciones auxiliares para el sidebar
 def save_state():
     """Función placeholder para save_state"""
@@ -209,151 +352,9 @@ def restore_project_data():
             st.session_state[key] = value
 
 def render_developer_sidebar():
-    """Renderiza el expander de Desarrollador en el sidebar (disponible en todas las pestañas)"""
+    """Renderiza SOLO la sección de Desarrollador con password (disponible solo cuando SHOW_DEVELOPER_SECTION=True)"""
     
-    # 1. Resumen Proyecto
-    with st.sidebar.expander("📋 Resumen Proyecto", expanded=False):
-        if 'json_viewer_enabled' not in st.session_state:
-            st.session_state.json_viewer_enabled = False
-        
-        json_enabled = st.checkbox(
-            "Activar Resumen", 
-            value=st.session_state.json_viewer_enabled,
-            key="json_checkbox",
-            help="Activa la pestaña de resumen del proyecto en la interfaz principal"
-        )
-        
-        st.session_state.json_viewer_enabled = json_enabled
-        
-        if json_enabled:
-            st.success("✅ Resumen activado")
-        else:
-            st.info("ℹ️ Resumen desactivado")
-    
-    # 2. Reportes
-    with st.sidebar.expander("📄 Reportes", expanded=False):
-        if 'informes_enabled' not in st.session_state:
-            st.session_state.informes_enabled = False
-        
-        informes_enabled = st.checkbox(
-            "Activar Reportes", 
-            value=st.session_state.informes_enabled,
-            key="informes_checkbox",
-            help="Activa la pestaña de Reportes en la interfaz principal"
-        )
-        
-        st.session_state.informes_enabled = informes_enabled
-        
-        if informes_enabled:
-            st.success("✅ Reportes activado")
-        else:
-            st.info("ℹ️ Reportes desactivado")
-    
-    # 3. Método de Cálculo de Pérdidas
-    with st.sidebar.expander("🧮 Método de Cálculo de Pérdidas", expanded=False):
-        # Inicializar si no existe
-        if 'metodo_calculo' not in st.session_state:
-            st.session_state.metodo_calculo = 'Hazen-Williams'
-        
-        metodo = st.radio(
-            "Seleccione el método:",
-            options=['Hazen-Williams', 'Darcy-Weisbach'],
-            index=0 if st.session_state.metodo_calculo == 'Hazen-Williams' else 1,
-            key='metodo_calculo_selector',
-            help="""
-            **Hazen-Williams**: Empírico, solo agua a 5-25°C, rápido
-            **Darcy-Weisbach**: Teórico universal, más preciso, considera Reynolds y rugosidad
-            """
-        )
-        
-        st.session_state.metodo_calculo = metodo
-        
-        # Indicador visual del método seleccionado
-        if metodo == 'Hazen-Williams':
-            st.info("📘 **Método Empírico**: Usa coef. C según material")
-        else:
-            st.success("📐 **Método Teórico**: Calcula factor f (Re + rugosidad)")
-            st.caption("⚙️ Requiere temperatura del fluido (ver Parámetros Físicos)")
-    
-    # 4. Tablas de Configuración
-    with st.sidebar.expander("📊 Tablas de Configuración", expanded=False):
-        if 'tables_enabled' not in st.session_state:
-            st.session_state.tables_enabled = False
-        
-        tables_enabled = st.checkbox(
-            "Activar Tablas", 
-            value=st.session_state.tables_enabled,
-            key="tables_checkbox",
-            help="Activa la pestaña de tablas de configuración del sistema"
-        )
-        
-        st.session_state.tables_enabled = tables_enabled
-        
-        if tables_enabled:
-            st.success("✅ Tablas activadas")
-        else:
-            st.info("ℹ️ Tablas desactivadas")
-    
-    # 4. Teoría y Fundamentos
-    with st.sidebar.expander("📚 Teoría y Fundamentos", expanded=False):
-        if 'theory_enabled' not in st.session_state:
-            st.session_state.theory_enabled = False
-        
-        theory_enabled = st.checkbox(
-            "Activar Teoría y Fundamentos", 
-            value=st.session_state.theory_enabled,
-            key="theory_checkbox",
-            help="Activa la pestaña de teoría y fundamentos hidráulicos"
-        )
-        
-        st.session_state.theory_enabled = theory_enabled
-        
-        if theory_enabled:
-            st.success("✅ Teoría activada")
-        else:
-            st.info("ℹ️ Teoría desactivada")
-    
-    # 5. Análisis IA - SECCIÓN ELIMINADA (Ahora se llama directamente desde main.py usando ai_module.render_ai_sidebar)
-    
-    # 5.1 Optimización IA (Genetic Algorithms)
-    with st.sidebar.expander("🎯 Optimización IA (GA)", expanded=False):
-        if 'optimization_enabled' not in st.session_state:
-            st.session_state.optimization_enabled = False
-        
-        opt_enabled = st.checkbox(
-            "Activar Optimización IA", 
-            value=st.session_state.optimization_enabled,
-            key="optimization_checkbox",
-            help="Activa la pestaña de optimización de diámetros mediante Algoritmos Genéticos"
-        )
-        
-        st.session_state.optimization_enabled = opt_enabled
-        
-        if opt_enabled:
-            st.success("✅ Optimización activada")
-        else:
-            st.info("ℹ️ Optimización desactivada")
-            
-    # 5.2 Selección de Diámetros (Análisis Técnico)
-    with st.sidebar.expander("📏 Selección de Diámetros", expanded=False):
-        if 'selection_enabled' not in st.session_state:
-            st.session_state.selection_enabled = True
-        
-        sel_enabled = st.checkbox(
-            "Activar Selección Técnica", 
-            value=st.session_state.selection_enabled,
-            key="selection_checkbox",
-            help="Activa la pestaña de análisis detallado de diámetros (NPSH, Pérdidas, Cavitación)"
-        )
-        
-        st.session_state.selection_enabled = sel_enabled
-        
-        if sel_enabled:
-            st.success("✅ Selección activada")
-        else:
-            st.info("ℹ️ Selección desactivada")
-    
-    # 6. Desarrollador
+    # Sección de Desarrollador con password
     with st.sidebar.expander("👨‍💻 Desarrollador", expanded=False):
         if 'developer_mode' not in st.session_state:
             st.session_state.developer_mode = False
@@ -421,7 +422,7 @@ def render_developer_sidebar():
     
     # PESTAÑAS DE DESARROLLADOR (solo visibles cuando desarrollador está activo)
     if st.session_state.get('developer_mode', False):
-        # 7. Análisis Transientes
+        # Análisis Transientes
         with st.sidebar.expander("🔄 Análisis Transientes", expanded=False):
             if 'transient_analysis_enabled' not in st.session_state:
                 st.session_state.transient_analysis_enabled = False
@@ -441,7 +442,7 @@ def render_developer_sidebar():
             else:
                 st.info("ℹ️ Análisis transientes desactivado")
         
-        # 8. Simulación Operativa
+        # Simulación Operativa
         with st.sidebar.expander("📈 Simulación Operativa", expanded=False):
             if 'simulation_enabled' not in st.session_state:
                 st.session_state.simulation_enabled = False
@@ -460,4 +461,3 @@ def render_developer_sidebar():
                 st.info("💡 La pestaña Simulación Operativa estará visible en la interfaz principal")
             else:
                 st.info("ℹ️ Simulación desactivada")
-    

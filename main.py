@@ -3,7 +3,7 @@
 import streamlit as st
 from config.settings import AppSettings
 from ui.tabs import render_main_tabs
-from ui.sidebar import render_sidebar, render_developer_sidebar
+from ui.sidebar import render_sidebar, render_common_sidebar_options, render_developer_sidebar
 from ui.ai_module import render_ai_sidebar
 from utils.helpers import initialize_state
 
@@ -20,11 +20,14 @@ def main():
     st.title("Tesis de Maestría Hidrosanitaria")
     st.header("Diseño de Sistemas de Bombeo")
     
-    # Renderizar configuración general
+    # Renderizar configuración general (siempre visible)
     render_sidebar()
     
-    # Renderizar panel de IA en sidebar (Centralizado en ai_module.py)
+    # Renderizar panel de IA en sidebar (siempre visible)
     render_ai_sidebar()
+    
+    # Renderizar opciones comunes del sidebar (siempre visible para todos los usuarios)
+    render_common_sidebar_options()
     
     # Renderizar expander de Desarrollador en sidebar (solo si está habilitado en configuración)
     if AppSettings.SHOW_DEVELOPER_SECTION:
