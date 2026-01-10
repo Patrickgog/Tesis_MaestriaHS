@@ -4,7 +4,7 @@ import streamlit as st
 from typing import Dict, Any, List
 
 def render_sidebar(use_grouped_layout: bool = False):
-    """Renderiza la barra lateral con configuración general (solo en tab1)"""
+    """Renderiza la barra lateral con configuración general"""
     
     # Indicador visual de modo desarrollador
     from config.settings import AppSettings
@@ -35,7 +35,7 @@ def render_sidebar(use_grouped_layout: bool = False):
         with st.sidebar.expander("⚙️ Configuración", expanded=True):
             _render_configuration_options()
     else:
-        # Layout original (para developer o cuando no se use agrupación)
+        # Layout original (para developer)
         st.sidebar.title("Configuración General")
         _render_configuration_options()
 
@@ -44,7 +44,6 @@ def _render_configuration_options():
     
     # Configuración de tipo de ajuste de curva
     with st.sidebar.expander("Tipo de ajuste de curva", expanded=False):
-        # Usar valor cargado si existe, sino usar valor por defecto
         default_ajuste = st.session_state.get('_loaded_ajuste_tipo', 'Cuadrática (2do grado)')
         ajuste_options = ["Lineal", "Cuadrática (2do grado)", "Polinomial (3er grado)"]
         default_index = ajuste_options.index(default_ajuste) if default_ajuste in ajuste_options else 1
@@ -57,16 +56,13 @@ def _render_configuration_options():
             horizontal=False
         )
         
-        # Limpiar el valor cargado después de usarlo
         if '_loaded_ajuste_tipo' in st.session_state:
             del st.session_state['_loaded_ajuste_tipo']
         
-        # Marcar que se ha configurado el tipo de ajuste
         st.session_state['ajuste_tipo_configured'] = True
     
     # Configuración de modo de curvas de bomba
     with st.sidebar.expander("Modo de Curvas de Bomba", expanded=False):
-        # Usar valor cargado si existe, sino usar valor por defecto
         default_curva_mode = st.session_state.get('_loaded_curva_mode', '3 puntos')
         curva_options = ["Excel", "3 puntos"]
         default_curva_index = curva_options.index(default_curva_mode) if default_curva_mode in curva_options else 1
@@ -79,7 +75,6 @@ def _render_configuration_options():
             horizontal=True
         )
         
-        # Limpiar el valor cargado después de usarlo
         if '_loaded_curva_mode' in st.session_state:
             del st.session_state['_loaded_curva_mode']
     
@@ -88,7 +83,6 @@ def _render_configuration_options():
         temperatura_c = st.number_input("Temperatura del líquido (°C)", min_value=0.0, max_value=100.0, value=st.session_state.get('temp_liquido', 20.0), step=0.1, key="temp_liquido")
         densidad_liquido = st.number_input("Densidad del líquido (g/cm³)", min_value=0.5, max_value=2.0, value=st.session_state.get('densidad_liquido', 1.0), step=0.01, key="densidad_liquido")
         
-        # Cálculo presión de vapor (solo depende de temperatura)
         def calcular_presion_vapor_mca(temp_input):
             from core.calculations import interpolar_propiedad
             temp_C = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
@@ -98,30 +92,23 @@ def _render_configuration_options():
         presion_vapor = calcular_presion_vapor_mca(temperatura_c)
         st.markdown(f"<b>Presión de vapor calculada:</b> {presion_vapor:.2f} m.c.a.", unsafe_allow_html=True)
         
-        # Cálculo presión barométrica (depende de elevación y densidad)
         elevacion = st.session_state.get('elevacion_sitio', 450.0)
-        densidad_agua = densidad_liquido * 1000  # g/cm³ a kg/m³
+        densidad_agua = densidad_liquido * 1000
         G = 9.81
         gamma = densidad_agua * G
         from core.calculations import calcular_presion_atmosferica_mca
         presion_barometrica = calcular_presion_atmosferica_mca(elevacion, gamma)
         st.markdown(f"<b>Presión barométrica calculada:</b> {presion_barometrica:.2f} m.c.a.", unsafe_allow_html=True)
         
-        # Guardar el valor calculado en session_state para uso en otras secciones
         st.session_state['presion_barometrica_calculada'] = presion_barometrica
         st.session_state['presion_vapor_calculada'] = presion_vapor
     
     # Configuración de unidades
     with st.sidebar.expander("Unidades", expanded=False):
-        # Usar valor cargado si existe, sino usar valor por defecto
-        default_flow_unit = st.session_state.get('_loaded_flow_unit', 'L/s')  # Mantener L/s por defecto
+        default_flow_unit = st.session_state.get('_loaded_flow_unit', 'L/s')
         flow_options = ['L/s', 'm³/h']
-        default_flow_index = flow_options.index(default_flow_unit) if default_flow_unit in flow_options else 0  # Por defecto L/s
+        default_flow_index = flow_options.index(default_flow_unit) if default_flow_unit in flow_options else 0
         
-        # Detectar cambio de unidad
-        previous_unit = st.session_state.get('flow_unit', default_flow_unit)
-        
-        # Inicializar _last_flow_unit si no existe
         if '_last_flow_unit' not in st.session_state:
             st.session_state['_last_flow_unit'] = default_flow_unit
         
@@ -134,44 +121,28 @@ def _render_configuration_options():
             horizontal=True
         )
         
-        # Limpiar el valor cargado después de usarlo
         if '_loaded_flow_unit' in st.session_state:
             del st.session_state['_loaded_flow_unit']
 
 def render_common_sidebar_options(use_grouped_layout: bool = False):
-    """Renderiza opciones de sidebar comunes para todos los usuarios (no requieren modo desarrollador)"""
+    """Renderiza opciones de sidebar comunes para todos los usuarios"""
     
     if use_grouped_layout:
         # NUEVO: Layout agrupado para versión pública
         
-        # Agregar "Método de Cálculo de Pérdidas" al expander de Configuración
+        # 1. Expander: Optimización IA (GA) - Independiente
+        _render_optimization_option()
+        
+        # 2. Expander: Configuración - Agrupa Método de Cálculo de Pérdidas
         with st.sidebar.expander("⚙️ Configuración", expanded=True):
             _render_loss_calculation_method()
         
-        # Expander principal: Herramientas y Recursos
+        # 3. Expander: Herramientas y Recursos - Agrupa módulos opcionales
         with st.sidebar.expander("🛠️ Herramientas y Recursos", expanded=False):
-            # Análisis IA (placeholder para futuro) - Sin sub-expander
-            st.markdown("### 🤖 Análisis IA")
-            st.info("🚧 Funcionalidad en desarrollo")
-            st.caption("Próximamente: Análisis inteligente de sistemas de bombeo")
-            st.markdown("---")
-            
-            # Optimización IA (GA)
-            _render_optimization_option()
-            
-            # Selección de Diámetros
             _render_selection_option()
-            
-            # Resumen Proyecto
             _render_json_viewer_option()
-            
-            # Reportes
             _render_reports_option()
-            
-            # Tablas de Configuración
             _render_tables_option()
-            
-            # Teoría y Fundamentos
             _render_theory_option()
     else:
         # Layout original (sin cambios)
@@ -226,7 +197,6 @@ def _render_reports_option():
 def _render_loss_calculation_method():
     """Renderiza la opción de Método de Cálculo de Pérdidas"""
     with st.sidebar.expander("🧮 Método de Cálculo de Pérdidas", expanded=False):
-        # Inicializar si no existe
         if 'metodo_calculo' not in st.session_state:
             st.session_state.metodo_calculo = 'Hazen-Williams'
         
@@ -243,7 +213,6 @@ def _render_loss_calculation_method():
         
         st.session_state.metodo_calculo = metodo
         
-        # Indicador visual del método seleccionado
         if metodo == 'Hazen-Williams':
             st.info("📘 **Método Empírico**: Usa coef. C según material")
         else:
@@ -341,21 +310,17 @@ def convert_units_on_change():
     current_unit = st.session_state.get('flow_unit', 'L/s')
     previous_unit = st.session_state.get('_last_flow_unit', 'L/s')
     
-    # Si hay un caudal en L/s, convertir a m³/h
     if 'caudal_lps' in st.session_state and current_unit == 'm³/h':
         caudal_lps = st.session_state['caudal_lps']
         caudal_m3h = caudal_lps * 3.6
         st.session_state['caudal_m3h'] = caudal_m3h
     
-    # Si hay un caudal en m³/h, convertir a L/s
     elif 'caudal_m3h' in st.session_state and current_unit == 'L/s':
         caudal_m3h = st.session_state['caudal_m3h']
         caudal_lps = caudal_m3h / 3.6
         st.session_state['caudal_lps'] = caudal_lps
     
-    # Convertir valores de las curvas características si cambió la unidad
     if current_unit != previous_unit:
-        # Lista de todas las curvas que necesitan conversión
         curva_keys = ['sistema', 'bomba', 'rendimiento', 'potencia', 'npsh']
         
         for curva_key in curva_keys:
@@ -368,40 +333,33 @@ def convert_units_on_change():
                         converted_lines = []
                         for line in lines:
                             if line.strip():
-                                # Intentar parsear diferentes formatos: "x y", "x,y", "x;y"
                                 vals = line.replace(',', ' ').replace(';', ' ').split()
                                 if len(vals) >= 2:
                                     try:
                                         x = float(vals[0])
                                         y = float(vals[1])
                                         
-                                        # Convertir x (caudal) según el cambio de unidad
                                         if previous_unit == 'L/s' and current_unit == 'm³/h':
-                                            x_converted = x * 3.6  # L/s a m³/h
+                                            x_converted = x * 3.6
                                         elif previous_unit == 'm³/h' and current_unit == 'L/s':
-                                            x_converted = x / 3.6  # m³/h a L/s
+                                            x_converted = x / 3.6
                                         else:
-                                            x_converted = x  # Sin cambio
+                                            x_converted = x
                                         
                                         converted_lines.append(f"{x_converted:.2f} {y:.2f}")
                                     except ValueError:
-                                        # Si no se puede convertir, mantener la línea original
                                         converted_lines.append(line)
                                 else:
                                     converted_lines.append(line)
                         
-                        # Actualizar el valor del textarea
                         st.session_state[textarea_key] = '\n'.join(converted_lines)
                     except Exception:
-                        # Si hay error en la conversión, mantener el valor original
                         pass
         
-        # Actualizar la unidad anterior
         st.session_state['_last_flow_unit'] = current_unit
 
 def preserve_project_data():
     """Preserva los datos del proyecto antes de cambios en el modo desarrollador"""
-    # Lista de claves importantes del proyecto que deben preservarse
     project_keys = [
         'proyecto', 'diseno', 'proyecto_input_main', 'diseno_input_main',
         'caudal_lps', 'caudal_m3h', 'elevacion_sitio', 'altura_succion_input',
@@ -420,11 +378,9 @@ def preserve_project_data():
         'current_project_path', 'curva_inputs', 'calibration_points', 'digitalized_points'
     ]
     
-    # Crear backup de datos del proyecto
     if 'project_data_backup' not in st.session_state:
         st.session_state.project_data_backup = {}
     
-    # Guardar datos actuales en backup
     for key in project_keys:
         if key in st.session_state:
             st.session_state.project_data_backup[key] = st.session_state[key]
@@ -436,9 +392,8 @@ def restore_project_data():
             st.session_state[key] = value
 
 def render_developer_sidebar():
-    """Renderiza SOLO la sección de Desarrollador con password (disponible solo cuando SHOW_DEVELOPER_SECTION=True)"""
+    """Renderiza SOLO la sección de Desarrollador con password"""
     
-    # Sección de Desarrollador con password
     with st.sidebar.expander("👨‍💻 Desarrollador", expanded=False):
         if 'developer_mode' not in st.session_state:
             st.session_state.developer_mode = False
@@ -464,11 +419,9 @@ def render_developer_sidebar():
                     try:
                         correct_password = None
                         
-                        # 1. Intentar desde st.secrets (Streamlit Cloud)
                         if 'DEVELOPER_PASSWORD' in st.secrets:
                             correct_password = st.secrets['DEVELOPER_PASSWORD']
                             
-                        # 2. Intentar desde archivo local (si existe)
                         if not correct_password:
                             try:
                                 with open('secrets', 'r', encoding='utf-8') as f:
@@ -480,7 +433,6 @@ def render_developer_sidebar():
                             except FileNotFoundError:
                                 pass
                         
-                        # 3. Valor por defecto
                         if not correct_password:
                             correct_password = 'patto25'
                         
@@ -504,9 +456,7 @@ def render_developer_sidebar():
                 st.session_state.developer_mode = False
                 restore_project_data()
     
-    # PESTAÑAS DE DESARROLLADOR (solo visibles cuando desarrollador está activo)
     if st.session_state.get('developer_mode', False):
-        # Análisis Transientes
         with st.sidebar.expander("🔄 Análisis Transientes", expanded=False):
             if 'transient_analysis_enabled' not in st.session_state:
                 st.session_state.transient_analysis_enabled = False
@@ -526,7 +476,6 @@ def render_developer_sidebar():
             else:
                 st.info("ℹ️ Análisis transientes desactivado")
         
-        # Simulación Operativa
         with st.sidebar.expander("📈 Simulación Operativa", expanded=False):
             if 'simulation_enabled' not in st.session_state:
                 st.session_state.simulation_enabled = False
