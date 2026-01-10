@@ -23,6 +23,28 @@ def main():
     # Determinar si usar layout agrupado (solo para versión pública)
     use_grouped_layout = not AppSettings.SHOW_DEVELOPER_SECTION
     
+    # PRIMERO: Mostrar banner de versión AL INICIO DE TODO
+    if AppSettings.SHOW_DEVELOPER_SECTION:
+        st.sidebar.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    text-align: center; 
+                    margin-bottom: 15px;">
+            <h3 style="color: white; margin: 0;">🔧 MODO DESARROLLADOR</h3>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("""
+        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
+                    padding: 10px; 
+                    border-radius: 5px; 
+                    text-align: center; 
+                    margin-bottom: 15px;">
+            <h3 style="color: white; margin: 0;">🌐 VERSIÓN PÚBLICA</h3>
+        </div>
+        """, unsafe_allow_html=True)
+    
     # 1. Renderizar panel de IA en sidebar (PRIMERO - siempre visible)
     render_ai_sidebar()
     

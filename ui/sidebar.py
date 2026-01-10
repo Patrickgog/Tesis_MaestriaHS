@@ -6,30 +6,8 @@ from typing import Dict, Any, List
 def render_sidebar(use_grouped_layout: bool = False):
     """Renderiza la barra lateral con configuración general"""
     
-    # Indicador visual de modo desarrollador
-    from config.settings import AppSettings
-    if AppSettings.SHOW_DEVELOPER_SECTION:
-        st.sidebar.markdown("""
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 10px; 
-                    border-radius: 5px; 
-                    text-align: center; 
-                    margin-bottom: 15px;">
-            <h3 style="color: white; margin: 0;">🔧 MODO DESARROLLADOR</h3>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.sidebar.markdown("""
-        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); 
-                    padding: 10px; 
-                    border-radius: 5px; 
-                    text-align: center; 
-                    margin-bottom: 15px;">
-            <h3 style="color: white; margin: 0;">🌐 VERSIÓN PÚBLICA</h3>
-        </div>
-        """, unsafe_allow_html=True)
-    
     # Determinar si usar layout agrupado (solo para versión pública)
+    from config.settings import AppSettings
     if use_grouped_layout and not AppSettings.SHOW_DEVELOPER_SECTION:
         # NUEVO: Layout agrupado para versión pública
         with st.sidebar.expander("⚙️ Configuración", expanded=True):
@@ -123,6 +101,11 @@ def _render_configuration_options():
         
         if '_loaded_flow_unit' in st.session_state:
             del st.session_state['_loaded_flow_unit']
+    
+    # Método de Cálculo de Pérdidas (solo en layout agrupado)
+    from config.settings import AppSettings
+    if not AppSettings.SHOW_DEVELOPER_SECTION:
+        _render_loss_calculation_method()
 
 def render_common_sidebar_options(use_grouped_layout: bool = False):
     """Renderiza opciones de sidebar comunes para todos los usuarios"""
@@ -133,11 +116,7 @@ def render_common_sidebar_options(use_grouped_layout: bool = False):
         # 1. Expander: Optimización IA (GA) - Independiente
         _render_optimization_option()
         
-        # 2. Expander: Configuración - Agrupa Método de Cálculo de Pérdidas
-        with st.sidebar.expander("⚙️ Configuración", expanded=True):
-            _render_loss_calculation_method()
-        
-        # 3. Expander: Herramientas y Recursos - Agrupa módulos opcionales
+        # 2. Expander: Herramientas y Recursos - Agrupa módulos opcionales
         with st.sidebar.expander("🛠️ Herramientas y Recursos", expanded=False):
             _render_selection_option()
             _render_json_viewer_option()
