@@ -20,7 +20,7 @@ def render_footer():
         <h5 style='margin-bottom: 5px;'>MAESTRÍA EN HIDROSANITARIA</h5>
         <p style='margin: 2px 0; font-size: 14px;'><strong>Desarrollador:</strong> Patricio Sarmiento Reinoso</p>
         <p style='margin: 2px 0; font-size: 14px;'><strong>Director:</strong> Aurelio Ochoa García</p>
-        <p style='margin: 2px 0; font-size: 14px;'><strong>2025</strong></p>
+        <p style='margin: 2px 0; font-size: 14px;'><strong>2026</strong></p>
     </div>
     """, unsafe_allow_html=True)
 

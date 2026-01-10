@@ -1498,6 +1498,4 @@ def render_json_tab():
             st.write("**Debug - Información del proyecto:**")
             st.write(f"- Claves disponibles en session_state: {len(list(st.session_state.keys()))} claves")
     
-    # Footer
-    render_footer()
 
