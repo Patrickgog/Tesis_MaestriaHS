@@ -10,7 +10,7 @@ def render_sidebar(use_grouped_layout: bool = False):
     from config.settings import AppSettings
     if use_grouped_layout and not AppSettings.SHOW_DEVELOPER_SECTION:
         # NUEVO: Layout agrupado para versión pública
-        with st.sidebar.expander("⚙️ Configuración", expanded=True):
+        with st.sidebar.expander("⚙️ Configuración", expanded=False):
             _render_configuration_content_grouped()
     else:
         # Layout original (para developer)
@@ -36,7 +36,6 @@ def _render_configuration_content_grouped():
     
     if '_loaded_ajuste_tipo' in st.session_state:
         del st.session_state['_loaded_ajuste_tipo']
-    st.session_state['ajuste_tipo_configured'] = True
     
     st.markdown("---")
     
