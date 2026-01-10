@@ -20,14 +20,17 @@ def main():
     st.title("Tesis de Maestría Hidrosanitaria")
     st.header("Diseño de Sistemas de Bombeo")
     
+    # Determinar si usar layout agrupado (solo para versión pública)
+    use_grouped_layout = not AppSettings.SHOW_DEVELOPER_SECTION
+    
     # Renderizar configuración general (siempre visible)
-    render_sidebar()
+    render_sidebar(use_grouped_layout=use_grouped_layout)
     
     # Renderizar panel de IA en sidebar (siempre visible)
     render_ai_sidebar()
     
     # Renderizar opciones comunes del sidebar (siempre visible para todos los usuarios)
-    render_common_sidebar_options()
+    render_common_sidebar_options(use_grouped_layout=use_grouped_layout)
     
     # Renderizar expander de Desarrollador en sidebar (solo si está habilitado en configuración)
     if AppSettings.SHOW_DEVELOPER_SECTION:
