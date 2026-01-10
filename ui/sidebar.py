@@ -102,10 +102,31 @@ def _render_configuration_options():
         if '_loaded_flow_unit' in st.session_state:
             del st.session_state['_loaded_flow_unit']
     
-    # Método de Cálculo de Pérdidas (solo en layout agrupado)
+    # Método de Cálculo de Pérdidas (dentro del expander de Configuración en versión pública)
     from config.settings import AppSettings
     if not AppSettings.SHOW_DEVELOPER_SECTION:
-        _render_loss_calculation_method()
+        with st.sidebar.expander("🧮 Método de Cálculo de Pérdidas", expanded=False):
+            if 'metodo_calculo' not in st.session_state:
+                st.session_state.metodo_calculo = 'Hazen-Williams'
+            
+            metodo = st.radio(
+                "Seleccione el método:",
+                options=['Hazen-Williams', 'Darcy-Weisbach'],
+                index=0 if st.session_state.metodo_calculo == 'Hazen-Williams' else 1,
+                key='metodo_calculo_selector',
+                help="""
+                **Hazen-Williams**: Empírico, solo agua a 5-25°C, rápido
+                **Darcy-Weisbach**: Teórico universal, más preciso, considera Reynolds y rugosidad
+                """
+            )
+            
+            st.session_state.metodo_calculo = metodo
+            
+            if metodo == 'Hazen-Williams':
+                st.info("📘 **Método Empírico**: Usa coef. C según material")
+            else:
+                st.success("📐 **Método Teórico**: Calcula factor f (Re + rugosidad)")
+                st.caption("⚙️ Requiere temperatura del fluido (ver Parámetros Físicos)")
 
 def render_common_sidebar_options(use_grouped_layout: bool = False):
     """Renderiza opciones de sidebar comunes para todos los usuarios"""
