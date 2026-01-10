@@ -332,15 +332,3 @@ def render_theory_tab():
     with subtabs[6]:
         st.info("📝 Sección en desarrollo: Análisis detallado de variadores de frecuencia y optimización energética")
     
-    # Footer profesional
-    st.markdown("---")
-    st.markdown("""
-    <div style="text-align: center; color: #7F8C8D; padding: 20px;">
-        <p style="margin: 0; font-size: 0.9em;">
-            💡 <em>Esta documentación técnica es parte del Sistema de Diseño de Bombeo</em>
-        </p>
-        <p style="margin: 5px 0 0 0; font-size: 0.85em;">
-            Desarrollado como tesis de Maestría en Ingeniería Hidrosanitaria
-        </p>
-    </div>
-    """, unsafe_allow_html=True)

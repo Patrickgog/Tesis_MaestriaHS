@@ -189,13 +189,8 @@ def render_main_tabs():
         with tab_preguntas:
             render_questions_tab()
 
-    # Footer global (ya incluido en las pestañas individuales si era el caso, o lo ponemos aquí?)
-    # En el código original, render_footer se llamaba al final de render_analysis_tab, etc.
-    # Dado que los módulos conservan esa llamada, no hace falta llamarlo aquí.
-    # Excepto que hemos limpiado las funciones...
-    # Revisemos: render_analysis_tab llamaba a render_footer al final.
-    # Como usamos slicer, esa llamada se mantuvo.
-    # Así que NO lo llamamos aquí para evitar duplicados.
+    # Footer global para todas las pestañas
+    render_footer()
 
 # Re-export de save_questions_to_json si es necesario (está en developer.py ahora)
 from ui.tabs_modules.developer import save_questions_to_json, render_tema_questions

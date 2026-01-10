@@ -274,7 +274,6 @@ def render_diameter_selection_tab():
         # Recopilar datos para la guía técnica (usamos impulsión por defecto para análisis si existe)
         render_technical_documentation()
         
-    render_footer()
 
 def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_est, mat_sess, le_sess_m, dn_range, is_suc):
     prefix = "suc" if is_suc else "imp"

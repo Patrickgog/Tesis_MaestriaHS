@@ -256,4 +256,3 @@ def render_optimization_tab():
             else:
                 st.info("💡 **Aviso**: Haz clic en el botón de la izquierda para generar la optimización. Los resultados se mostrarán en esta pestaña.")
 
-    render_footer()

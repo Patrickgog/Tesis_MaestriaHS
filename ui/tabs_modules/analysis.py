@@ -2562,7 +2562,5 @@ def render_analysis_tab():
                     st.error(f"❌ Error al generar archivo Excel: {e}")
     
     
-    # Footer
-    render_footer()
 
 
