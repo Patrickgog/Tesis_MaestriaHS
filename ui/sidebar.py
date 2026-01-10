@@ -150,10 +150,11 @@ def render_common_sidebar_options(use_grouped_layout: bool = False):
         
         # Expander principal: Herramientas y Recursos
         with st.sidebar.expander("🛠️ Herramientas y Recursos", expanded=False):
-            # Análisis IA (placeholder para futuro)
-            with st.expander("🤖 Análisis IA", expanded=False):
-                st.info("🚧 Funcionalidad en desarrollo")
-                st.caption("Próximamente: Análisis inteligente de sistemas de bombeo")
+            # Análisis IA (placeholder para futuro) - Sin sub-expander
+            st.markdown("### 🤖 Análisis IA")
+            st.info("🚧 Funcionalidad en desarrollo")
+            st.caption("Próximamente: Análisis inteligente de sistemas de bombeo")
+            st.markdown("---")
             
             # Optimización IA (GA)
             _render_optimization_option()
