@@ -3,7 +3,7 @@
 import streamlit as st
 from typing import Dict, Any, List
 
-def render_sidebar():
+def render_sidebar(use_grouped_layout: bool = False):
     """Renderiza la barra lateral con configuración general (solo en tab1)"""
     
     # Indicador visual de modo desarrollador
@@ -29,7 +29,18 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
     
-    st.sidebar.title("Configuración General")
+    # Determinar si usar layout agrupado (solo para versión pública)
+    if use_grouped_layout and not AppSettings.SHOW_DEVELOPER_SECTION:
+        # NUEVO: Layout agrupado para versión pública
+        with st.sidebar.expander("⚙️ Configuración", expanded=True):
+            _render_configuration_options()
+    else:
+        # Layout original (para developer o cuando no se use agrupación)
+        st.sidebar.title("Configuración General")
+        _render_configuration_options()
+
+def _render_configuration_options():
+    """Renderiza las opciones de configuración (contenido común para ambos layouts)"""
     
     # Configuración de tipo de ajuste de curva
     with st.sidebar.expander("Tipo de ajuste de curva", expanded=False):
@@ -127,10 +138,52 @@ def render_sidebar():
         if '_loaded_flow_unit' in st.session_state:
             del st.session_state['_loaded_flow_unit']
 
-def render_common_sidebar_options():
+def render_common_sidebar_options(use_grouped_layout: bool = False):
     """Renderiza opciones de sidebar comunes para todos los usuarios (no requieren modo desarrollador)"""
     
-    # 1. Resumen Proyecto
+    if use_grouped_layout:
+        # NUEVO: Layout agrupado para versión pública
+        
+        # Agregar "Método de Cálculo de Pérdidas" al expander de Configuración
+        with st.sidebar.expander("⚙️ Configuración", expanded=True):
+            _render_loss_calculation_method()
+        
+        # Expander principal: Herramientas y Recursos
+        with st.sidebar.expander("🛠️ Herramientas y Recursos", expanded=False):
+            # Análisis IA (placeholder para futuro)
+            with st.expander("🤖 Análisis IA", expanded=False):
+                st.info("🚧 Funcionalidad en desarrollo")
+                st.caption("Próximamente: Análisis inteligente de sistemas de bombeo")
+            
+            # Optimización IA (GA)
+            _render_optimization_option()
+            
+            # Selección de Diámetros
+            _render_selection_option()
+            
+            # Resumen Proyecto
+            _render_json_viewer_option()
+            
+            # Reportes
+            _render_reports_option()
+            
+            # Tablas de Configuración
+            _render_tables_option()
+            
+            # Teoría y Fundamentos
+            _render_theory_option()
+    else:
+        # Layout original (sin cambios)
+        _render_json_viewer_option()
+        _render_reports_option()
+        _render_loss_calculation_method()
+        _render_tables_option()
+        _render_theory_option()
+        _render_optimization_option()
+        _render_selection_option()
+
+def _render_json_viewer_option():
+    """Renderiza la opción de Resumen Proyecto"""
     with st.sidebar.expander("📋 Resumen Proyecto", expanded=False):
         if 'json_viewer_enabled' not in st.session_state:
             st.session_state.json_viewer_enabled = False
@@ -148,8 +201,9 @@ def render_common_sidebar_options():
             st.success("✅ Resumen activado")
         else:
             st.info("ℹ️ Resumen desactivado")
-    
-    # 2. Reportes
+
+def _render_reports_option():
+    """Renderiza la opción de Reportes"""
     with st.sidebar.expander("📄 Reportes", expanded=False):
         if 'informes_enabled' not in st.session_state:
             st.session_state.informes_enabled = False
@@ -167,8 +221,9 @@ def render_common_sidebar_options():
             st.success("✅ Reportes activado")
         else:
             st.info("ℹ️ Reportes desactivado")
-    
-    # 3. Método de Cálculo de Pérdidas
+
+def _render_loss_calculation_method():
+    """Renderiza la opción de Método de Cálculo de Pérdidas"""
     with st.sidebar.expander("🧮 Método de Cálculo de Pérdidas", expanded=False):
         # Inicializar si no existe
         if 'metodo_calculo' not in st.session_state:
@@ -193,8 +248,9 @@ def render_common_sidebar_options():
         else:
             st.success("📐 **Método Teórico**: Calcula factor f (Re + rugosidad)")
             st.caption("⚙️ Requiere temperatura del fluido (ver Parámetros Físicos)")
-    
-    # 4. Tablas de Configuración
+
+def _render_tables_option():
+    """Renderiza la opción de Tablas de Configuración"""
     with st.sidebar.expander("📊 Tablas de Configuración", expanded=False):
         if 'tables_enabled' not in st.session_state:
             st.session_state.tables_enabled = False
@@ -212,8 +268,9 @@ def render_common_sidebar_options():
             st.success("✅ Tablas activadas")
         else:
             st.info("ℹ️ Tablas desactivadas")
-    
-    # 5. Teoría y Fundamentos
+
+def _render_theory_option():
+    """Renderiza la opción de Teoría y Fundamentos"""
     with st.sidebar.expander("📚 Teoría y Fundamentos", expanded=False):
         if 'theory_enabled' not in st.session_state:
             st.session_state.theory_enabled = False
@@ -231,8 +288,9 @@ def render_common_sidebar_options():
             st.success("✅ Teoría activada")
         else:
             st.info("ℹ️ Teoría desactivada")
-    
-    # 6. Optimización IA (Genetic Algorithms)
+
+def _render_optimization_option():
+    """Renderiza la opción de Optimización IA (GA)"""
     with st.sidebar.expander("🎯 Optimización IA (GA)", expanded=False):
         if 'optimization_enabled' not in st.session_state:
             st.session_state.optimization_enabled = False
@@ -250,8 +308,9 @@ def render_common_sidebar_options():
             st.success("✅ Optimización activada")
         else:
             st.info("ℹ️ Optimización desactivada")
-            
-    # 7. Selección de Diámetros (Análisis Técnico)
+
+def _render_selection_option():
+    """Renderiza la opción de Selección de Diámetros"""
     with st.sidebar.expander("📏 Selección de Diámetros", expanded=False):
         if 'selection_enabled' not in st.session_state:
             st.session_state.selection_enabled = True
@@ -269,6 +328,7 @@ def render_common_sidebar_options():
             st.success("✅ Selección activada")
         else:
             st.info("ℹ️ Selección desactivada")
+
 
 # Funciones auxiliares para el sidebar
 def save_state():
