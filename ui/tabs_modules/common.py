@@ -108,12 +108,25 @@ def render_ai_tab():
         st.info("Por favor, configura tu clave API de Gemini en el panel lateral (🤖 Análisis IA).")
         return
     
-    # Configurar Gemini si no está configurado
-    if not st.session_state.get('api_key') or st.session_state.get('api_key') != gemini_api_key:
+    # Obtener modelo seleccionado
+    selected_model = st.session_state.get('selected_model', 'gemini-1.5-flash')
+    
+    # Configurar Gemini si no está configurado o si cambió el modelo
+    current_api_key = st.session_state.get('api_key')
+    current_model = st.session_state.get('model')
+    
+    if not current_api_key or current_api_key != gemini_api_key or current_model != selected_model:
         try:
             # Configurar Gemini con la API key del usuario
-            configure_gemini(gemini_api_key)
-            st.session_state['api_key'] = gemini_api_key
+            model_instance = configure_gemini(gemini_api_key, selected_model) # Pass selected_model
+            if model_instance:
+                st.session_state['api_key'] = gemini_api_key
+                st.session_state['model'] = selected_model
+                st.success(f"✅ Gemini configurado correctamente con modelo: {selected_model}")
+            else:
+                st.error("❌ Error al configurar Gemini")
+                st.info("Verifica que tu API key sea válida.")
+                return
         except Exception as e:
             st.error(f"❌ Error al configurar Gemini: {e}")
             st.info("Verifica que tu API key sea válida.")

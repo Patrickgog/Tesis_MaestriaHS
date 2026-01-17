@@ -173,6 +173,16 @@ def render_common_sidebar_options():
     with st.sidebar.expander("🤖 Análisis IA", expanded=False):
         st.markdown("**Configuración de API Key de Gemini**")
         
+        # Cargar API key desde query params si existe (persistencia)
+        if 'gemini_api_key' not in st.session_state:
+            # Intentar cargar desde query params
+            try:
+                params = st.query_params
+                if 'gak' in params:
+                    st.session_state['gemini_api_key'] = params['gak']
+            except:
+                pass
+        
         # Input para API key
         api_key_input = st.text_input(
             "Ingresa tu API Key de Gemini:",
@@ -182,17 +192,63 @@ def render_common_sidebar_options():
             help="Obtén tu API key gratuita en https://makersuite.google.com/app/apikey"
         )
         
+        # Selector de modelo de Gemini
+        modelos_disponibles = [
+            "gemini-2.0-flash-exp",   # Experimental 2.0 (más reciente)
+            "gemini-1.5-flash",       # Flash 1.5 estable (recomendado)
+            "gemini-1.5-flash-8b",    # Flash 1.5 ligero
+            "gemini-1.5-pro",         # Pro 1.5 (mejor calidad)
+        ]
+        
+        # Cargar modelo guardado o usar por defecto
+        modelo_actual = st.session_state.get('selected_model', 'gemini-1.5-flash')
+        try:
+            modelo_index = modelos_disponibles.index(modelo_actual)
+        except ValueError:
+            modelo_index = 1  # Por defecto gemini-1.5-flash
+        
+        selected_model = st.selectbox(
+            "Modelo de IA:",
+            modelos_disponibles,
+            index=modelo_index,
+            key="gemini_model_selector",
+            help="Selecciona el modelo de Gemini a utilizar"
+        )
+        
+        # Guardar modelo seleccionado
+        st.session_state['selected_model'] = selected_model
+        
         # Botón para guardar API key
-        if st.button("💾 Guardar API Key", key="save_api_key"):
-            if api_key_input and api_key_input.strip():
-                st.session_state['gemini_api_key'] = api_key_input.strip()
-                st.success("✅ API Key guardada")
-            else:
-                st.error("❌ Por favor ingresa una API key válida")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("💾 Guardar", key="save_api_key", use_container_width=True):
+                if api_key_input and api_key_input.strip():
+                    st.session_state['gemini_api_key'] = api_key_input.strip()
+                    # Guardar en query params para persistencia
+                    try:
+                        st.query_params['gak'] = api_key_input.strip()
+                    except:
+                        pass
+                    st.success("✅ API Key guardada")
+                    st.rerun()
+                else:
+                    st.error("❌ Ingresa una API key válida")
+        
+        with col2:
+            if st.button("🗑️ Limpiar", key="clear_api_key", use_container_width=True):
+                if 'gemini_api_key' in st.session_state:
+                    del st.session_state['gemini_api_key']
+                try:
+                    if 'gak' in st.query_params:
+                        del st.query_params['gak']
+                except:
+                    pass
+                st.info("🔄 API Key eliminada")
+                st.rerun()
         
         # Mostrar estado de configuración
         if st.session_state.get('gemini_api_key'):
-            st.success("✅ API Key configurada")
+            st.success(f"✅ API Key configurada | Modelo: {selected_model}")
             
             # Checkbox para activar análisis IA (solo habilitado si hay API key)
             if 'ai_enabled' not in st.session_state:
