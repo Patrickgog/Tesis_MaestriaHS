@@ -109,7 +109,7 @@ def render_ai_tab():
         return
     
     # Obtener modelo seleccionado
-    selected_model = st.session_state.get('selected_model', 'gemini-1.5-flash')
+    selected_model = st.session_state.get('selected_model', 'gemini-2.5-flash')
     
     # Configurar Gemini si no está configurado o si cambió el modelo
     current_api_key = st.session_state.get('api_key')
