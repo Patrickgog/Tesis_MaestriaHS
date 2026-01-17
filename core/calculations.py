@@ -275,6 +275,10 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
             )
             hf_primaria_succion = res_suc['hf']
             
+            # Guardar el método en los detalles para la UI
+            res_suc['metodo'] = 'Darcy-Weisbach'
+            detalles_darcy_suc = res_suc
+            
             # Longitud equivalente para accesorios
             le_total_succion = 0
             for acc in system_params['accesorios_succion']:
@@ -298,6 +302,10 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
             )
             hf_primaria_impulsion = res_imp['hf']
             
+            # Guardar el método en los detalles para la UI
+            res_imp['metodo'] = 'Darcy-Weisbach'
+            detalles_darcy_imp = res_imp
+            
             # Longitud equivalente para accesorios
             le_total_impulsion = 0
             for acc in system_params['accesorios_impulsion']:
@@ -316,6 +324,8 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
             
         else:
             # --- CÁLCULO POR HAZEN-WILLIAMS ---
+            detalles_darcy_suc = {}
+            detalles_darcy_imp = {}
             # Succión
             hf_primaria_succion = calcular_hf_hazen_williams(
                 caudal_m3s, system_params['long_succion'], 
@@ -377,7 +387,9 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
             'hf_primaria_succion': hf_primaria_succion,
             'hf_secundaria_succion': hf_secundaria_succion,
             'hf_primaria_impulsion': hf_primaria_impulsion,
-            'hf_secundaria_impulsion': hf_secundaria_impulsion
+            'hf_secundaria_impulsion': hf_secundaria_impulsion,
+            'detalles_darcy_suc': detalles_darcy_suc,
+            'detalles_darcy_imp': detalles_darcy_imp
         })
     
     return resultados

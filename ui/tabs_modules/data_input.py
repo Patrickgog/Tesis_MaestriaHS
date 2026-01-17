@@ -2361,6 +2361,10 @@ def render_data_input_tab():
     st.session_state['perdidas_totales_sistema'] = res_diseno['perdida_succion'] + res_diseno['perdida_impulsion']
     st.session_state['adt_total'] = res_diseno['adt_total']
 
+    # Sincronizar detalles para visualización de Darcy-Weisbach
+    st.session_state['detalles_calc_succion_primaria'] = res_diseno.get('detalles_darcy_suc', {})
+    st.session_state['detalles_calc_impulsion_primaria'] = res_diseno.get('detalles_darcy_imp', {})
+
     # --- RECALCULAR LONGITUDES EQUIVALENTES PARA VISUALIZACIÓN ---
     le_total_succion = 0
     for acc in st.session_state.get('accesorios_succion', []):
