@@ -195,17 +195,17 @@ def render_common_sidebar_options():
             st.success("✅ API Key configurada")
             
             # Checkbox para activar análisis IA (solo habilitado si hay API key)
-            if 'ai_analysis_enabled' not in st.session_state:
-                st.session_state.ai_analysis_enabled = False
+            if 'ai_enabled' not in st.session_state:
+                st.session_state.ai_enabled = False
             
             ai_enabled = st.checkbox(
                 "Activar Análisis IA",
-                value=st.session_state.ai_analysis_enabled,
+                value=st.session_state.ai_enabled,
                 key="ai_analysis_checkbox",
                 help="Activa la funcionalidad de análisis con IA en la interfaz principal"
             )
             
-            st.session_state.ai_analysis_enabled = ai_enabled
+            st.session_state.ai_enabled = ai_enabled
             
             if ai_enabled:
                 st.info("💡 El análisis IA estará disponible en la interfaz principal")
