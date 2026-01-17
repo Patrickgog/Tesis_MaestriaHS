@@ -1,0 +1,100 @@
+{
+  "wave_speeds": {
+    "Hierro Dúctil": {
+      "material_code": "HIERRO_DUCTIL",
+      "typical_wave_speed": 1300,
+      "min_wave_speed": 1200,
+      "max_wave_speed": 1400,
+      "density": 7050,
+      "young_modulus": 165000000000,
+      "notes": "Velocidad de onda típica para hierro dúctil clase 50"
+    },
+    "Hierro Fundido": {
+      "material_code": "HIERRO_FUNDIDO", 
+      "typical_wave_speed": 1100,
+      "min_wave_speed": 1000,
+      "max_wave_speed": 1200,
+      "density": 7200,
+      "young_modulus": 110000000000,
+      "notes": "Velocidad de onda típica para hierro fundido"
+    },
+    "PVC": {
+      "material_code": "PVC",
+      "typical_wave_speed": 400,
+      "min_wave_speed": 300,
+      "max_wave_speed": 500,
+      "density": 1400,
+      "young_modulus": 2950000000,
+      "notes": "Velocidad de onda para PVC rígido"
+    },
+    "HDPE (Polietileno)": {
+      "material_code": "HDPE",
+      "typical_wave_speed": 275,
+      "min_wave_speed": 200,
+      "max_wave_speed": 350,
+      "density": 950,
+      "young_modulus": 950000000,
+      "notes": "Velocidad de onda baja debido a flexibilidad del material"
+    },
+    "PEAD": {
+      "material_code": "PEAD",
+      "typical_wave_speed": 275,
+      "min_wave_speed": 200,
+      "max_wave_speed": 350,
+      "density": 950,
+      "young_modulus": 950000000,
+      "notes": "Polietileno Alta Densidad con mayor flexibilidad"
+    },
+    "Acero Comercial": {
+      "material_code": "ACERO_COMERCIAL",
+      "typical_wave_speed": 1200,
+      "min_wave_speed": 1100,
+      "max_wave_speed": 1300,
+      "density": 7850,
+      "young_modulus": 200000000000,
+      "notes": "Velocidad de onda para acero comercial al carbono"
+    },
+    "HIERRO": {
+      "material_code": "HIERRO",
+      "typical_wave_speed": 1100,
+      "min_wave_speed": 1000,
+      "max_wave_speed": 1200,
+      "density": 7200,
+      "young_modulus": 110000000000,
+      "notes": "Hierro fundido tradicional (alias para compatibilidad)"
+    },
+    "Asbesto Cemento": {
+      "material_code": "ASBESTO_CEMENTO",
+      "typical_wave_speed": 900,
+      "min_wave_speed": 800,
+      "max_wave_speed": 1000,
+      "density": 1900,
+      "young_modulus": 24000000000,
+      "notes": "Tubería de asbesto cemento (en desuso)"
+    },
+    "Cobre": {
+      "material_code": "COBRE",
+      "typical_wave_speed": 1200,
+      "min_wave_speed": 1100,
+      "max_wave_speed": 1300,
+      "density": 8900,
+      "young_modulus": 110000000000,
+      "notes": "Tubería de cobre para instalaciones"
+    },
+    "Concreto": {
+      "material_code": "CONCRETO",
+      "typical_wave_speed": 1000,
+      "min_wave_speed": 900,
+      "max_wave_speed": 1100,
+      "density": 2400,
+      "young_modulus": 25000000000,
+      "notes": "Tuberías de concreto reforzado"
+    }
+  },
+  "notes": {
+    "description": "Tabla de velocidades de ondas de presión para diferentes materiales de tuberías utilizado en análisis de transientes hidráulicos",
+    "speed_formula": "a = \\sqrt{\\frac{K_{bulk}}{\\rho \\left(1 + \\frac{K_{bulk}}{E_{young}} \\cdot \\frac{D}{2 \\cdot e}\\right)}}",
+    "references": "Referencias técnicas de mecánica de fluidos y análisis transiente hidráulico - Streeter & Wylie, Fluid Mechanics",
+    "ranges_info": "Los valores típicos representan el promedio del rango. Los usuarios pueden seleccionar valores dentro del rango min-max según condiciones específicas del proyecto."
+  }
+}

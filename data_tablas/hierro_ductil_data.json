@@ -1,0 +1,652 @@
+{
+  "hierro_ductil": {
+    "c40": {
+      "clase": "C40",
+      "pfa_bar": 40,
+      "pma_bar": 48,
+      "descripcion": "Clase C40 (PFA = 40 bar) - Sistemas de alta presión, impulsiones de bombeo",
+      "tuberias": [
+        {
+          "dn_mm": 40,
+          "de_mm": 56,
+          "espesor_nominal_mm": 4.4,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 5016,
+          "deflexion_admisible_porcentaje": 0.75,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 50,
+          "de_mm": 66,
+          "espesor_nominal_mm": 4.4,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 2968,
+          "deflexion_admisible_porcentaje": 0.9,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 60,
+          "de_mm": 77,
+          "espesor_nominal_mm": 4.4,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 1822,
+          "deflexion_admisible_porcentaje": 1.1,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 65,
+          "de_mm": 82,
+          "espesor_nominal_mm": 4.4,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 1495,
+          "deflexion_admisible_porcentaje": 1.15,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 80,
+          "de_mm": 98,
+          "espesor_nominal_mm": 4.4,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 856,
+          "deflexion_admisible_porcentaje": 1.4,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 100,
+          "de_mm": 118,
+          "espesor_nominal_mm": 4.4,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 481,
+          "deflexion_admisible_porcentaje": 1.7,
+          "costo_usd_m": 55.6
+        },
+        {
+          "dn_mm": 125,
+          "de_mm": 144,
+          "espesor_nominal_mm": 4.5,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 271,
+          "deflexion_admisible_porcentaje": 2.05,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 150,
+          "de_mm": 170,
+          "espesor_nominal_mm": 4.5,
+          "espesor_minimo_mm": 3.0,
+          "rigidez_kn_m2": 163,
+          "deflexion_admisible_porcentaje": 2.45,
+          "costo_usd_m": 76.2
+        },
+        {
+          "dn_mm": 200,
+          "de_mm": 222,
+          "espesor_nominal_mm": 4.7,
+          "espesor_minimo_mm": 3.2,
+          "rigidez_kn_m2": 84,
+          "deflexion_admisible_porcentaje": 3.0,
+          "costo_usd_m": 102.6
+        },
+        {
+          "dn_mm": 250,
+          "de_mm": 274,
+          "espesor_nominal_mm": 5.5,
+          "espesor_minimo_mm": 3.9,
+          "rigidez_kn_m2": 75,
+          "deflexion_admisible_porcentaje": 3.0,
+          "costo_usd_m": 134.6
+        },
+        {
+          "dn_mm": 300,
+          "de_mm": 326,
+          "espesor_nominal_mm": 6.2,
+          "espesor_minimo_mm": 4.6,
+          "rigidez_kn_m2": 68,
+          "deflexion_admisible_porcentaje": 3.0,
+          "costo_usd_m": 172.1
+        },
+        {
+          "dn_mm": 350,
+          "de_mm": 378,
+          "espesor_nominal_mm": 7.1,
+          "espesor_minimo_mm": 5.4,
+          "rigidez_kn_m2": 67,
+          "deflexion_admisible_porcentaje": 3.1,
+          "costo_usd_m": 215.0
+        },
+        {
+          "dn_mm": 400,
+          "de_mm": 429,
+          "espesor_nominal_mm": 7.8,
+          "espesor_minimo_mm": 6.1,
+          "rigidez_kn_m2": 63,
+          "deflexion_admisible_porcentaje": 3.2,
+          "costo_usd_m": 263.5
+        },
+        {
+          "dn_mm": 450,
+          "de_mm": 480,
+          "espesor_nominal_mm": 8.6,
+          "espesor_minimo_mm": 6.8,
+          "rigidez_kn_m2": 61,
+          "deflexion_admisible_porcentaje": 3.3,
+          "costo_usd_m": 317.9
+        },
+        {
+          "dn_mm": 500,
+          "de_mm": 532,
+          "espesor_nominal_mm": 9.3,
+          "espesor_minimo_mm": 7.5,
+          "rigidez_kn_m2": 58,
+          "deflexion_admisible_porcentaje": 3.4,
+          "costo_usd_m": 378.5
+        },
+        {
+          "dn_mm": 600,
+          "de_mm": 635,
+          "espesor_nominal_mm": 10.9,
+          "espesor_minimo_mm": 9.0,
+          "rigidez_kn_m2": 57,
+          "deflexion_admisible_porcentaje": 3.5,
+          "costo_usd_m": 518.0
+        }
+      ]
+    },
+    "c30": {
+      "clase": "C30",
+      "pfa_bar": 30,
+      "pma_bar": 36,
+      "descripcion": "Clase C30 (PFA = 30 bar) - Redes principales de distribución de agua",
+      "tuberias": [
+        {
+          "dn_mm": 300,
+          "de_mm": 326,
+          "espesor_nominal_mm": 5.1,
+          "espesor_minimo_mm": 3.5,
+          "rigidez_kn_m2": 34,
+          "deflexion_admisible_porcentaje": 3.0,
+          "costo_usd_m": 152.3
+        },
+        {
+          "dn_mm": 350,
+          "de_mm": 378,
+          "espesor_nominal_mm": 6.3,
+          "espesor_minimo_mm": 4.6,
+          "rigidez_kn_m2": 44,
+          "deflexion_admisible_porcentaje": 3.1,
+          "costo_usd_m": 190.3
+        },
+        {
+          "dn_mm": 400,
+          "de_mm": 429,
+          "espesor_nominal_mm": 6.5,
+          "espesor_minimo_mm": 4.8,
+          "rigidez_kn_m2": 34,
+          "deflexion_admisible_porcentaje": 3.2,
+          "costo_usd_m": 233.2
+        },
+        {
+          "dn_mm": 450,
+          "de_mm": 480,
+          "espesor_nominal_mm": 6.9,
+          "espesor_minimo_mm": 5.1,
+          "rigidez_kn_m2": 29,
+          "deflexion_admisible_porcentaje": 3.3,
+          "costo_usd_m": 281.3
+        },
+        {
+          "dn_mm": 500,
+          "de_mm": 532,
+          "espesor_nominal_mm": 7.5,
+          "espesor_minimo_mm": 5.7,
+          "rigidez_kn_m2": 28,
+          "deflexion_admisible_porcentaje": 3.4,
+          "costo_usd_m": 334.9
+        },
+        {
+          "dn_mm": 600,
+          "de_mm": 635,
+          "espesor_nominal_mm": 8.7,
+          "espesor_minimo_mm": 6.8,
+          "rigidez_kn_m2": 27,
+          "deflexion_admisible_porcentaje": 3.6,
+          "costo_usd_m": 458.4
+        },
+        {
+          "dn_mm": 700,
+          "de_mm": 738,
+          "espesor_nominal_mm": 9.9,
+          "espesor_minimo_mm": 7.9,
+          "rigidez_kn_m2": 26,
+          "deflexion_admisible_porcentaje": 3.8,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 800,
+          "de_mm": 842,
+          "espesor_nominal_mm": 11.1,
+          "espesor_minimo_mm": 9.0,
+          "rigidez_kn_m2": 25,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 900,
+          "de_mm": 945,
+          "espesor_nominal_mm": 12.3,
+          "espesor_minimo_mm": 10.1,
+          "rigidez_kn_m2": 24,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1000,
+          "de_mm": 1048,
+          "espesor_nominal_mm": 13.4,
+          "espesor_minimo_mm": 11.1,
+          "rigidez_kn_m2": 23,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1100,
+          "de_mm": 1152,
+          "espesor_nominal_mm": 14.7,
+          "espesor_minimo_mm": 12.3,
+          "rigidez_kn_m2": 24,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1200,
+          "de_mm": 1255,
+          "espesor_nominal_mm": 15.8,
+          "espesor_minimo_mm": 13.3,
+          "rigidez_kn_m2": 23,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1400,
+          "de_mm": 1462,
+          "espesor_nominal_mm": 18.2,
+          "espesor_minimo_mm": 15.5,
+          "rigidez_kn_m2": 22,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1500,
+          "de_mm": 1565,
+          "espesor_nominal_mm": 19.4,
+          "espesor_minimo_mm": 16.6,
+          "rigidez_kn_m2": 22,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1600,
+          "de_mm": 1668,
+          "espesor_nominal_mm": 20.6,
+          "espesor_minimo_mm": 17.7,
+          "rigidez_kn_m2": 22,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1800,
+          "de_mm": 1875,
+          "espesor_nominal_mm": 23.0,
+          "espesor_minimo_mm": 19.9,
+          "rigidez_kn_m2": 22,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2000,
+          "de_mm": 2082,
+          "espesor_nominal_mm": 25.4,
+          "espesor_minimo_mm": 22.1,
+          "rigidez_kn_m2": 22,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        }
+      ]
+    },
+    "c25": {
+      "clase": "C25",
+      "pfa_bar": 25,
+      "pma_bar": 30,
+      "descripcion": "Clase C25 (PFA = 25 bar) - Redes secundarias, zonas con presiones moderadas",
+      "tuberias": [
+        {
+          "dn_mm": 350,
+          "de_mm": 378,
+          "espesor_nominal_mm": 5.1,
+          "espesor_minimo_mm": 3.4,
+          "rigidez_kn_m2": 21,
+          "deflexion_admisible_porcentaje": 3.1,
+          "costo_usd_m": 177.0
+        },
+        {
+          "dn_mm": 400,
+          "de_mm": 429,
+          "espesor_nominal_mm": 5.5,
+          "espesor_minimo_mm": 3.8,
+          "rigidez_kn_m2": 19,
+          "deflexion_admisible_porcentaje": 3.2,
+          "costo_usd_m": 217.0
+        },
+        {
+          "dn_mm": 450,
+          "de_mm": 480,
+          "espesor_nominal_mm": 6.1,
+          "espesor_minimo_mm": 4.3,
+          "rigidez_kn_m2": 19,
+          "deflexion_admisible_porcentaje": 3.3,
+          "costo_usd_m": 261.7
+        },
+        {
+          "dn_mm": 500,
+          "de_mm": 532,
+          "espesor_nominal_mm": 6.5,
+          "espesor_minimo_mm": 4.7,
+          "rigidez_kn_m2": 17,
+          "deflexion_admisible_porcentaje": 3.4,
+          "costo_usd_m": 311.5
+        },
+        {
+          "dn_mm": 600,
+          "de_mm": 635,
+          "espesor_nominal_mm": 7.6,
+          "espesor_minimo_mm": 5.7,
+          "rigidez_kn_m2": 17,
+          "deflexion_admisible_porcentaje": 3.6,
+          "costo_usd_m": 426.4
+        },
+        {
+          "dn_mm": 700,
+          "de_mm": 738,
+          "espesor_nominal_mm": 8.8,
+          "espesor_minimo_mm": 6.8,
+          "rigidez_kn_m2": 17,
+          "deflexion_admisible_porcentaje": 3.8,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 800,
+          "de_mm": 842,
+          "espesor_nominal_mm": 9.6,
+          "espesor_minimo_mm": 7.5,
+          "rigidez_kn_m2": 15,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 900,
+          "de_mm": 945,
+          "espesor_nominal_mm": 10.6,
+          "espesor_minimo_mm": 8.4,
+          "rigidez_kn_m2": 15,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1000,
+          "de_mm": 1048,
+          "espesor_nominal_mm": 11.6,
+          "espesor_minimo_mm": 9.3,
+          "rigidez_kn_m2": 14,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1100,
+          "de_mm": 1152,
+          "espesor_nominal_mm": 12.6,
+          "espesor_minimo_mm": 10.2,
+          "rigidez_kn_m2": 14,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1200,
+          "de_mm": 1255,
+          "espesor_nominal_mm": 13.6,
+          "espesor_minimo_mm": 11.1,
+          "rigidez_kn_m2": 14,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1400,
+          "de_mm": 1462,
+          "espesor_nominal_mm": 15.7,
+          "espesor_minimo_mm": 13.0,
+          "rigidez_kn_m2": 14,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1500,
+          "de_mm": 1565,
+          "espesor_nominal_mm": 16.7,
+          "espesor_minimo_mm": 13.9,
+          "rigidez_kn_m2": 14,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1600,
+          "de_mm": 1668,
+          "espesor_nominal_mm": 17.7,
+          "espesor_minimo_mm": 14.8,
+          "rigidez_kn_m2": 13,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1800,
+          "de_mm": 1875,
+          "espesor_nominal_mm": 19.7,
+          "espesor_minimo_mm": 16.6,
+          "rigidez_kn_m2": 13,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2000,
+          "de_mm": 2082,
+          "espesor_nominal_mm": 21.8,
+          "espesor_minimo_mm": 18.5,
+          "rigidez_kn_m2": 13,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2200,
+          "de_mm": 2288,
+          "espesor_nominal_mm": 23.8,
+          "espesor_minimo_mm": 20.3,
+          "rigidez_kn_m2": 13,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2400,
+          "de_mm": 2495,
+          "espesor_nominal_mm": 25.8,
+          "espesor_minimo_mm": 22.1,
+          "rigidez_kn_m2": 13,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2600,
+          "de_mm": 2702,
+          "espesor_nominal_mm": 27.9,
+          "espesor_minimo_mm": 24.0,
+          "rigidez_kn_m2": 13,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        }
+      ]
+    },
+    "c20": {
+      "clase": "C20",
+      "pfa_bar": 20,
+      "pma_bar": 24,
+      "descripcion": "Clase C20 (PFA = 20 bar) - Sistemas de baja presión, riego",
+      "tuberias": [
+        {
+          "dn_mm": 700,
+          "de_mm": 738,
+          "espesor_nominal_mm": 7.3,
+          "espesor_minimo_mm": 5.3,
+          "rigidez_kn_m2": 9,
+          "deflexion_admisible_porcentaje": 3.8,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 800,
+          "de_mm": 842,
+          "espesor_nominal_mm": 8.1,
+          "espesor_minimo_mm": 6.0,
+          "rigidez_kn_m2": 9,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 900,
+          "de_mm": 945,
+          "espesor_nominal_mm": 8.9,
+          "espesor_minimo_mm": 6.7,
+          "rigidez_kn_m2": 9,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1000,
+          "de_mm": 1048,
+          "espesor_nominal_mm": 9.8,
+          "espesor_minimo_mm": 7.5,
+          "rigidez_kn_m2": 8,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1100,
+          "de_mm": 1152,
+          "espesor_nominal_mm": 10.6,
+          "espesor_minimo_mm": 8.2,
+          "rigidez_kn_m2": 8,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1200,
+          "de_mm": 1255,
+          "espesor_nominal_mm": 11.4,
+          "espesor_minimo_mm": 8.9,
+          "rigidez_kn_m2": 8,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1400,
+          "de_mm": 1462,
+          "espesor_nominal_mm": 13.1,
+          "espesor_minimo_mm": 10.4,
+          "rigidez_kn_m2": 8,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1500,
+          "de_mm": 1565,
+          "espesor_nominal_mm": 13.9,
+          "espesor_minimo_mm": 11.1,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1600,
+          "de_mm": 1668,
+          "espesor_nominal_mm": 14.8,
+          "espesor_minimo_mm": 11.9,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 1800,
+          "de_mm": 1875,
+          "espesor_nominal_mm": 16.4,
+          "espesor_minimo_mm": 13.3,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2000,
+          "de_mm": 2082,
+          "espesor_nominal_mm": 18.1,
+          "espesor_minimo_mm": 14.8,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2200,
+          "de_mm": 2288,
+          "espesor_nominal_mm": 19.8,
+          "espesor_minimo_mm": 16.3,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2400,
+          "de_mm": 2495,
+          "espesor_nominal_mm": 21.4,
+          "espesor_minimo_mm": 17.7,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        },
+        {
+          "dn_mm": 2600,
+          "de_mm": 2702,
+          "espesor_nominal_mm": 23.1,
+          "espesor_minimo_mm": 19.2,
+          "rigidez_kn_m2": 7,
+          "deflexion_admisible_porcentaje": 4.0,
+          "costo_usd_m": 0.0
+        }
+      ]
+    }
+  },
+  "configuracion": {
+    "version": "1.0",
+    "fecha_creacion": "2025-01-01",
+    "descripcion": "Tabla de espesores, presiones y rigideces para tuberías de hierro dúctil según ISO 2531",
+    "norma": "ISO 2531:2009",
+    "rango_dn": "DN 40 a DN 2600",
+    "material": "Hierro dúctil con grafito esferoidal",
+    "resistencia_minima_traccion": "420 MPa",
+    "clases_presion": {
+      "C40": "PN 40 → 40 bar - Sistemas de alta presión, impulsiones de bombeo",
+      "C30": "PN 30 → 30 bar - Redes principales de distribución de agua",
+      "C25": "PN 25 → 25 bar - Redes secundarias, zonas con presiones moderadas",
+      "C20": "PN 20 → 20 bar - Sistemas de baja presión, riego"
+    },
+    "formulas": {
+      "presion_maxima": "PMA = 1.20 × PFA",
+      "presion_prueba_obra": "PEA = (1.20 × PFA) + 5 bar",
+      "diametro_interno": "DI = DE - 2 × espesor_nominal",
+      "espesor_minimo": "emin = (PFA × 3 × DE) / (20 × 420 + (PFA × 3))",
+      "rigidez_diametral": "S = (1000 × E) / (12 × (estiff/D)³)"
+    }
+  }
+}

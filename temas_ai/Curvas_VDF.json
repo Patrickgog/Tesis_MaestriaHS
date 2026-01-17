@@ -1,0 +1,14 @@
+{
+    "tema": "Curvas_VDF",
+    "descripcion": "Análisis de operación con variador de frecuencia (VFD) y aplicación de leyes de afinidad",
+    "preguntas": [
+        "Calcula el porcentaje de RPM necesario para que la curva de la bomba (ajustada por leyes de afinidad) y la curva del sistema se intersecten exactamente en el caudal nominal",
+        "Verifica la aplicación correcta de leyes de afinidad para el %RPM seleccionado: Q₂/Q₁=N₂/N₁, H₂/H₁=(N₂/N₁)², P₂/P₁=(N₂/N₁)³. ¿Los cálculos son correctos?",
+        "Analiza el nuevo punto de operación a RPM reducido. ¿Sigue en zona de eficiencia aceptable (>70%), o la eficiencia cae drásticamente?",
+        "Calcula el ahorro energético anual comparando potencia a 100% RPM vs %RPM reducido. ¿Justifica la inversión en VFD (USD 200-500/HP)?",
+        "Evalúa si VFD es la mejor estrategia de control. Compara con bypass con válvula reguladora en términos de pérdidas y costo. ¿Cuál es más simple y económico?",
+        "Analiza efecto del VFD en NPSH. Al reducir RPM, ¿el NPSH requerido disminuye suficiente para evitar cavitación si había margen justo a 100%?",
+        "Calcula tiempo de retorno de inversión (ROI) del VFD. Considera: costo VFD, ahorro energético anual, horas operación/año, tarifa eléctrica. ¿Es <3 años?",
+        "Describe la familia de curvas H-Q a diferentes %RPM (60%, 70%, 80%, 90%, 100%) junto con curva del sistema. Identifica rango de operación flexible y límites"
+    ]
+}

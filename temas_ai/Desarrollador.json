@@ -1,0 +1,25 @@
+{
+    "tema": "Desarrollador",
+    "descripcion": "Tema especial para desarrolladores que permite realizar cualquier pregunta técnica sobre sistemas de bombeo",
+    "preguntas": [
+        "Analiza completamente el sistema de bombeo con todos los datos proporcionados",
+        "¿Cuáles son los principales problemas identificados en este diseño?",
+        "¿Qué mejoras recomiendas para optimizar el sistema?",
+        "¿Es adecuada la selección de materiales y diámetros?",
+        "¿El motor seleccionado es apropiado para la aplicación?",
+        "¿Qué consideraciones especiales requiere este proyecto?",
+        "¿Cómo afectan las condiciones ambientales al diseño?",
+        "¿Qué análisis adicionales serían recomendables?",
+        "¿Existen riesgos potenciales en la operación?",
+        "¿Qué mantenimiento preventivo requiere el sistema?",
+        "¿El tipo de ajuste de curva seleccionado es el más adecuado para los datos?",
+        "Dame la formula para calcular las ecuaciones",
+        "Dame la formula para calcular las ecuaciones cuadráticas usadas en el cálculo, si son matriciales coloca tambien las matrices, basandose en los 3 puntos de la curva de la bomba",
+        "Analiza completamente el sistema de bombeo con todos los datos proporcionados, incluyendo fórmulas, conceptos y criterios técnicos. Adiciona el cálculo de las longitudes equivalentes de implosión y succión en forma de cuadros",
+        "como puedo aumentar en NSPH",
+        "como puedo aumentar en NSPH disponible en este caso",
+        "Este siseño esta en peligro de caer en golpe de ariete? si es así cual sera la solucion",
+        "Analiza y dame un link de una bomba tipo que se adapte a las caracteristica de los inputs de entrada. Busca en grundfos y ebara",
+        "que es el Le/D  en la app"
+    ]
+}

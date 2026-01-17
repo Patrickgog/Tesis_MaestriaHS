@@ -1,0 +1,54 @@
+{
+  "tuberias": [
+    {
+      "id": 1,
+      "material": "PVC",
+      "tipo": "Clase 10",
+      "diametros_disponibles": "50-600 mm",
+      "propiedades": "Ligero, resistente a la corrosión",
+      "aplicaciones": "Agua potable, riego, saneamiento",
+      "ventajas": "Bajo costo, fácil instalación",
+      "desventajas": "Sensible a UV, menor resistencia a impacto"
+    },
+    {
+      "id": 2,
+      "material": "PEAD",
+      "tipo": "PN16",
+      "diametros_disponibles": "20-1200 mm",
+      "propiedades": "Flexible, alta resistencia química",
+      "aplicaciones": "Agua, gas, minería, agricultura",
+      "ventajas": "Larga vida útil, resistencia a la abrasión",
+      "desventajas": "Mayor costo inicial, requiere soldadura"
+    },
+    {
+      "id": 3,
+      "material": "Acero",
+      "tipo": "ASTM A53",
+      "diametros_disponibles": "DN15-DN1000",
+      "propiedades": "Alta resistencia mecánica, soldable",
+      "aplicaciones": "Industrial, alta presión, vapor",
+      "ventajas": "Durabilidad, resistencia a altas temperaturas",
+      "desventajas": "Corrosión, mayor peso, instalación compleja"
+    },
+    {
+      "id": 4,
+      "material": "Hierro Fundido",
+      "tipo": "Clase K9",
+      "diametros_disponibles": "DN80-DN2000",
+      "propiedades": "Resistente a la corrosión, duradero",
+      "aplicaciones": "Redes de agua, saneamiento",
+      "ventajas": "Larga vida útil, buena resistencia a la presión",
+      "desventajas": "Pesado, frágil a impactos, costo moderado"
+    },
+    {
+      "id": 5,
+      "material": "Hierro Dúctil",
+      "tipo": "Clase K9",
+      "diametros_disponibles": "DN80-DN2000",
+      "propiedades": "Resistente a la corrosión, duradero",
+      "aplicaciones": "Redes de agua, saneamiento",
+      "ventajas": "Larga vida útil, buena resistencia a la presión",
+      "desventajas": "Pesado, frágil a impactos, costo moderado"
+    }
+  ]
+}

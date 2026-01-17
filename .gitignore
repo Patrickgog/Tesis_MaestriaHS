@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets and credentials
+secrets
+*.key
+*.pem
+
+# Output folders - keep structure but not content
+informes/*.pdf
+informes/*.html
+informes/*.json
+!informes/.gitkeep
+
+proyectos/*.json
+!proyectos/.gitkeep
+
+resultados_para_IA/*.json
+!resultados_para_IA/.gitkeep
+
+resultados_EPANET/
+resultados_transientes/
+
+# Temporary files
+*.tmp
+*.temp
+temp.*
+*.log
+
+# Large data files
+*.obj
+*.bin
+*.rpt
+*.inp
+
+# Backup folders
+1_respaldos/

@@ -1,0 +1,43 @@
+{
+    "criterios_tecnicos": {
+        "velocidades_optimas": {
+            "succion": {
+                "min": 0.6,
+                "max": 0.9,
+                "unidad": "m/s",
+                "descripcion": "Velocidad óptima en tubería de succión"
+            },
+            "impulsion": {
+                "min": 1.0,
+                "max": 2.5,
+                "unidad": "m/s",
+                "descripcion": "Velocidad óptima en tubería de impulsión"
+            }
+        },
+        "npsh": {
+            "margen_seguridad_minimo": 0.5,
+            "unidad": "m",
+            "descripcion": "Margen de seguridad mínimo para NPSH"
+        },
+        "perdidas": {
+            "succion_maxima_porcentaje": 10,
+            "descripcion": "Pérdidas en succión deben ser <10% de la altura total"
+        },
+        "eficiencias": {
+            "bomba_tipica_min": 70,
+            "bomba_tipica_max": 85,
+            "unidad": "%",
+            "descripcion": "Rango típico de eficiencia de bombas"
+        },
+        "motor": {
+            "factor_servicio_min": 1.15,
+            "factor_servicio_max": 1.25,
+            "descripcion": "Factor de servicio recomendado para motores"
+        },
+        "formulas": {
+            "npsh": "NPSH = Pvapor + Patm - Psucción - Pperdidas",
+            "bernoulli": "P1/γ + V1²/2g + Z1 = P2/γ + V2²/2g + Z2 + hf",
+            "leyes_afinidad": "Q1/Q2 = N1/N2, H1/H2 = (N1/N2)², P1/P2 = (N1/N2)³"
+        }
+    }
+}

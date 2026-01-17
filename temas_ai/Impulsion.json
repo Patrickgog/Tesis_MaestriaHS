@@ -1,0 +1,14 @@
+{
+    "tema": "Impulsion",
+    "descripcion": "Análisis técnico de la línea de impulsión: geometría, pérdidas, golpe de ariete y eficiencia energética",
+    "preguntas": [
+        "Dame el rango de diámetros comerciales que puedo usar para que la velocidad de impulsión esté en el rango óptimo (1.5-2.5 m/s)",
+        "Calcula el costo energético anual de las pérdidas en impulsión considerando tarifa eléctrica promedio. ¿Se justificaría aumentar un diámetro para reducir pérdidas en 10 años?",
+        "Proporciona una tabla con los accesorios de impulsión y sus longitudes equivalentes. Incluye el total al final",
+        "Evalúa el riesgo de golpe de ariete calculando la sobrepresión máxima por el método de Allievi. ¿Es necesario un sistema de protección (válvula de alivio, tanque anti-ariete)?",
+        "Revisa la configuración de accesorios en impulsión. ¿Faltan elementos críticos como válvulas de aire en puntos altos, válvulas de purga en puntos bajos?",
+        "Analiza puntos críticos de la trayectoria: cambios bruscos de dirección, puntos altos sin expulsión de aire, puntos bajos sin drenaje. Propón soluciones",
+        "Compara el diseño actual con una configuración usando VFD. Calcula el ahorro energético anual y el tiempo de retorno de inversión del variador",
+        "Crea tabla comparativa de 3 materiales (PVC, PEAD, Acero) mostrando: pérdidas, resistencia a sobrepresión, costo y vida útil. Recomienda para este proyecto"
+    ]
+}

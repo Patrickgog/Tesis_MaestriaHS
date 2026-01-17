@@ -1,0 +1,318 @@
+{
+    "marca": "Pedrollo",
+    "descripcion": "Catálogo de bombas Pedrollo - CP (Centrífuga), 2CP, NK (Multietapa) y F (Industrial)",
+    "url_catalogo": "https://www.pedrollo.com/es",
+    "ultima_actualizacion": "2026-01-14",
+    "categorias": [
+        {
+            "categoria": "CP - Centrífugas Monobloque (Caudal Recurrente)",
+            "tipo": "Horizontal",
+            "rango_caudal_min_lps": 0.5,
+            "rango_caudal_max_lps": 15,
+            "rango_altura_min_m": 5,
+            "rango_altura_max_m": 60,
+            "bombas": [
+                {
+                    "codigo": "CP 230C",
+                    "modelo": "CP 230C",
+                    "serie": "CP",
+                    "tipo_bomba": "Centrífuga Horizontal",
+                    "potencia_hp": 4.0,
+                    "potencia_kw": 3.0,
+                    "rpm": 3450,
+                    "etapas": 1,
+                    "peso_kg": 28,
+                    "costo_estimado_usd": 1200,
+                    "material_impulsor": "Latón",
+                    "temperatura_max_c": 90,
+                    "presion_max_bar": 10,
+                    "rango_caudal_optimo_lps": [
+                        4,
+                        10
+                    ],
+                    "rango_altura_optima_m": [
+                        25,
+                        40
+                    ],
+                    "url_ficha_tecnica": "https://www.pedrollo.com/es/cp-130-250/26",
+                    "curvas": {
+                        "h_q": {
+                            "caudales_lps": [
+                                0,
+                                3,
+                                6,
+                                9,
+                                12,
+                                15
+                            ],
+                            "alturas_m": [
+                                48,
+                                45,
+                                40,
+                                32,
+                                22,
+                                10
+                            ]
+                        },
+                        "eta_q": {
+                            "caudales_lps": [
+                                3,
+                                6,
+                                9,
+                                12,
+                                15
+                            ],
+                            "eficiencias_porcentaje": [
+                                45,
+                                62,
+                                70,
+                                65,
+                                48
+                            ]
+                        },
+                        "pbhp_q": {
+                            "caudales_lps": [
+                                0,
+                                3,
+                                6,
+                                9,
+                                12,
+                                15
+                            ],
+                            "potencias_kw": [
+                                1.0,
+                                1.8,
+                                2.5,
+                                3.0,
+                                3.5,
+                                4.0
+                            ]
+                        },
+                        "npshr_q": {
+                            "caudales_lps": [
+                                0,
+                                3,
+                                6,
+                                9,
+                                12,
+                                15
+                            ],
+                            "npsh_requerido_m": [
+                                1.8,
+                                2.2,
+                                3.0,
+                                4.2,
+                                6.0,
+                                8.5
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "categoria": "2CP - Centrífugas de Doble Impulsor (Mayor Presión)",
+            "tipo": "Horizontal",
+            "rango_caudal_min_lps": 1,
+            "rango_caudal_max_lps": 10,
+            "rango_altura_min_m": 30,
+            "rango_altura_max_m": 100,
+            "bombas": [
+                {
+                    "codigo": "2CP 40/200B",
+                    "modelo": "2CP 40/200B",
+                    "serie": "2CP",
+                    "tipo_bomba": "Horizontal Doble Impulsor",
+                    "potencia_hp": 15.0,
+                    "potencia_kw": 11.0,
+                    "rpm": 3450,
+                    "etapas": 2,
+                    "peso_kg": 85,
+                    "costo_estimado_usd": 3800,
+                    "material_impulsor": "Latón / Inoxidable",
+                    "temperatura_max_c": 90,
+                    "presion_max_bar": 10,
+                    "rango_caudal_optimo_lps": [
+                        2,
+                        6
+                    ],
+                    "rango_altura_optima_m": [
+                        65,
+                        85
+                    ],
+                    "url_ficha_tecnica": "https://www.pedrollo.com/es/2cp-32-40/31",
+                    "curvas": {
+                        "h_q": {
+                            "caudales_lps": [
+                                0,
+                                2,
+                                4,
+                                6,
+                                8
+                            ],
+                            "alturas_m": [
+                                94,
+                                88,
+                                78,
+                                62,
+                                40
+                            ]
+                        },
+                        "eta_q": {
+                            "caudales_lps": [
+                                2,
+                                4,
+                                6,
+                                8
+                            ],
+                            "eficiencias_porcentaje": [
+                                48,
+                                65,
+                                68,
+                                55
+                            ]
+                        },
+                        "pbhp_q": {
+                            "caudales_lps": [
+                                0,
+                                2,
+                                4,
+                                6,
+                                8
+                            ],
+                            "potencias_kw": [
+                                3.5,
+                                5.5,
+                                8.0,
+                                10.5,
+                                12.5
+                            ]
+                        },
+                        "npshr_q": {
+                            "caudales_lps": [
+                                0,
+                                2,
+                                4,
+                                6,
+                                8
+                            ],
+                            "npsh_requerido_m": [
+                                2.0,
+                                2.5,
+                                3.5,
+                                5.0,
+                                7.5
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "categoria": "F - Centrífugas Bridadas Industriales (Gran Caudal)",
+            "tipo": "Horizontal",
+            "rango_caudal_min_lps": 10,
+            "rango_caudal_max_lps": 100,
+            "rango_altura_min_m": 15,
+            "rango_altura_max_m": 100,
+            "bombas": [
+                {
+                    "codigo": "F 50/250B",
+                    "modelo": "F 50/250B",
+                    "serie": "F",
+                    "tipo_bomba": "Centrífuga Bridada EN 733",
+                    "potencia_hp": 25.0,
+                    "potencia_kw": 18.5,
+                    "rpm": 3450,
+                    "etapas": 1,
+                    "peso_kg": 155,
+                    "costo_estimado_usd": 5500,
+                    "material_impulsor": "Hierro fundido / Bronce",
+                    "temperatura_max_c": 90,
+                    "presion_max_bar": 10,
+                    "rango_caudal_optimo_lps": [
+                        15,
+                        30
+                    ],
+                    "rango_altura_optima_m": [
+                        65,
+                        85
+                    ],
+                    "url_ficha_tecnica": "https://www.pedrollo.com/es/f/33",
+                    "curvas": {
+                        "h_q": {
+                            "caudales_lps": [
+                                0,
+                                10,
+                                20,
+                                30,
+                                40,
+                                50
+                            ],
+                            "alturas_m": [
+                                96,
+                                92,
+                                85,
+                                75,
+                                60,
+                                40
+                            ]
+                        },
+                        "eta_q": {
+                            "caudales_lps": [
+                                10,
+                                20,
+                                30,
+                                40,
+                                50
+                            ],
+                            "eficiencias_porcentaje": [
+                                55,
+                                72,
+                                78,
+                                75,
+                                65
+                            ]
+                        },
+                        "pbhp_q": {
+                            "caudales_lps": [
+                                0,
+                                10,
+                                20,
+                                30,
+                                40,
+                                50
+                            ],
+                            "potencias_kw": [
+                                6.5,
+                                11,
+                                15,
+                                18,
+                                21,
+                                24
+                            ]
+                        },
+                        "npshr_q": {
+                            "caudales_lps": [
+                                0,
+                                10,
+                                20,
+                                30,
+                                40,
+                                50
+                            ],
+                            "npsh_requerido_m": [
+                                2.5,
+                                3.5,
+                                5.0,
+                                7.5,
+                                11,
+                                16
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

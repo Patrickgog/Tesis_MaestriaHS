@@ -1,0 +1,106 @@
+{
+  "materiales": [
+    {
+      "id": 1,
+      "material": "PVC",
+      "coeficiente_c": 150,
+      "descripcion": "Cloruro de Polivinilo - Tubería plástica de uso común",
+      "aplicacion": "Sistemas de agua potable, riego, drenaje",
+      "rango_diametros": "1/2\" - 24\"",
+      "presion_maxima": "150-200 PSI",
+      "temperatura_maxima": "60°C"
+    },
+    {
+      "id": 2,
+      "material": "HDPE (Polietileno)",
+      "coeficiente_c": 150,
+      "descripcion": "Polietileno de Alta Densidad - Tubería plástica flexible",
+      "aplicacion": "Sistemas de agua potable, gas, minería",
+      "rango_diametros": "1/2\" - 48\"",
+      "presion_maxima": "100-200 PSI",
+      "temperatura_maxima": "80°C"
+    },
+    {
+      "id": 3,
+      "material": "Acero Comercial",
+      "coeficiente_c": 140,
+      "descripcion": "Acero al carbono de uso comercial",
+      "aplicacion": "Sistemas industriales, agua potable, vapor",
+      "rango_diametros": "1/2\" - 48\"",
+      "presion_maxima": "300-600 PSI",
+      "temperatura_maxima": "400°C"
+    },
+    {
+      "id": 4,
+      "material": "Hierro Dúctil",
+      "coeficiente_c": 140,
+      "descripcion": "Hierro fundido dúctil con propiedades mejoradas",
+      "aplicacion": "Sistemas de agua potable, alcantarillado, riego",
+      "rango_diametros": "3\" - 64\"",
+      "presion_maxima": "250-350 PSI",
+      "temperatura_maxima": "100°C"
+    },
+    {
+      "id": 5,
+      "material": "Hierro Fundido",
+      "coeficiente_c": 130,
+      "descripcion": "Hierro fundido tradicional",
+      "aplicacion": "Sistemas de alcantarillado, drenaje",
+      "rango_diametros": "4\" - 48\"",
+      "presion_maxima": "150-250 PSI",
+      "temperatura_maxima": "80°C"
+    },
+    {
+      "id": 6,
+      "material": "Concreto",
+      "coeficiente_c": 120,
+      "descripcion": "Tubería de concreto reforzado",
+      "aplicacion": "Sistemas de alcantarillado, drenaje pluvial",
+      "rango_diametros": "12\" - 144\"",
+      "presion_maxima": "50-100 PSI",
+      "temperatura_maxima": "40°C"
+    },
+    {
+      "id": 7,
+      "material": "Asbesto Cemento",
+      "coeficiente_c": 140,
+      "descripcion": "Tubería de asbesto cemento (en desuso)",
+      "aplicacion": "Sistemas antiguos de agua potable",
+      "rango_diametros": "4\" - 36\"",
+      "presion_maxima": "100-200 PSI",
+      "temperatura_maxima": "60°C"
+    },
+    {
+      "id": 8,
+      "material": "Cobre",
+      "coeficiente_c": 130,
+      "descripcion": "Tubería de cobre para instalaciones",
+      "aplicacion": "Sistemas residenciales, agua caliente",
+      "rango_diametros": "1/4\" - 8\"",
+      "presion_maxima": "200-400 PSI",
+      "temperatura_maxima": "200°C"
+    },
+    {
+      "id": 9,
+      "material": "HIERRO",
+      "coeficiente_c": 130,
+      "descripcion": "Hierro fundido tradicional (alias para compatibilidad)",
+      "aplicacion": "Sistemas de alcantarillado, drenaje",
+      "rango_diametros": "4\" - 48\"",
+      "presion_maxima": "150-250 PSI",
+      "temperatura_maxima": "80°C"
+    }
+  ],
+  "configuracion": {
+    "version": "1.0",
+    "fecha_creacion": "2025-01-01",
+    "descripcion": "Coeficientes C de Hazen-Williams para diferentes materiales de tubería",
+    "formula": "hf = 10.67 * (Q^1.852) * L / (C^1.852 * D^4.871)",
+    "unidades": {
+      "caudal": "m³/s",
+      "longitud": "m",
+      "diametro": "m",
+      "perdida_friccion": "m"
+    }
+  }
+}
