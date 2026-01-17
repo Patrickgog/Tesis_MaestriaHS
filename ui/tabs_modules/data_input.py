@@ -159,6 +159,110 @@ def render_data_input_tab():
         if k not in st.session_state:
             st.session_state[k] = v
     
+    # SINCRONIZACIÓN AUTOMÁTICA DE DIÁMETROS
+    # Esta función asegura que diam_succion_mm y diam_impulsion_mm reflejen
+    # los valores calculados desde los datos específicos del material
+    def sync_diameters_from_material_data():
+        """Sincroniza diam_succion_mm y diam_impulsion_mm con los datos específicos del material"""
+        # Sincronizar Succión
+        mat_suc = st.session_state.get('mat_succion', 'PVC')
+        
+        if mat_suc in ["PEAD", "HDPE (Polietileno)"]:
+            diam_ext = st.session_state.get('diam_externo_succion', None)
+            serie = st.session_state.get('serie_succion', None)
+            if diam_ext and serie:
+                try:
+                    di_calc = calculate_diametro_interno_pead(diam_ext, serie)
+                    if di_calc and di_calc > 0:
+                        st.session_state['diam_succion_mm'] = di_calc
+                except:
+                    pass
+        
+        elif mat_suc == "PVC":
+            tipo_union = st.session_state.get('tipo_union_pvc_succion', None)
+            serie_pvc = st.session_state.get('serie_pvc_succion_nombre', None)
+            dn_pvc = st.session_state.get('dn_pvc_succion', None)
+            if tipo_union and serie_pvc and dn_pvc:
+                try:
+                    di_calc = calculate_diametro_interno_pvc(tipo_union, serie_pvc, dn_pvc)
+                    if di_calc and di_calc > 0:
+                        st.session_state['diam_succion_mm'] = di_calc
+                except:
+                    pass
+        
+        elif mat_suc == "Hierro Dúctil":
+            clase = st.session_state.get('clase_hierro_succion', None)
+            dn = st.session_state.get('dn_succion', None)
+            if clase and dn:
+                try:
+                    di_calc = calculate_diametro_interno_hierro_ductil(clase, dn)
+                    if di_calc and di_calc > 0:
+                        st.session_state['diam_succion_mm'] = di_calc
+                except:
+                    pass
+        
+        elif mat_suc == "Hierro Fundido":
+            clase_hf = st.session_state.get('clase_hierro_fundido_succion', None)
+            dn_hf = st.session_state.get('dn_hierro_fundido_succion', None)
+            if clase_hf and dn_hf:
+                try:
+                    data = get_hierro_fundido_data(clase_hf, dn_hf)
+                    if data and 'di_mm' in data:
+                        st.session_state['diam_succion_mm'] = data['di_mm']
+                except:
+                    pass
+        
+        # Sincronizar Impulsión
+        mat_imp = st.session_state.get('mat_impulsion', 'PVC')
+        
+        if mat_imp in ["PEAD", "HDPE (Polietileno)"]:
+            diam_ext = st.session_state.get('diam_externo_impulsion', None)
+            serie = st.session_state.get('serie_impulsion', None)
+            if diam_ext and serie:
+                try:
+                    di_calc = calculate_diametro_interno_pead(diam_ext, serie)
+                    if di_calc and di_calc > 0:
+                        st.session_state['diam_impulsion_mm'] = di_calc
+                except:
+                    pass
+        
+        elif mat_imp == "PVC":
+            tipo_union = st.session_state.get('tipo_union_pvc_impulsion', None)
+            serie_pvc = st.session_state.get('serie_pvc_impulsion_nombre', None)
+            dn_pvc = st.session_state.get('dn_pvc_impulsion', None)
+            if tipo_union and serie_pvc and dn_pvc:
+                try:
+                    di_calc = calculate_diametro_interno_pvc(tipo_union, serie_pvc, dn_pvc)
+                    if di_calc and di_calc > 0:
+                        st.session_state['diam_impulsion_mm'] = di_calc
+                except:
+                    pass
+        
+        elif mat_imp == "Hierro Dúctil":
+            clase = st.session_state.get('clase_hierro_impulsion', None)
+            dn = st.session_state.get('dn_impulsion', None)
+            if clase and dn:
+                try:
+                    di_calc = calculate_diametro_interno_hierro_ductil(clase, dn)
+                    if di_calc and di_calc > 0:
+                        st.session_state['diam_impulsion_mm'] = di_calc
+                except:
+                    pass
+        
+        elif mat_imp == "Hierro Fundido":
+            clase_hf = st.session_state.get('clase_hierro_fundido_impulsion', None)
+            dn_hf = st.session_state.get('dn_hierro_fundido_impulsion', None)
+            if clase_hf and dn_hf:
+                try:
+                    data = get_hierro_fundido_data(clase_hf, dn_hf)
+                    if data and 'di_mm' in data:
+                        st.session_state['diam_impulsion_mm'] = data['di_mm']
+                except:
+                    pass
+    
+    # Ejecutar sincronización automática
+    sync_diameters_from_material_data()
+    
     def get_current_system_params():
         """Obtiene un diccionario unificado de parámetros del sistema desde el session_state."""
         # Asegurar sincronización con los selectores detallados si existen
