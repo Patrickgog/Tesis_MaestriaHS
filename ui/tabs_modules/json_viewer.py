@@ -134,21 +134,36 @@ def render_json_tab():
                 'vfd': {
                     'rpm_percentage': st.session_state.get('rpm_percentage', 100),
                 },
-                'analisis_vdf': {
-                    'caudal_nominal_vdf': st.session_state.get('caudal_nominal', 0),
-                    'caudal_diseno_lps': st.session_state.get('caudal_lps', 0),
-                    'potencia_ajustada': st.session_state.get('potencia_ajustada', 0),
-                    'eficiencia_ajustada': st.session_state.get('eficiencia_ajustada', 0),
-                    'rpm_porcentaje': st.session_state.get('rpm_percentage', 100),
-                    'eficiencia_operacion': st.session_state.get('eficiencia_operacion', 0),
-                    'interseccion_vfd': st.session_state.get('interseccion_vfd', [0, 0]),
-                },
-                # Bomba seleccionada
-                'bomba_seleccionada': {
-                    'nombre': st.session_state.get('bomba_nombre', 'N/A'),
-                    'url': st.session_state.get('bomba_url', ''),
-                    'descripcion': st.session_state.get('bomba_descripcion', 'N/A'),
-                },
+            }
+            
+            # Leer datos VFD desde vfd_results
+            vfd_results = st.session_state.get('vfd_results', {})
+            q_vfd = vfd_results.get('q_op_vfd', 0)
+            h_vfd = vfd_results.get('h_op_vfd', 0)
+            p_vfd = vfd_results.get('power_vfd_hp', 0)
+            e_vfd = vfd_results.get('eff_vfd', 0)
+            n_vfd = vfd_results.get('npsh_vfd', 0)
+            rpm_p = vfd_results.get('rpm_percentage', 100)
+            
+            project_data['analisis_vdf'] = {
+                'caudal_nominal_vdf': q_vfd,
+                'caudal_diseno_lps': st.session_state.get('caudal_lps', 0),
+                'potencia_ajustada_hp': p_vfd,
+                'potencia_ajustada_kw': p_vfd * 0.7457 if p_vfd else 0,
+                'eficiencia_ajustada': e_vfd,
+                'npsh_vfd': n_vfd,
+                'rpm_porcentaje': rpm_p,
+                'factor_rpm': rpm_p / 100.0 if rpm_p > 0 else 1.0,
+                'eficiencia_operacion': e_vfd,
+                'interseccion_vfd': [q_vfd, h_vfd],
+                'nota_calculo': f"Calculado a {rpm_p:.1f}% RPM" if vfd_results else 'N/A'
+            }
+            
+            # Bomba seleccionada
+            project_data['bomba_seleccionada'] = {
+                'nombre': st.session_state.get('bomba_nombre', 'N/A'),
+                'url': st.session_state.get('bomba_url', ''),
+                'descripcion': st.session_state.get('bomba_descripcion', 'N/A'),
             }
             
             # Función helper para convertir DataFrame al formato esperado por tablas_graficos
@@ -1039,9 +1054,13 @@ def render_json_tab():
                     if caudal_diseno_lps != 'N/A':
                         caudal_diseno_lps = f"{float(caudal_diseno_lps):.2f}"
                     
-                    potencia_ajustada = vdf.get('potencia_ajustada', 'N/A')
-                    if potencia_ajustada != 'N/A':
-                        potencia_ajustada = f"{float(potencia_ajustada):.2f}"
+                    potencia_ajustada_hp = vdf.get('potencia_ajustada_hp', 'N/A')
+                    if potencia_ajustada_hp != 'N/A':
+                        potencia_ajustada_hp = f"{float(potencia_ajustada_hp):.2f}"
+                    
+                    potencia_ajustada_kw = vdf.get('potencia_ajustada_kw', 'N/A')
+                    if potencia_ajustada_kw != 'N/A':
+                        potencia_ajustada_kw = f"{float(potencia_ajustada_kw):.2f}"
                     
                     eficiencia_ajustada = vdf.get('eficiencia_ajustada', 'N/A')
                     if eficiencia_ajustada != 'N/A':
@@ -1082,9 +1101,9 @@ def render_json_tab():
                             <td style="border: 1px solid #ddd; padding: 10px;">L/s</td>
                         </tr>
                         <tr>
-                            <td style="border: 1px solid #ddd; padding: 10px;">Potencia Ajustada</td>
-                            <td style="border: 1px solid #ddd; padding: 10px;">{potencia_ajustada}</td>
-                            <td style="border: 1px solid #ddd; padding: 10px;">kW</td>
+                            <td style="border: 1px solid #ddd; padding: 10px;">Potencia Ajustada (PBHP)</td>
+                            <td style="border: 1px solid #ddd; padding: 10px;">{potencia_ajustada_hp} HP ({potencia_ajustada_kw} kW)</td>
+                            <td style="border: 1px solid #ddd; padding: 10px;">HP/kW</td>
                         </tr>
                         <tr>
                             <td style="border: 1px solid #ddd; padding: 10px;">Eficiencia Ajustada</td>
@@ -1222,37 +1241,29 @@ def render_json_tab():
                     analisis_vdf = project_data['analisis_vdf']
                     
                     # Datos del punto de operación VDF
-                    caudal_vdf = analisis_vdf.get('caudal_diseno_lps', 'N/A')
-                    altura_vdf = analisis_vdf.get('interseccion_vfd', ['N/A', 'N/A'])
-                    eficiencia_vdf = analisis_vdf.get('eficiencia_operacion', 'N/A')
-                    potencia_vdf = analisis_vdf.get('potencia_ajustada', 'N/A')
-                    
-                    # Formatear valores
+                    caudal_vdf = analisis_vdf.get('caudal_nominal_vdf', 'N/A')
                     if caudal_vdf != 'N/A':
                         caudal_vdf = f"{float(caudal_vdf):.2f}"
-                    if altura_vdf[1] != 'N/A':
-                        altura_vdf = f"{float(altura_vdf[1]):.2f}"
-                    else:
-                        altura_vdf = "N/A"
+                    
+                    # Altura (H) desde la intersección calculada
+                    inter_vfd = analisis_vdf.get('interseccion_vfd', [0, 0])
+                    altura_vdf = f"{float(inter_vfd[1]):.2f}" if inter_vfd and len(inter_vfd) > 1 else "0.00"
+                    
+                    # Eficiencia y Potencia
+                    eficiencia_vdf = analisis_vdf.get('eficiencia_ajustada', 'N/A')
                     if eficiencia_vdf != 'N/A':
                         eficiencia_vdf = f"{float(eficiencia_vdf):.2f}"
-                    if potencia_vdf != 'N/A':
-                        potencia_vdf = f"{float(potencia_vdf):.2f}"
                     
-                    # Obtener datos de NPSH VDF
-                    npsh_vdf = "N/A"
-                    if 'curvas_texto' in project_data and 'npsh' in project_data['curvas_texto']:
-                        npsh_texto = project_data['curvas_texto']['npsh']
-                        puntos_npsh = []
-                        for linea in npsh_texto.split('\n'):
-                            if linea.strip():
-                                partes = linea.strip().split('\t')
-                                if len(partes) >= 2:
-                                    puntos_npsh.append([float(partes[0]), float(partes[1])])
-                        
-                        if len(puntos_npsh) >= 2:
-                            punto_npsh_vdf = puntos_npsh[1]  # Segundo punto como punto de operación
-                            npsh_vdf = f"{punto_npsh_vdf[1]:.2f}"
+                    potencia_vdf_hp = analisis_vdf.get('potencia_ajustada_hp', '0.00')
+                    if potencia_vdf_hp != 'N/A' and potencia_vdf_hp is not None:
+                        potencia_vdf_hp = f"{float(potencia_vdf_hp):.2f}"
+                    
+                    # NPSH Requerido VDF (Desde vfd_results)
+                    npsh_vdf = analisis_vdf.get('npsh_vfd', 'N/A')
+                    if npsh_vdf != 'N/A' and npsh_vdf is not None:
+                        npsh_vdf = f"{float(npsh_vdf):.2f}"
+                    else:
+                        npsh_vdf = "N/A"
                     
                     # Crear tabla HTML para punto 7 (VDF)
                     tabla_html_vdf = f"""
@@ -1283,7 +1294,7 @@ def render_json_tab():
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
                                 <strong>Caudal (Q):</strong> {caudal_vdf} L/s<br>
-                                <strong>Potencia (PBHP):</strong> {potencia_vdf} HP
+                                <strong>Potencia (PBHP):</strong> {potencia_vdf_hp} HP
                             </td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
                                 <strong>Caudal (Q):</strong> {caudal_vdf} L/s<br>

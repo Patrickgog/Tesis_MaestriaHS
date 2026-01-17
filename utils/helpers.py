@@ -53,7 +53,8 @@ def initialize_state():
             'accesorios_impulsion': loaded_state.get('accesorios_impulsion', []),
             'curva_inputs': loaded_state.get('curva_inputs', {}),
             'rpm_percentage': loaded_state.get('rpm_percentage', 75.0),
-            'paso_caudal_vfd': loaded_state.get('paso_caudal_vfd', 5.0)
+            'paso_caudal_vfd': loaded_state.get('paso_caudal_vfd', 5.0),
+            'metodo_calculo': loaded_state.get('metodo_calculo', 'Darcy-Weisbach')
         }
         
         # Aplicar valores por defecto

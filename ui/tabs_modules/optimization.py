@@ -42,8 +42,8 @@ def render_optimization_tab():
             l_impulsion = st.number_input("Longitud Impulsión (m)", value=l_impulsion_def, step=1.0)
 
         with st.expander("💰 Parámetros Económicos", expanded=False):
-            costo_kwh = st.number_input("Costo Energía (USD/kWh)", value=0.12, step=0.01)
-            años = st.slider("Años de Análisis (Vida Útil)", 5, 50, 20, help="Periodo sobre el cual se proyecta el gasto energético.")
+            costo_kwh = st.number_input("Costo Energía (USD/kWh)", value=0.09, step=0.01, help="Tarifa ARCONEL 2025 para bombeo público.")
+            años = st.slider("Años de Análisis (Vida Útil)", 5, 50, 25, help="Periodo normativo recomendado (NTE INEN 1680).")
             horas = st.slider("Horas de Operación / Día", 1, 24, 12)
             tasa = st.number_input("Tasa de Descuento Anual (%)", value=5.0, step=0.5, help="Tasa usada para traer costos futuros al presente (Valor Presente Neto).") / 100.0
 
@@ -53,14 +53,14 @@ def render_optimization_tab():
 
         with st.expander("📈 Costos de Mercado (Plastigama/Rival)", expanded=False):
             st.info("Calibra el costo por metro: $Base \cdot (D_{pulg})^{Factor}$")
-            c_pvc_b = st.number_input("PVC: Valor Base", value=5.0, step=0.1)
-            c_pvc_f = st.number_input("PVC: Factor Exp.", value=1.5, step=0.1)
+            c_pvc_b = st.number_input("PVC: Valor Base", value=1.0, step=0.1, help="Costo base para tubería de 1 pulgada.")
+            c_pvc_f = st.number_input("PVC: Factor Exp.", value=1.6, step=0.05, help="Exponente de crecimiento de costo según el diámetro.")
             
-            c_pead_b = st.number_input("PEAD: Valor Base", value=7.0, step=0.1)
-            c_pead_f = st.number_input("PEAD: Factor Exp.", value=1.6, step=0.1)
+            c_pead_b = st.number_input("PEAD: Valor Base", value=1.5, step=0.1)
+            c_pead_f = st.number_input("PEAD: Factor Exp.", value=1.65, step=0.05)
             
-            c_hd_b = st.number_input("Dúctil: Valor Base", value=25.0, step=0.5)
-            c_hd_f = st.number_input("Dúctil: Factor Exp.", value=1.3, step=0.1)
+            c_hd_b = st.number_input("Dúctil: Valor Base", value=10.0, step=0.5)
+            c_hd_f = st.number_input("Dúctil: Factor Exp.", value=1.4, step=0.05)
             
             dict_costos = {
                 "PVC": {"base": c_pvc_b, "factor": c_pvc_f},

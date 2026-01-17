@@ -70,27 +70,30 @@ def obtener_cotas_sistema() -> Dict[str, float]:
 def obtener_propiedades_tuberias() -> Dict[str, Dict[str, Any]]:
     """Obtiene propiedades de tuberías desde session_state"""
     from core.transient_analysis import calculate_wave_speed
+    from core.hydraulics import obtener_rugosidad_absoluta
     
+    mat_suc = st.session_state.get('mat_succion', 'PVC')
     succion = {
         'longitud': st.session_state.get('long_succion', 10.0),
         'diametro_interno_mm': st.session_state.get('diam_succion_mm', 61.4),
         'diametro_interno_m': st.session_state.get('diam_succion_mm', 61.4) / 1000.0,
         'espesor_mm': st.session_state.get('espesor_succion', 5.0),
-        'material': st.session_state.get('mat_succion', 'PVC'),
+        'material': mat_suc,
         'c_hazen_williams': st.session_state.get('coef_hazen_succion', 150),
-        'rugosidad_m': 0.00015,
+        'rugosidad_m': obtener_rugosidad_absoluta(mat_suc),
         'long_equiv_accesorios': st.session_state.get('long_equiv_succion', 0.0),
         'k_accesorios': st.session_state.get('k_total_succion', 0.0),
     }
     
+    mat_imp = st.session_state.get('mat_impulsion', 'PVC')
     impulsion = {
         'longitud': st.session_state.get('long_impulsion', 150.0),
         'diametro_interno_mm': st.session_state.get('diam_impulsion_mm', 40.8),
         'diametro_interno_m': st.session_state.get('diam_impulsion_mm', 40.8) / 1000.0,
         'espesor_mm': st.session_state.get('espesor_impulsion', 8.0),
-        'material': st.session_state.get('mat_impulsion', 'PVC'),
+        'material': mat_imp,
         'c_hazen_williams': st.session_state.get('coef_hazen_impulsion', 150),
-        'rugosidad_m': 0.00015,
+        'rugosidad_m': obtener_rugosidad_absoluta(mat_imp),
         'long_equiv_accesorios': st.session_state.get('long_equiv_impulsion', 0.0),
         'k_accesorios': st.session_state.get('k_total_impulsion', 0.0),
     }
@@ -109,19 +112,30 @@ def obtener_propiedades_tuberias() -> Dict[str, Dict[str, Any]]:
     
     return {'succion': succion, 'impulsion': impulsion}
 
-def obtener_propiedades_bomba() -> Dict[str, Any]:
-    """Obtiene propiedades de la bomba desde session_state"""
+def obtener_propiedades_bomba(force_100rpm=False) -> Dict[str, Any]:
+    """Obtiene propiedades de la bomba desde session_state
+    
+    Args:
+        force_100rpm: Si True, fuerza el uso de curvas de 100% RPM (df_bomba_100)
+                     Si False, usa df_bomba_vfd si existe (curvas escaladas)
+    """
     rpm_nominal = st.session_state.get('rpm_bomba', 3500)
     rpm_percentage = st.session_state.get('rpm_percentage', 100.0)
     rpm_actual = rpm_nominal * (rpm_percentage / 100.0)
     
-    # Determinar si usar curvas 100% o VFD basado en rpm_percentage
-    use_vfd = rpm_percentage < 99.5  # Si es menos de 100%, usar curvas VFD
-    
     # Buscar curvas H-Q
     hq_points = []
-    if use_vfd:
-        # PRIORIDAD VFD: Usar df_bomba_vfd (ya escalado)
+    
+    if force_100rpm:
+        # FORZAR 100% RPM: Usar df_bomba_100 (curvas originales sin escalar)
+        df_bomba = st.session_state.get('df_bomba_100')
+        if df_bomba is not None and hasattr(df_bomba, 'values') and len(df_bomba) > 0:
+            try:
+                hq_points = [(float(row[0]), float(row[1])) for row in df_bomba.values[:20]]
+            except:
+                pass
+    else:
+        # LÓGICA NORMAL: Usar df_bomba_vfd si existe (curvas escaladas al RPM actual)
         df_bomba = st.session_state.get('df_bomba_vfd')
         if df_bomba is not None and hasattr(df_bomba, 'values') and len(df_bomba) > 0:
             try:
@@ -133,6 +147,7 @@ def obtener_propiedades_bomba() -> Dict[str, Any]:
         # Fallback: curva_inputs['bomba'] (100% RPM)
         curva_inputs = st.session_state.get('curva_inputs', {})
         hq_points = curva_inputs.get('bomba', [])
+
     
     if not hq_points:
         # Fallback: df_bomba_100 (100% RPM desde tabla)
@@ -148,8 +163,8 @@ def obtener_propiedades_bomba() -> Dict[str, Any]:
     potencia_points = []
     npsh_points = []
     
-    if use_vfd:
-        # Usar dataframes VFD ya escalados
+    if not force_100rpm:
+        # LÓGICA NORMAL: Usar dataframes VFD ya escalados
         df_eff = st.session_state.get('df_rendimiento_vfd')
         if df_eff is not None and hasattr(df_eff, 'values') and len(df_eff) > 0:
             try:
@@ -190,6 +205,9 @@ def obtener_propiedades_bomba() -> Dict[str, Any]:
     }
     
     eficiencia_motor = st.session_state.get('eficiencia_motor', 90.0)
+    
+    # Determinar use_vfd basado en force_100rpm (para compatibilidad)
+    use_vfd = not force_100rpm
     
     return {
         'rpm_nominal': rpm_nominal,
