@@ -92,6 +92,7 @@ def render_reports_tab():
 def render_ai_tab():
     """Renderiza la pestaña dedicada al análisis con IA"""
     from ui.ai_module import render_ai_question_response
+    from ui.helpers import configure_gemini
     
     # Verificar si la IA está configurada
     if not st.session_state.get('ai_enabled', False):
@@ -99,10 +100,24 @@ def render_ai_tab():
         st.info("Para usar el análisis con IA, activa 'Análisis IA' en el panel lateral y configura tu clave API.")
         return
     
-    if not st.session_state.get('api_key') or not st.session_state.get('model'):
+    # Verificar si hay API key configurada (desde el sidebar)
+    gemini_api_key = st.session_state.get('gemini_api_key')
+    
+    if not gemini_api_key:
         st.warning("⚠️ **Configuración de IA incompleta**")
-        st.info("Por favor, configura tu clave API de Gemini en el panel lateral.")
+        st.info("Por favor, configura tu clave API de Gemini en el panel lateral (🤖 Análisis IA).")
         return
+    
+    # Configurar Gemini si no está configurado
+    if not st.session_state.get('api_key') or st.session_state.get('api_key') != gemini_api_key:
+        try:
+            # Configurar Gemini con la API key del usuario
+            configure_gemini(gemini_api_key)
+            st.session_state['api_key'] = gemini_api_key
+        except Exception as e:
+            st.error(f"❌ Error al configurar Gemini: {e}")
+            st.info("Verifica que tu API key sea válida.")
+            return
     
     # Renderizar la funcionalidad de pregunta/respuesta
     render_ai_question_response()
