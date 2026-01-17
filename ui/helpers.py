@@ -10,19 +10,26 @@ except ImportError:
 import pandas as pd
 import io
 
-def configure_gemini():
-    """Configura Gemini para generación de análisis"""
+def configure_gemini(api_key=None):
+    """Configura Gemini para generación de análisis
+    
+    Args:
+        api_key: API key de Gemini (opcional). Si no se proporciona, intenta leer desde archivo secrets.
+    """
     if not GEMINI_AVAILABLE:
         return None
     try:
-        with open('secrets', 'r', encoding='utf-8') as f:
-            content = f.read()
-            for line in content.split('\n'):
-                if line.startswith('GEMINI_API_KEY='):
-                    api_key = line.split('=', 1)[1].strip()
-                    break
-            else:
-                api_key = None
+        # Si no se proporciona API key, intentar leer desde archivo
+        if not api_key:
+            try:
+                with open('secrets', 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    for line in content.split('\n'):
+                        if line.startswith('GEMINI_API_KEY='):
+                            api_key = line.split('=', 1)[1].strip()
+                            break
+            except:
+                pass
         
         if api_key:
             genai.configure(api_key=api_key)
