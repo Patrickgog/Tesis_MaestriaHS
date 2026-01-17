@@ -1,12 +1,19 @@
 import streamlit as st
 import json
 import os
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    genai = None
+    GEMINI_AVAILABLE = False
 import pandas as pd
 import io
 
 def configure_gemini():
     """Configura Gemini para generación de análisis"""
+    if not GEMINI_AVAILABLE:
+        return None
     try:
         with open('secrets', 'r', encoding='utf-8') as f:
             content = f.read()
