@@ -109,20 +109,21 @@ def render_ai_tab():
         return
     
     # Obtener modelo seleccionado
-    selected_model = st.session_state.get('selected_model', 'gemini-2.5-flash')
+    selected_model_name = st.session_state.get('selected_model', 'gemini-2.5-flash')
     
     # Configurar Gemini si no está configurado o si cambió el modelo
     current_api_key = st.session_state.get('api_key')
-    current_model = st.session_state.get('model')
+    current_model_name = st.session_state.get('current_model_name')
     
-    if not current_api_key or current_api_key != gemini_api_key or current_model != selected_model:
+    if not current_api_key or current_api_key != gemini_api_key or current_model_name != selected_model_name:
         try:
             # Configurar Gemini con la API key del usuario
-            model_instance = configure_gemini(gemini_api_key, selected_model) # Pass selected_model
+            model_instance = configure_gemini(gemini_api_key, selected_model_name)
             if model_instance:
                 st.session_state['api_key'] = gemini_api_key
-                st.session_state['model'] = selected_model
-                st.success(f"✅ Gemini configurado correctamente con modelo: {selected_model}")
+                st.session_state['model'] = model_instance  # Guardar el OBJETO modelo
+                st.session_state['current_model_name'] = selected_model_name  # Guardar el NOMBRE del modelo
+                st.success(f"✅ Gemini configurado correctamente con modelo: {selected_model_name}")
             else:
                 st.error("❌ Error al configurar Gemini")
                 st.info("Verifica que tu API key sea válida.")
