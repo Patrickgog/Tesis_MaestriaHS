@@ -10,6 +10,7 @@ from core.hydraulics import obtener_rugosidad_absoluta, obtener_viscosidad_cinem
 from core.calculations import interpolar_propiedad
 from ui.tabs_modules.common import render_footer
 from ui.tabs_modules.diameter_selection_docs import render_technical_documentation
+from utils.sync_manager import sync_pipe_data
 
 def calcular_presion_vapor_mca_local(temp_input):
     temp_C = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
@@ -327,6 +328,7 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
         if abs(q_current_val - q_target_divided) > 0.01:
             st.session_state[f"q_pt_{prefix}"] = q_target_divided
 
+        prefix_long = "succion" if is_suc else "impulsion"
         q_lps = st.number_input("Caudal de Análisis [L/s]", value=q_target_divided, key=f"q_pt_{prefix}")
         q_m3s = q_lps / 1000.0
         
@@ -356,30 +358,9 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
         # Actualizar C si cambia el material
         c_hazen_punto = HAZEN_WILLIAMS_C.get(mat, 150.0)
         
-        # --- OPCIÓN PARA USAR DIÁMETRO EXPORTADO ---
-        diam_exportado = st.session_state.get('diam_succion_mm' if is_suc else 'diam_impulsion_mm', None)
-        usar_exportado = False
-        
-        if diam_exportado and diam_exportado > 0:
-            usar_exportado = st.checkbox(
-                f"✅ Usar diámetro exportado ({diam_exportado:.1f} mm)",
-                value=True,
-                key=f"use_exported_{prefix}",
-                help="Usa el diámetro exportado desde la pestaña de Datos de Entrada"
-            )
-        
-        # --- SELECCIÓN ESPECÍFICA POR MATERIAL ---
-        di_eval = 100.0  # Valor por defecto
-        tipo_union_key = None
-        serie_key = None
-        dn_value = None
-        diam_externo_value = None
-        clase_value = None
-        
-        # Si se usa el diámetro exportado, se sobrescribirá di_eval al final
-        # Mostrar advertencia si se está usando el diámetro exportado
-        if usar_exportado:
-            st.warning("⚠️ Los selectores de material/serie/DN se ignoran mientras el checkbox esté marcado. El análisis usa el diámetro exportado.")
+        # --- SINCRONIZACIÓN AUTOMÁTICA ACTIVA ---
+        # Los cambios en material/diámetro se propagan automáticamente a Datos de Entrada
+        st.caption("🔄 Sincronizado automáticamente con Datos de Entrada")
         
         # ========== PVC ==========
         if mat == "PVC":
@@ -391,21 +372,60 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
                 "Unión Sellado Elastomérico (Unión R)",
                 "Unión Encolada (Unión E)"
             ]
-            # Obtener índice guardado o usar 0 por defecto
-            idx_tipo_union = st.session_state.get(f'tipo_union_pvc_{prefix}_index', 0)
+            
+            # SINCRONIZACIÓN COMPLETA: Leer tipo de unión guardado en Datos de Entrada
+            tipo_union_guardado = st.session_state.get(f'tipo_union_pvc_{prefix_long}', None)
+            idx_tipo_union = 0
+            
+            if tipo_union_guardado:
+                # Mapear el tipo guardado al índice del display
+                if "Elastomérico" in tipo_union_guardado or "R" in tipo_union_guardado:
+                    idx_tipo_union = 0
+                else:
+                    idx_tipo_union = 1
+            else:
+                # Fallback: usar índice guardado previamente en esta pestaña
+                idx_tipo_union = st.session_state.get(f'tipo_union_pvc_{prefix}_index', 0)
+            
             if idx_tipo_union >= len(tipos_union_display):
                 idx_tipo_union = 0
             
+            # Callback para sincronizar PVC
+            def on_pvc_change():
+                # Disparar sincronización automática
+                sync_pipe_data(prefix_long, 'diameter_selection')
+                
+                # Actualizar el material global
+                st.session_state[f'mat_{prefix_long}'] = "PVC"
+                
+                # Guardar tipo de unión en la clave de Datos de Entrada
+                t_u_sel = st.session_state[f"tipo_union_pvc_{prefix}_analysis"]
+                st.session_state[f'tipo_union_pvc_{prefix_long}'] = t_u_sel
+                
+                # Forzar actualización de diámetro interno basada en la selección actual
+                t_u = "union_elastomerica" if "Elastomérico" in t_u_sel else "union_encolada"
+                from core.calculations import get_pvc_series_disponibles, get_pvc_diametros_disponibles, get_pvc_data, calculate_diametro_interno_pvc
+                s_pvc = get_pvc_series_disponibles(t_u)
+                s_idx = st.session_state.get(f'serie_pvc_{prefix}_nombre_index', 0)
+                if s_idx < len(s_pvc):
+                    s_k = s_pvc[s_idx]
+                    d_pvc = get_pvc_diametros_disponibles(t_u, s_k)
+                    d_idx = st.session_state.get(f'dn_pvc_{prefix}_index', 0)
+                    if d_idx < len(d_pvc):
+                        dn = d_pvc[d_idx]
+                        tub = get_pvc_data(t_u, s_k, dn)
+                        if tub:
+                            di = calculate_diametro_interno_pvc(tub["de_mm"], tub["espesor_min_mm"], tub["espesor_max_mm"])
+                            st.session_state[f'diam_{prefix_long}_mm'] = di
+
             tipo_union = st.selectbox(
                 "Tipo de Unión",
                 options=tipos_union_display,
                 index=idx_tipo_union,
                 key=f"tipo_union_pvc_{prefix}_analysis",
+                on_change=on_pvc_change,
                 help="Tipo de unión de la tubería PVC"
             )
-            
-            # Guardar índice seleccionado
-            st.session_state[f'tipo_union_pvc_{prefix}_index'] = tipos_union_display.index(tipo_union)
             
             # Mapear a clave interna
             tipo_union_key = "union_elastomerica" if "Elastomérico" in tipo_union else "union_encolada"
@@ -429,16 +449,35 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
                     elif serie_key_item == "s6_3":
                         series_nombres.append("Serie S 6.3 (Presión: 2.00 MPa)")
                 
-                # Obtener índice guardado o usar 0 por defecto
-                idx_serie = st.session_state.get(f'serie_pvc_{prefix}_nombre_index', 0)
+                # SINCRONIZACIÓN COMPLETA: Leer serie guardada en Datos de Entrada
+                serie_nombre_guardada = st.session_state.get(f'serie_pvc_{prefix_long}_nombre', None)
+                idx_serie = 0
+                
+                # Buscar el índice de la serie guardada
+                if serie_nombre_guardada and serie_nombre_guardada in series_nombres:
+                    try:
+                        idx_serie = series_nombres.index(serie_nombre_guardada)
+                    except ValueError:
+                        idx_serie = 0
+                else:
+                    # Fallback: usar índice guardado previamente en esta pestaña
+                    idx_serie = st.session_state.get(f'serie_pvc_{prefix}_nombre_index', 0)
+                
                 if idx_serie >= len(series_nombres):
                     idx_serie = 0
+                
+                def on_pvc_serie_change():
+                    # Guardar serie en la clave de Datos de Entrada
+                    s_nombre = st.session_state[f"serie_pvc_{prefix}_analysis"]
+                    st.session_state[f'serie_pvc_{prefix_long}_nombre'] = s_nombre
+                    sync_pipe_data(prefix_long, 'diameter_selection')
                 
                 serie_pvc_nombre = st.selectbox(
                     "Serie del Tubo",
                     options=series_nombres,
                     index=idx_serie,
                     key=f"serie_pvc_{prefix}_analysis",
+                    on_change=on_pvc_serie_change,
                     help="Serie del tubo PVC"
                 )
                 
@@ -449,19 +488,37 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
                 serie_idx = series_nombres.index(serie_pvc_nombre)
                 serie_key = series_pvc[serie_idx]
                 
-                # Diámetros disponibles
                 diametros_pvc = get_pvc_diametros_disponibles(tipo_union_key, serie_key)
                 if diametros_pvc:
-                    # Obtener índice guardado o usar 0 por defecto
-                    idx_dn = st.session_state.get(f'dn_pvc_{prefix}_index', 0)
+                    # SINCRONIZACIÓN COMPLETA: Leer DN guardado en Datos de Entrada
+                    dn_guardado = st.session_state.get(f'dn_pvc_{prefix_long}', None)
+                    idx_dn = 0
+                    
+                    # Buscar el índice del DN guardado
+                    if dn_guardado and dn_guardado in diametros_pvc:
+                        try:
+                            idx_dn = diametros_pvc.index(dn_guardado)
+                        except ValueError:
+                            idx_dn = 0
+                    else:
+                        # Fallback: usar índice guardado previamente en esta pestaña
+                        idx_dn = st.session_state.get(f'dn_pvc_{prefix}_index', 0)
+                    
                     if idx_dn >= len(diametros_pvc):
                         idx_dn = 0
+                    
+                    def on_pvc_dn_change():
+                        # Guardar DN en la clave de Datos de Entrada
+                        dn_sel = st.session_state[f"dn_pvc_{prefix}_analysis"]
+                        st.session_state[f'dn_pvc_{prefix_long}'] = dn_sel
+                        sync_pipe_data(prefix_long, 'diameter_selection')
                     
                     dn_pvc = st.selectbox(
                         "Diámetro Nominal (DN mm)",
                         options=diametros_pvc,
                         index=idx_dn,
                         key=f"dn_pvc_{prefix}_analysis",
+                        on_change=on_pvc_dn_change,
                         help="Diámetro nominal de la tubería PVC"
                     )
                     
@@ -504,21 +561,45 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
             # Diámetro Externo
             diametros_pead = [item["diametro_nominal_mm"] for item in PEAD_DATA]
             if diametros_pead:
-                # Obtener índice guardado o usar 0 por defecto
-                idx_diam_ext = st.session_state.get(f'diam_externo_{prefix}_index', 0)
-                if idx_diam_ext >= len(diametros_pead):
-                    idx_diam_ext = 0
+                # SINCRONIZACIÓN COMPLETA: Leer diámetro externo guardado en Datos de Entrada
+                diam_ext_guardado = st.session_state.get(f'diam_externo_{prefix_long}', None)
+                idx_diam_ext = 0
                 
+                # Buscar el índice del diámetro guardado
+                if diam_ext_guardado and diam_ext_guardado in diametros_pead:
+                    try:
+                        idx_diam_ext = diametros_pead.index(diam_ext_guardado)
+                    except ValueError:
+                        idx_diam_ext = 0
+                else:
+                    # Fallback: usar índice guardado previamente en esta pestaña
+                    idx_diam_ext = st.session_state.get(f'diam_externo_{prefix}_index', 0)
+                    if idx_diam_ext >= len(diametros_pead):
+                        idx_diam_ext = 0
+                
+                def on_pead_change():
+                    # Disparar sincronización automática
+                    sync_pipe_data(prefix_long, 'diameter_selection')
+                    
+                    st.session_state[f'mat_{prefix_long}'] = "HDPE (Polietileno)"
+                    from core.calculations import get_pead_espesor
+                    d_ext = st.session_state[f"diam_externo_{prefix}_analysis"]
+                    # Guardar también en la clave de Datos de Entrada
+                    st.session_state[f'diam_externo_{prefix_long}'] = d_ext
+                    # Buscar serie actual
+                    s_pead = st.session_state.get(f'serie_{prefix}_analysis', 's5')
+                    esp = get_pead_espesor(d_ext, s_pead)
+                    if esp:
+                        st.session_state[f'diam_{prefix_long}_mm'] = d_ext - 2 * esp
+
                 diam_externo = st.selectbox(
                     "Diámetro Externo (mm)",
                     options=diametros_pead,
                     index=idx_diam_ext,
                     key=f"diam_externo_{prefix}_analysis",
+                    on_change=on_pead_change,
                     help="Diámetro externo de la tubería PEAD"
                 )
-                
-                # Guardar índice seleccionado
-                st.session_state[f'diam_externo_{prefix}_index'] = diametros_pead.index(diam_externo)
                 diam_externo_value = diam_externo
                 
                 # Serie
@@ -530,16 +611,39 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
                             series_disponibles.append(serie_key_item)
                     
                     if series_disponibles:
-                        # Obtener índice guardado o usar 0 por defecto
-                        idx_serie = st.session_state.get(f'serie_{prefix}_index', 0)
-                        if idx_serie >= len(series_disponibles):
-                            idx_serie = 0
+                        # SINCRONIZACIÓN COMPLETA: Leer serie guardada en Datos de Entrada
+                        serie_guardada = st.session_state.get(f'serie_{prefix_long}', None)
+                        idx_serie = 0
+                        
+                        # Buscar el índice de la serie guardada
+                        if serie_guardada and serie_guardada in series_disponibles:
+                            try:
+                                idx_serie = series_disponibles.index(serie_guardada)
+                            except ValueError:
+                                idx_serie = 0
+                        else:
+                            # Fallback: usar índice guardado previamente en esta pestaña
+                            idx_serie = st.session_state.get(f'serie_{prefix}_index', 0)
+                            if idx_serie >= len(series_disponibles):
+                                idx_serie = 0
+                        
+                        def on_pead_serie_change():
+                            # Guardar serie en la clave de Datos de Entrada
+                            s_sel = st.session_state[f'serie_{prefix}_analysis']
+                            st.session_state[f'serie_{prefix_long}'] = s_sel
+                            # Recalcular diámetro interno
+                            d_ext = st.session_state.get(f"diam_externo_{prefix}_analysis")
+                            esp = get_pead_espesor(d_ext, s_sel)
+                            if esp:
+                                st.session_state[f'diam_{prefix_long}_mm'] = d_ext - 2 * esp
+                            sync_pipe_data(prefix_long, 'diameter_selection')
                         
                         serie = st.selectbox(
                             "Serie del Tubo",
                             options=series_disponibles,
                             index=idx_serie,
                             key=f"serie_{prefix}_analysis",
+                            on_change=on_pead_serie_change,
                             help="Serie del tubo PEAD"
                         )
                         
@@ -580,21 +684,51 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
             
             # Clase
             clases_display = ["Clase 40", "Clase 30", "Clase 25"]
-            # Obtener índice guardado o usar 0 por defecto
-            idx_clase = st.session_state.get(f'clase_hierro_{prefix}_index', 0)
+            
+            # SINCRONIZACIÓN COMPLETA: Leer clase guardada en Datos de Entrada
+            clase_guardada = st.session_state.get(f'clase_hierro_{prefix_long}', None)
+            idx_clase = 0
+            
+            if clase_guardada and clase_guardada in clases_display:
+                try:
+                    idx_clase = clases_display.index(clase_guardada)
+                except ValueError:
+                    idx_clase = 0
+            else:
+                # Fallback: usar índice guardado previamente en esta pestaña
+                idx_clase = st.session_state.get(f'clase_hierro_{prefix}_index', 0)
+            
             if idx_clase >= len(clases_display):
                 idx_clase = 0
             
+            def on_hd_change():
+                # Disparar sincronización automática
+                sync_pipe_data(prefix_long, 'diameter_selection')
+                
+                st.session_state[f'mat_{prefix_long}'] = "Hierro Ductil"
+                
+                # Guardar clase en la clave de Datos de Entrada
+                clase_sel = st.session_state[f"clase_hierro_{prefix}_analysis"]
+                st.session_state[f'clase_hierro_{prefix_long}'] = clase_sel
+                
+                from core.calculations import get_hierro_ductil_diametros_disponibles, get_hierro_ductil_data, calculate_diametro_interno_hierro_ductil
+                c_k = clase_sel.lower().replace(" ", "_")
+                d_hd = get_hierro_ductil_diametros_disponibles(c_k)
+                dn_idx = st.session_state.get(f'dn_{prefix}_index', 0)
+                if dn_idx < len(d_hd):
+                    dn_val = d_hd[dn_idx]
+                    dat_hd = get_hierro_ductil_data(c_k, dn_val)
+                    if dat_hd:
+                        st.session_state[f'diam_{prefix_long}_mm'] = calculate_diametro_interno_hierro_ductil(dat_hd["de_mm"], dat_hd["espesor_nominal_mm"])
+
             clase = st.selectbox(
                 "Clase de Presión",
                 options=clases_display,
                 index=idx_clase,
                 key=f"clase_hierro_{prefix}_analysis",
+                on_change=on_hd_change,
                 help="Clase de presión del hierro dúctil"
             )
-            
-            # Guardar índice seleccionado
-            st.session_state[f'clase_hierro_{prefix}_index'] = clases_display.index(clase)
             clase_value = clase
             
             # Mapear a clave interna
@@ -603,16 +737,35 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
             # DN
             diametros_hd = get_hierro_ductil_diametros_disponibles(clase_key)
             if diametros_hd:
-                # Obtener índice guardado o usar 0 por defecto
-                idx_dn = st.session_state.get(f'dn_{prefix}_index', 0)
+                # SINCRONIZACIÓN COMPLETA: Leer DN guardado en Datos de Entrada
+                dn_guardado = st.session_state.get(f'dn_{prefix_long}', None)
+                idx_dn = 0
+                
+                # Buscar el índice del DN guardado
+                if dn_guardado and dn_guardado in diametros_hd:
+                    try:
+                        idx_dn = diametros_hd.index(dn_guardado)
+                    except ValueError:
+                        idx_dn = 0
+                else:
+                    # Fallback: usar índice guardado previamente en esta pestaña
+                    idx_dn = st.session_state.get(f'dn_{prefix}_index', 0)
+                
                 if idx_dn >= len(diametros_hd):
                     idx_dn = 0
+                
+                def on_hd_dn_change():
+                    # Guardar DN en la clave de Datos de Entrada
+                    dn_sel = st.session_state[f"dn_{prefix}_analysis"]
+                    st.session_state[f'dn_{prefix_long}'] = dn_sel
+                    sync_pipe_data(prefix_long, 'diameter_selection')
                 
                 dn = st.selectbox(
                     "Diámetro Nominal (DN mm)",
                     options=diametros_hd,
                     index=idx_dn,
                     key=f"dn_{prefix}_analysis",
+                    on_change=on_hd_dn_change,
                     help="Diámetro nominal del hierro dúctil"
                 )
                 
@@ -720,10 +873,11 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
                 help="Diámetro interno de la tubería en milímetros"
             )
         
-        # OVERRIDE: Si el usuario marcó el checkbox para usar el diámetro exportado, sobrescribir di_eval
-        if usar_exportado and diam_exportado:
-            di_eval = float(diam_exportado)
-            st.success(f"✅ Usando diámetro exportado: {di_eval:.1f} mm")
+        
+        # GUARDAR DIÁMETRO CALCULADO EN SESSION_STATE
+        # Esto asegura que el diámetro se refleje en los gráficos y en Datos de Entrada
+        if di_eval and di_eval > 0:
+            st.session_state[f'diam_{prefix_long}_mm'] = float(di_eval)
         
         l_eval = st.number_input("Longitud de Tubería (m)", value=float(length_sess), key=f"len_pt_{prefix}")
         le_m_input = st.number_input("Long. Equiv. Accesorios (m)", value=float(le_sess_m), format="%.2f", key=f"le_m_pt_{prefix}")

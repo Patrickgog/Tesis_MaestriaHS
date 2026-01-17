@@ -16,6 +16,65 @@ from ui.transients import render_transient_tab
 from ui.html_generator import generate_html_report
 from ui.tabs_modules.common import render_footer
 
+def calculate_smart_axes(q_op, val_op, val_static=0, val_max_data=10, tipo_grafico="hq", q_max_curve=None, val_max_curve=None):
+    """
+    Calcula rangos inteligentes para los ejes de los gráficos basándose en el punto de operación
+    y los valores máximos reales de las curvas.
+    
+    Args:
+        q_op: Caudal de operación
+        val_op: Valor de operación (altura, potencia, rendimiento, NPSH)
+        val_static: Valor estático (para H-Q)
+        val_max_data: Valor máximo de datos (fallback)
+        tipo_grafico: Tipo de gráfico ("hq", "potencia", "rendimiento", "npsh")
+        q_max_curve: Caudal máximo de la curva (opcional)
+        val_max_curve: Valor máximo de la curva (opcional)
+    """
+    # Eje X: Usar el máximo de la curva si está disponible, sino centrar en operación
+    if q_max_curve and q_max_curve > 0:
+        x_max = q_max_curve * 1.05  # Solo 5% de margen para que ocupe casi todo el área
+    elif q_op and q_op > 0:
+        x_max = q_op * 1.4  # Reducido de 1.6 a 1.4 para mejor ajuste
+    else:
+        x_max = val_max_data * 1.1 if val_max_data > 0 else 5.0
+    
+    x_range = [0, x_max]
+    
+    # Eje Y: Depende del tipo de gráfico y usa valores máximos reales
+    if tipo_grafico == "hq":
+        # Altura Dinámica: Desde un poco menos de la estática hasta un poco más del máximo
+        y_min = val_static * 0.95 if val_static > 0 else 0
+        if val_max_curve and val_max_curve > 0:
+            y_max = val_max_curve * 1.05  # Solo 5% de margen
+        else:
+            y_max = max(val_op * 1.2, val_static * 1.1) if val_op > 0 else 100.0
+        y_range = [y_min, y_max]
+    elif tipo_grafico == "rendimiento":
+        # Rendimiento: Ajustar al máximo real de la curva o BEP
+        if val_max_curve and val_max_curve > 0:
+            y_max = min(100.0, val_max_curve * 1.05)  
+        else:
+            y_max = min(100.0, max(val_op * 1.1, 80.0)) if val_op > 0 else 100.0
+        y_range = [0, y_max]
+    elif tipo_grafico == "potencia":
+        # Potencia: Ajustar al máximo real de la curva
+        if val_max_curve and val_max_curve > 0:
+            y_max = val_max_curve * 1.05  # Solo 5% de margen
+        else:
+            y_max = val_op * 1.2 if val_op > 0 else 50.0
+        y_range = [0, y_max]
+    elif tipo_grafico == "npsh":
+        # NPSH: Ajustar al máximo real de la curva
+        if val_max_curve and val_max_curve > 0:
+            y_max = val_max_curve * 1.1  # 10% de margen para NPSH (para que no toque el borde superior bruscamente)
+        else:
+            y_max = max(val_op * 2.0, 10.0) if val_op > 0 else 15.0
+        y_range = [0, y_max]
+    else:
+        y_range = None
+        
+    return x_range, y_range
+
 def render_analysis_tab():
     """Renderiza la pestaña de análisis de curvas"""
     from core.calculations import get_display_unit_label
@@ -74,7 +133,7 @@ def render_analysis_tab():
     bep_eta = 0
     rpm_percentage = st.session_state.get('rpm_percentage', 100.0)
     
-    # --- Graficar según modo seleccionado ---
+    
     curva_mode = st.session_state.get('curva_mode_sidebar', 'Excel')
     if curva_mode == "Excel":
         st.subheader("1. Gráfico de Curvas desde Excel")
@@ -180,31 +239,44 @@ def render_analysis_tab():
         if not puntos_sistema:
             try:
                 # Generar caudales para calcular la curva del sistema
-                flows = np.linspace(0, 200, 20).tolist()  # 0 a 200 L/s
+                # Usar un rango representativo basado en el caudal nominal
+                q_max = (caudal_nominal_total or 10.0) * 1.5
+                flows = np.linspace(0, q_max, 20).tolist()
                 flow_unit = st.session_state.get('flow_unit', 'L/s')
                 
-                # Obtener parámetros del sistema
+                # Obtener parámetros del sistema estandarizados
                 system_params = {
-                    'h_estatica': st.session_state.get('h_estatica', 50.0),
                     'long_succion': st.session_state.get('long_succion', 10.0),
-                    'diam_succion_m': st.session_state.get('diam_succion', 200.0) / 1000.0,
-                    'C_succion': st.session_state.get('C_succion', 150),
+                    'diam_succion_m': st.session_state.get('diam_succion_mm', 200.0) / 1000.0,
+                    'mat_succion': st.session_state.get('mat_succion', 'PVC'),
+                    'otras_perdidas_succion': st.session_state.get('otras_perdidas_succion', 0.0),
                     'accesorios_succion': st.session_state.get('accesorios_succion', []),
-                    'otras_perdidas_succion': 0.0,
-                    'long_impulsion': st.session_state.get('long_impulsion', 100.0),
-                    'diam_impulsion_m': st.session_state.get('diam_impulsion', 150.0) / 1000.0,
-                    'C_impulsion': st.session_state.get('C_impulsion', 150),
+                    'long_impulsion': st.session_state.get('long_impulsion', 500.0),
+                    'diam_impulsion_m': st.session_state.get('diam_impulsion_mm', 150.0) / 1000.0,
+                    'mat_impulsion': st.session_state.get('mat_impulsion', 'PVC'),
+                    'otras_perdidas_impulsion': st.session_state.get('otras_perdidas_impulsion', 0.0),
                     'accesorios_impulsion': st.session_state.get('accesorios_impulsion', []),
-                    'otras_perdidas_impulsion': 0.0
+                    'altura_succion': st.session_state.get('altura_succion_input', 1.65),
+                    'altura_descarga': st.session_state.get('altura_descarga', 80.0),
+                    'bomba_inundada': st.session_state.get('bomba_inundada', False),
+                    'metodo_calculo': st.session_state.get('metodo_calculo', 'Hazen-Williams'),
+                    'temp_liquido': st.session_state.get('temp_liquido', 20.0),
+                    'C_succion': st.session_state.get('coeficiente_hazen_succion', 150),
+                    'C_impulsion': st.session_state.get('coeficiente_hazen_impulsion', 150)
                 }
                 
-                from core.system_head import calculate_adt_for_multiple_flows
-                adt_values = calculate_adt_for_multiple_flows(flows, flow_unit, system_params)
+                from core.calculations import calculate_adt_for_multiple_flows
+                resultados_adt = calculate_adt_for_multiple_flows(flows, flow_unit, system_params)
                 
-                if adt_values:
-                    puntos_sistema = [(flows[i], adt_values[i]) for i in range(len(flows)) if adt_values[i] is not None]
+                if resultados_adt:
+                    # En el gráfico de análisis comparamos con UNA BOMBA INDIVIDUAL
+                    puntos_sistema = []
+                    for i, r in enumerate(resultados_adt):
+                        # Escalar eje X: Caudal Total / N bombas
+                        q_indiv = flows[i] / n_bombas if n_bombas > 0 else flows[i]
+                        puntos_sistema.append((q_indiv, r['adt_total']))
             except Exception as e:
-                st.warning(f"Error calculando curva del sistema: {e}")
+                st.warning(f"Error calculando curva del sistema en Análisis: {e}")
 
     # --- CÁLCULO CENTRALIZADO DE INTERSECCIÓN (100% RPM) ---
     interseccion = None
@@ -352,76 +424,7 @@ def render_analysis_tab():
     # --- Columna 3: Resumen y Comentarios ---
     with col3:
         # --- Expander de Personalización de Gráficos ---
-        with st.expander("⚙️ Personalizar Vista de Gráficos curvas 100%RPM", expanded=False):
-            st.markdown("**Configuración de Ejes**")
-            st.caption("Configura los rangos de los ejes para los gráficos de 100% RPM")
-            
-            # Calcular valores por defecto basados en datos actuales
-            puntos_bomba = curva_inputs.get('bomba', [])
-            if len(puntos_bomba) >= 2:
-                x_data = np.array([pt[0] for pt in puntos_bomba])
-                default_x_max = float(x_data.max() * 1.2)
-            else:
-                default_x_max = 10.0
-            
-            # Configuración del Eje X
-            st.markdown("**Eje X (Caudal)**")
-            col_x1, col_x2 = st.columns(2)
-            with col_x1:
-                x_min_graph = st.number_input(
-                    "Inicio X",
-                    min_value=0.0,
-                    value=st.session_state.get('graph_x_min', 0.0),
-                    step=0.5,
-                    key='graph_x_min',
-                    help="Valor mínimo del eje X (Caudal)"
-                )
-            with col_x2:
-                x_max_graph = st.number_input(
-                    "Final X",
-                    min_value=0.1,
-                    value=st.session_state.get('graph_x_max', default_x_max),
-                    step=1.0,
-                    key='graph_x_max',
-                    help="Valor máximo del eje X (Caudal)"
-                )
-            
-            x_step_graph = st.number_input(
-                "Paso X",
-                min_value=0.1,
-                max_value=10.0,
-                value=st.session_state.get('graph_x_step', 0.5),
-                step=0.1,
-                key='graph_x_step',
-                help="Incremento para puntos en el eje X"
-            )
-            
-            # Configuración del Eje Y
-            st.markdown("**Eje Y (Altura)**")
-            col_y1, col_y2 = st.columns(2)
-            with col_y1:
-                y_min_graph = st.number_input(
-                    "Inicio Y",
-                    value=st.session_state.get('graph_y_min', 0.0),
-                    step=5.0,
-                    key='graph_y_min',
-                    help="Valor mínimo del eje Y (Altura)"
-                )
-            with col_y2:
-                y_max_graph = st.number_input(
-                    "Final Y",
-                    min_value=1.0,
-                    value=st.session_state.get('graph_y_max', 150.0),
-                    step=10.0,
-                    key='graph_y_max',
-                    help="Valor máximo del eje Y (Altura)"
-                )
-            
-            # Botón para resetear a valores automáticos
-            if st.button("🔄 Resetear a Automático", use_container_width=True, key='reset_graph_axes'):
-                # Usar un flag para resetear en el próximo rerun
-                st.session_state['_reset_graph_axes'] = True
-                st.rerun()
+        # El expander de personalización manual ha sido eliminado en favor del autoajuste inteligente
         
         with st.expander("📊 Resumen y Comentarios Técnicos - 100% RPM", expanded=False):
             st.markdown("### 📈 **Resumen de Resultados**")
@@ -608,6 +611,21 @@ def render_analysis_tab():
                     bep_q = x_fit[idx_bep]
                     bep_eta = y_fit[idx_bep]
                     
+                    # Calcular H en el BEP (interpolar desde curva H-Q)
+                    if len(puntos_bomba) >= 2:
+                        x_bom_bep = np.array([pt[0] for pt in puntos_bomba])
+                        y_bom_bep = np.array([pt[1] for pt in puntos_bomba])
+                        grado_bom = 1 if ajuste_tipo == "Lineal" else 2 if ajuste_tipo == "Cuadrática (2do grado)" else 3
+                        coef_bom_bep = np.polyfit(x_bom_bep, y_bom_bep, grado_bom)
+                        bep_h = np.polyval(coef_bom_bep, bep_q)
+                    else:
+                        bep_h = 0
+                    
+                    # GUARDAR BEP EN SESSION_STATE para usar en expander de Allievi
+                    st.session_state['bep_q_100'] = float(bep_q)
+                    st.session_state['bep_h_100'] = float(bep_h)
+                    st.session_state['bep_eta_100'] = float(bep_eta)
+                    
                     st.markdown("### 🎯 **Análisis de BEP (Best Efficiency Point)**")
                     # Mostrar en unidades correctas
                     unidad_caudal = st.session_state.get('flow_unit', 'L/s')
@@ -693,20 +711,25 @@ def render_analysis_tab():
                 bep_h = np.polyval(coef_bom, bep_q)
                 fig_hq.add_trace(go.Scatter(x=[bep_q_disp], y=[bep_h], mode='markers+text', name='BEP', marker=dict(color='darkgreen', size=8, symbol='diamond'), text=[f"BEP: {bep_q_disp:.1f}"], textposition="top right"))
 
-            # Aplicar configuración de ejes personalizados si están definidos
-            x_range_hq = None
-            y_range_hq = None
-            if 'graph_x_min' in st.session_state and 'graph_x_max' in st.session_state:
-                x_min_val = st.session_state['graph_x_min']
-                x_max_val = st.session_state['graph_x_max']
-                # Convertir a unidades de visualización si es necesario
-                if unidad_caudal == 'm³/h':
-                    x_range_hq = [x_min_val * 3.6, x_max_val * 3.6]
-                else:
-                    x_range_hq = [x_min_val, x_max_val]
+            # Calcular rangos inteligentes (Escalado Automático)
+            q_op_val = interseccion[0] if interseccion else (puntos_bomba[0][0] if puntos_bomba else 0)
+            h_op_val = interseccion[1] if interseccion else (puntos_bomba[0][1] if puntos_bomba else 0)
+            h_static = st.session_state.get('altura_estatica_total', 0)
             
-            if 'graph_y_min' in st.session_state and 'graph_y_max' in st.session_state:
-                y_range_hq = [st.session_state['graph_y_min'], st.session_state['graph_y_max']]
+            # Obtener rangos base del motor de escalado
+            smart_x, smart_y = calculate_smart_axes(
+                q_op_val, h_op_val, h_static, x_max_bom, 
+                tipo_grafico="hq",
+                q_max_curve=x_max_bom,
+                val_max_curve=np.array([pt[1] for pt in puntos_bomba]).max()
+            )
+            
+            # Ajustar eje X a la unidad de visualización
+            if unidad_caudal == 'm³/h':
+                smart_x = [v * 3.6 for v in smart_x]
+
+            x_range_hq = smart_x
+            y_range_hq = smart_y
             
             fig_hq.update_layout(
                 xaxis_title=f"Caudal (Q) [{get_display_unit_label(unidad_caudal)}]",
@@ -764,15 +787,21 @@ def render_analysis_tab():
                 q_disp = interseccion[0] * 3.6 if unidad_caudal == 'm³/h' else interseccion[0]
                 fig_pot.add_trace(go.Scatter(x=[q_disp], y=[op_pot], mode='markers+text', name='Potencia Op.', marker=dict(color='orange', size=8, symbol='star'), text=[f"{op_pot:.1f} HP"], textposition="top right"))
 
-            # Aplicar configuración de ejes personalizados
-            x_range_pot = None
-            if 'graph_x_min' in st.session_state and 'graph_x_max' in st.session_state:
-                x_min_val = st.session_state['graph_x_min']
-                x_max_val = st.session_state['graph_x_max']
-                if unidad_caudal == 'm³/h':
-                    x_range_pot = [x_min_val * 3.6, x_max_val * 3.6]
-                else:
-                    x_range_pot = [x_min_val, x_max_val]
+            # Calcular rangos inteligentes
+            q_op_val = interseccion[0] if interseccion else 0
+            pot_op_val = np.polyval(coef_pot, q_op_val) if q_op_val > 0 else 0
+            smart_x_pot, smart_y_pot = calculate_smart_axes(
+                q_op_val, pot_op_val, 0, x_max_p, 
+                tipo_grafico="potencia",
+                q_max_curve=x_max_p,
+                val_max_curve=np.array([pt[1] for pt in puntos_pot]).max()
+            )
+            
+            if unidad_caudal == 'm³/h':
+                smart_x_pot = [v * 3.6 for v in smart_x_pot]
+
+            x_range_pot = smart_x_pot
+            y_range_pot = smart_y_pot
             
             fig_pot.update_layout(
                 xaxis_title=f"Caudal (Q) [{get_display_unit_label(unidad_caudal)}]",
@@ -834,15 +863,21 @@ def render_analysis_tab():
                 q_disp = interseccion[0] * 3.6 if unidad_caudal == 'm³/h' else interseccion[0]
                 fig_rend.add_trace(go.Scatter(x=[q_disp], y=[op_rend], mode='markers+text', name='Rendimiento Op.', marker=dict(color='orange', size=8, symbol='star'), text=[f"{op_rend:.1f}%"], textposition="top right"))
 
-            # Aplicar configuración de ejes personalizados
-            x_range_rend = None
-            if 'graph_x_min' in st.session_state and 'graph_x_max' in st.session_state:
-                x_min_val = st.session_state['graph_x_min']
-                x_max_val = st.session_state['graph_x_max']
-                if unidad_caudal == 'm³/h':
-                    x_range_rend = [x_min_val * 3.6, x_max_val * 3.6]
-                else:
-                    x_range_rend = [x_min_val, x_max_val]
+            # Calcular rangos inteligentes
+            q_op_val = interseccion[0] if interseccion else bep_q
+            rend_op_val = np.polyval(coef_rend, q_op_val) if q_op_val > 0 else bep_eta
+            smart_x_rend, smart_y_rend = calculate_smart_axes(
+                q_op_val, rend_op_val, 0, x_max_r, 
+                tipo_grafico="rendimiento",
+                q_max_curve=x_max_r,
+                val_max_curve=np.array([pt[1] for pt in puntos_rend]).max()
+            )
+            
+            if unidad_caudal == 'm³/h':
+                smart_x_rend = [v * 3.6 for v in smart_x_rend]
+
+            x_range_rend = smart_x_rend
+            y_range_rend = smart_y_rend
             
             fig_rend.update_layout(
                 xaxis_title=f"Caudal (Q) [{get_display_unit_label(unidad_caudal)}]",
@@ -901,15 +936,21 @@ def render_analysis_tab():
                 q_disp = interseccion[0] * 3.6 if unidad_caudal == 'm³/h' else interseccion[0]
                 fig_npsh.add_trace(go.Scatter(x=[q_disp], y=[op_npsh], mode='markers+text', name='NPSH Op.', marker=dict(color='orange', size=8, symbol='star'), text=[f"{op_npsh:.1f} m"], textposition="top right"))
 
-            # Aplicar configuración de ejes personalizados
-            x_range_npsh = None
-            if 'graph_x_min' in st.session_state and 'graph_x_max' in st.session_state:
-                x_min_val = st.session_state['graph_x_min']
-                x_max_val = st.session_state['graph_x_max']
-                if unidad_caudal == 'm³/h':
-                    x_range_npsh = [x_min_val * 3.6, x_max_val * 3.6]
-                else:
-                    x_range_npsh = [x_min_val, x_max_val]
+            # Calcular rangos inteligentes
+            q_op_val = interseccion[0] if interseccion else 0
+            npsh_op_val = np.polyval(coef_npsh, q_op_val) if q_op_val > 0 else 0
+            smart_x_npsh, smart_y_npsh = calculate_smart_axes(
+                q_op_val, npsh_op_val, 0, x_max_n, 
+                tipo_grafico="npsh",
+                q_max_curve=x_max_n,
+                val_max_curve=np.array([pt[1] for pt in puntos_npsh]).max()
+            )
+            
+            if unidad_caudal == 'm³/h':
+                smart_x_npsh = [v * 3.6 for v in smart_x_npsh]
+
+            x_range_npsh = smart_x_npsh
+            y_range_npsh = smart_y_npsh
             
             fig_npsh.update_layout(
                 xaxis_title=f"Caudal (Q) [{get_display_unit_label(unidad_caudal)}]",
@@ -1211,14 +1252,35 @@ def render_analysis_tab():
             idx_bep_v = np.argmax(y_rend_scan)
             bep_q_vfd = x_pts_scan[idx_bep_v]
             bep_eta_vfd = y_rend_scan[idx_bep_v]
+            
+            # Calcular H en el BEP de VFD usando curva base escalada
+            # Usar leyes de afinidad: Q ∝ N, H ∝ N²
+            factor_rpm_vfd = rpm_percentage / 100.0
+            x_bom_base = np.array([pt[0] for pt in puntos_bomba])
+            y_bom_base = np.array([pt[1] for pt in puntos_bomba])
+            grado_bom_base = 1 if st.session_state.get('ajuste_tipo', 'Cuadrática') == "Lineal" else 2
+            coef_bom_base = np.polyfit(x_bom_base, y_bom_base, grado_bom_base)
+            # Interpolar H en la curva base para el Q equivalente
+            q_equiv_base = bep_q_vfd / factor_rpm_vfd
+            h_equiv_base = np.polyval(coef_bom_base, q_equiv_base)
+            bep_h_vfd = h_equiv_base * (factor_rpm_vfd ** 2)
+            
+            # GUARDAR BEP VFD EN SESSION_STATE para usar en expander de Allievi
+            st.session_state['bep_q_vfd'] = float(bep_q_vfd)
+            st.session_state['bep_h_vfd'] = float(bep_h_vfd)
+            st.session_state['bep_eta_vfd'] = float(bep_eta_vfd)
             z_min_p = st.session_state.get('zona_eff_min', 65.0) / 100.0
             z_max_p = st.session_state.get('zona_eff_max', 115.0) / 100.0
             zona_min_v = bep_q_vfd * z_min_p
             zona_max_v = bep_q_vfd * z_max_p
 
-        # 4. Rango de visualización para gráficos VFD
+        # 4. Rango de visualización para gráficos VFD (Autoajustable)
         q_op_ref = interseccion_vfd[0] if interseccion_vfd else bep_q_vfd
-        x_max_plot_v = max(q_op_ref * 1.5, bep_q_vfd * 1.5, 10.0)
+        # El límite físico de la bomba escalado por las leyes de afinidad (eta = rpm_ratio)
+        q_limit_vfd = x_max_bom_base * eta if 'x_max_bom_base' in locals() else q_op_ref * 1.5
+        
+        # El rango será el máximo entre el límite físico y el 140% del punto de operación
+        x_max_plot_v = max(q_op_ref * 1.4, bep_q_vfd * 1.2, q_limit_vfd, 1.0)
         x_ext_v = np.linspace(0, x_max_plot_v, 500)
         u_flow = st.session_state.get('flow_unit', 'L/s')
         x_disp_v = x_ext_v * 3.6 if u_flow == 'm³/h' else x_ext_v
@@ -1244,32 +1306,24 @@ def render_analysis_tab():
                     q_i_disp = interseccion_vfd[0] * 3.6 if u_flow == 'm³/h' else interseccion_vfd[0]
                     fig_vfd.add_trace(go.Scatter(x=[q_i_disp], y=[interseccion_vfd[1]], mode='markers+text', name='Op. VFD', marker=dict(color='orange', size=10, symbol='star'), text=["Op. VFD"], textposition="top right"))
                 
-                # Aplicar configuración de ejes personalizados VFD si están definidos
-                x_range_vfd = None
-                y_range_vfd = None
-                if 'graph_vfd_x_min' in st.session_state and 'graph_vfd_x_max' in st.session_state:
-                    x_min_vfd = st.session_state['graph_vfd_x_min']
-                    x_max_vfd = st.session_state['graph_vfd_x_max']
-                    # Convertir a unidades de visualización si es necesario
-                    if u_flow == 'm³/h':
-                        x_range_vfd = [x_min_vfd * 3.6, x_max_vfd * 3.6]
-                    else:
-                        x_range_vfd = [x_min_vfd, x_max_vfd]
-                else:
-                    # Usar rango automático basado en datos
-                    x_range_vfd = [0, x_disp_v.max()]
+                # Calcular rangos inteligentes VFD con valores máximos de curva
+                q_op_vfd = interseccion_vfd[0] if interseccion_vfd else (bep_q_vfd if bep_q_vfd > 0 else 0)
+                h_op_vfd = interseccion_vfd[1] if interseccion_vfd else (np.polyval(coef_bom_vfd, bep_q_vfd) if bep_q_vfd > 0 else 0)
+                h_static_vfd = st.session_state.get('altura_estatica_total', 0)
                 
-                if 'graph_vfd_y_min' in st.session_state and 'graph_vfd_y_max' in st.session_state:
-                    y_range_vfd = [st.session_state['graph_vfd_y_min'], st.session_state['graph_vfd_y_max']]
-                else:
-                    # Calcular rangos dinámicos basados en datos reales
-                    y_all = np.concatenate([y_sis_v[y_sis_v >= 0], y_bom_v[y_bom_v >= 0]])
-                    if len(y_all) > 0:
-                        y_min, y_max = y_all.min(), y_all.max()
-                        y_margin = (y_max - y_min) * 0.1
-                        y_range_vfd = [max(0, y_min - y_margin), y_max + y_margin]
-                    else:
-                        y_range_vfd = None
+                # Usar solo el máximo de la bomba, no del sistema (que puede ser muy alto)
+                smart_x_vfd, smart_y_vfd = calculate_smart_axes(
+                    q_op_vfd, h_op_vfd, h_static_vfd, x_ext_v.max(), 
+                    tipo_grafico="hq",
+                    q_max_curve=x_ext_v.max(),
+                    val_max_curve=y_bom_v.max()  # Solo bomba, no sistema
+                )
+                if u_flow == 'm³/h':
+                    smart_x_vfd = [v * 3.6 for v in smart_x_vfd]
+
+                # Usar rangos inteligentes directamente
+                x_range_vfd = smart_x_vfd
+                y_range_vfd = smart_y_vfd
                 
                 fig_vfd.update_layout(
                     xaxis_title=f"Q [{get_display_unit_label(u_flow)}]",
@@ -1299,29 +1353,22 @@ def render_analysis_tab():
                     p_op_v = np.polyval(coef_pot_vfd, interseccion_vfd[0])
                     fig_pot_v.add_trace(go.Scatter(x=[q_i_disp], y=[p_op_v], mode='markers+text', name='Pot. Op.', marker=dict(color='orange', size=8, symbol='star'), text=[f"{p_op_v:.1f} HP"], textposition="top right"))
                 
-                # Aplicar configuración de ejes personalizados VFD
-                x_range_pot_vfd = None
-                if 'graph_vfd_x_min' in st.session_state and 'graph_vfd_x_max' in st.session_state:
-                    x_min_vfd = st.session_state['graph_vfd_x_min']
-                    x_max_vfd = st.session_state['graph_vfd_x_max']
-                    if u_flow == 'm³/h':
-                        x_range_pot_vfd = [x_min_vfd * 3.6, x_max_vfd * 3.6]
-                    else:
-                        x_range_pot_vfd = [x_min_vfd, x_max_vfd]
-                else:
-                    x_range_pot_vfd = [0, x_disp_v.max()]
+                # Calcular rangos inteligentes con valores máximos de curva
+                q_op_vfd = interseccion_vfd[0] if interseccion_vfd else 0
+                pot_op_vfd = np.polyval(coef_pot_vfd, q_op_vfd) if q_op_vfd > 0 else 0
+                smart_x_pot_v, smart_y_pot_v = calculate_smart_axes(
+                    q_op_vfd, pot_op_vfd, 0, x_ext_v.max(), 
+                    tipo_grafico="potencia",
+                    q_max_curve=x_ext_v.max(),
+                    val_max_curve=y_pot_v.max()
+                )
                 
-                # Calcular rango Y automático si no está personalizado
-                if 'graph_vfd_y_min' not in st.session_state or 'graph_vfd_y_max' not in st.session_state:
-                    y_pot_positive = y_pot_v[y_pot_v >= 0]
-                    if len(y_pot_positive) > 0:
-                        y_min, y_max = y_pot_positive.min(), y_pot_positive.max()
-                        y_margin = (y_max - y_min) * 0.1
-                        y_range_pot_vfd = [max(0, y_min - y_margin), y_max + y_margin]
-                    else:
-                        y_range_pot_vfd = None
-                else:
-                    y_range_pot_vfd = None  # Dejar que autorange maneje esto para potencia
+                if u_flow == 'm³/h':
+                    smart_x_pot_v = [v * 3.6 for v in smart_x_pot_v]
+
+                # Usar rangos inteligentes directamente
+                x_range_pot_vfd = smart_x_pot_v
+                y_range_pot_vfd = smart_y_pot_v
                 
                 fig_pot_v.update_layout(
                     xaxis_title=f"Q [{get_display_unit_label(u_flow)}]",
@@ -1352,29 +1399,22 @@ def render_analysis_tab():
                         r_op_v = np.polyval(coef_rend_vfd, interseccion_vfd[0])
                         fig_rend_v.add_trace(go.Scatter(x=[q_i_disp], y=[r_op_v], mode='markers+text', name='Rend. Op.', marker=dict(color='orange', size=8, symbol='star'), text=[f"{r_op_v:.1f}%"], textposition="top right"))
                     
-                    # Aplicar configuración de ejes personalizados VFD
-                    x_range_rend_vfd = None
-                    if 'graph_vfd_x_min' in st.session_state and 'graph_vfd_x_max' in st.session_state:
-                        x_min_vfd = st.session_state['graph_vfd_x_min']
-                        x_max_vfd = st.session_state['graph_vfd_x_max']
-                        if u_flow == 'm³/h':
-                            x_range_rend_vfd = [x_min_vfd * 3.6, x_max_vfd * 3.6]
-                        else:
-                            x_range_rend_vfd = [x_min_vfd, x_max_vfd]
-                    else:
-                        x_range_rend_vfd = [0, x_disp_v.max()]
+                    # Calcular rangos inteligentes con valores máximos de curva
+                    q_op_vfd = interseccion_vfd[0] if interseccion_vfd else bep_q_vfd
+                    rend_op_vfd = np.polyval(coef_rend_vfd, q_op_vfd) if q_op_vfd > 0 else bep_eta_vfd
+                    smart_x_rend_v, smart_y_rend_v = calculate_smart_axes(
+                        q_op_vfd, rend_op_vfd, 0, x_ext_v.max(), 
+                        tipo_grafico="rendimiento",
+                        q_max_curve=x_ext_v.max(),
+                        val_max_curve=y_rend_v.max()
+                    )
                     
-                    # Calcular rango Y automático si no está personalizado
-                    if 'graph_vfd_y_min' not in st.session_state or 'graph_vfd_y_max' not in st.session_state:
-                        y_rend_positive = y_rend_v[y_rend_v >= 0]
-                        if len(y_rend_positive) > 0:
-                            y_min, y_max = y_rend_positive.min(), y_rend_positive.max()
-                            y_margin = (y_max - y_min) * 0.1
-                            y_range_rend_vfd = [max(0, y_min - y_margin), y_max + y_margin]
-                        else:
-                            y_range_rend_vfd = None
-                    else:
-                        y_range_rend_vfd = None  # Dejar que autorange maneje esto para rendimiento
+                    if u_flow == 'm³/h':
+                        smart_x_rend_v = [v * 3.6 for v in smart_x_rend_v]
+
+                    # Usar rangos inteligentes directamente
+                    x_range_rend_vfd = smart_x_rend_v
+                    y_range_rend_vfd = smart_y_rend_v
                     
                     fig_rend_v.update_layout(
                         xaxis_title=f"Q [{get_display_unit_label(u_flow)}]",
@@ -1401,29 +1441,22 @@ def render_analysis_tab():
                         n_op_v = np.polyval(coef_npsh_vfd, interseccion_vfd[0])
                         fig_npsh_v.add_trace(go.Scatter(x=[q_i_disp], y=[n_op_v], mode='markers+text', name='NPSH Op.', marker=dict(color='orange', size=8, symbol='star'), text=[f"{n_op_v:.1f} m"], textposition="top right"))
                     
-                    # Aplicar configuración de ejes personalizados VFD
-                    x_range_npsh_vfd = None
-                    if 'graph_vfd_x_min' in st.session_state and 'graph_vfd_x_max' in st.session_state:
-                        x_min_vfd = st.session_state['graph_vfd_x_min']
-                        x_max_vfd = st.session_state['graph_vfd_x_max']
-                        if u_flow == 'm³/h':
-                            x_range_npsh_vfd = [x_min_vfd * 3.6, x_max_vfd * 3.6]
-                        else:
-                            x_range_npsh_vfd = [x_min_vfd, x_max_vfd]
-                    else:
-                        x_range_npsh_vfd = [0, x_disp_v.max()]
+                    # Calcular rangos inteligentes con valores máximos de curva
+                    q_op_vfd = interseccion_vfd[0] if interseccion_vfd else 0
+                    npsh_op_vfd = np.polyval(coef_npsh_vfd, q_op_vfd) if q_op_vfd > 0 else 0
+                    smart_x_npsh_v, smart_y_npsh_v = calculate_smart_axes(
+                        q_op_vfd, npsh_op_vfd, 0, x_ext_v.max(), 
+                        tipo_grafico="npsh",
+                        q_max_curve=x_ext_v.max(),
+                        val_max_curve=y_npsh_v.max()
+                    )
                     
-                    # Calcular rango Y automático si no está personalizado
-                    if 'graph_vfd_y_min' not in st.session_state or 'graph_vfd_y_max' not in st.session_state:
-                        y_npsh_positive = y_npsh_v[y_npsh_v >= 0]
-                        if len(y_npsh_positive) > 0:
-                            y_min, y_max = y_npsh_positive.min(), y_npsh_positive.max()
-                            y_margin = (y_max - y_min) * 0.1
-                            y_range_npsh_vfd = [max(0, y_min - y_margin), y_max + y_margin]
-                        else:
-                            y_range_npsh_vfd = None
-                    else:
-                        y_range_npsh_vfd = None  # Dejar que autorange maneje esto para NPSH
+                    if u_flow == 'm³/h':
+                        smart_x_npsh_v = [v * 3.6 for v in smart_x_npsh_v]
+
+                    # Usar rangos inteligentes directamente
+                    x_range_npsh_vfd = smart_x_npsh_v
+                    y_range_npsh_vfd = smart_y_npsh_v
                     
                     fig_npsh_v.update_layout(
                         xaxis_title=f"Q [{get_display_unit_label(u_flow)}]",
@@ -1438,67 +1471,7 @@ def render_analysis_tab():
                         st.markdown(f"""<div style="background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 4px solid #0066cc;"><strong>Punto de Operación:</strong><br><strong>Caudal (Q):</strong> {q_i_disp:.2f} {get_display_unit_label(u_flow)}<br><strong>NPSH:</strong> {n_op_v:.2f} m</div>""", unsafe_allow_html=True)
 
         with col_vfd3:
-            # --- Expander de Personalización de Gráficos VFD ---
-            with st.expander("⚙️ Personalizar Vista de Gráficos VFD", expanded=False):
-                st.markdown("**Configuración de Ejes**")
-                st.caption("Configura los rangos de los ejes para los gráficos VFD")
-                
-                # Calcular valores por defecto basados en datos actuales
-                puntos_bomba_vfd = curva_inputs.get('bomba', [])
-                if len(puntos_bomba_vfd) >= 2:
-                    x_data_vfd = np.array([pt[0] for pt in puntos_bomba_vfd])
-                    default_x_max_vfd = float(x_data_vfd.max() * 1.2)
-                else:
-                    default_x_max_vfd = 10.0
-                
-                # Configuración del Eje X
-                st.markdown("**Eje X (Caudal)**")
-                col_x1_vfd, col_x2_vfd = st.columns(2)
-                with col_x1_vfd:
-                    x_min_graph_vfd = st.number_input(
-                        "Inicio X",
-                        min_value=0.0,
-                        value=st.session_state.get('graph_vfd_x_min', 0.0),
-                        step=0.5,
-                        key='graph_vfd_x_min',
-                        help="Valor mínimo del eje X (Caudal) para gráficos VFD"
-                    )
-                with col_x2_vfd:
-                    x_max_graph_vfd = st.number_input(
-                        "Final X",
-                        min_value=0.1,
-                        value=st.session_state.get('graph_vfd_x_max', default_x_max_vfd),
-                        step=1.0,
-                        key='graph_vfd_x_max',
-                        help="Valor máximo del eje X (Caudal) para gráficos VFD"
-                    )
-                
-                # Configuración del Eje Y
-                st.markdown("**Eje Y (Altura)**")
-                col_y1_vfd, col_y2_vfd = st.columns(2)
-                with col_y1_vfd:
-                    y_min_graph_vfd = st.number_input(
-                        "Inicio Y",
-                        value=st.session_state.get('graph_vfd_y_min', 0.0),
-                        step=5.0,
-                        key='graph_vfd_y_min',
-                        help="Valor mínimo del eje Y (Altura) para gráficos VFD"
-                    )
-                with col_y2_vfd:
-                    y_max_graph_vfd = st.number_input(
-                        "Final Y",
-                        min_value=1.0,
-                        value=st.session_state.get('graph_vfd_y_max', 150.0),
-                        step=10.0,
-                        key='graph_vfd_y_max',
-                        help="Valor máximo del eje Y (Altura) para gráficos VFD"
-                    )
-                
-                # Botón para resetear a valores automáticos
-                if st.button("🔄 Resetear a Automático", use_container_width=True, key='reset_vfd_axes'):
-                    # Usar un flag para resetear en el próximo rerun
-                    st.session_state['_reset_vfd_axes'] = True
-                    st.rerun()
+            # El expander de personalización VFD ha sido eliminado en favor del autoajuste inteligente
             
             with st.expander(f"📊 Resumen y Comentarios Técnicos - VFD ({rpm_percentage:.2f}% RPM)", expanded=False):
                 st.markdown("### 📈 **Resumen de Resultados**")
@@ -1690,11 +1663,47 @@ def render_analysis_tab():
                 help=f"Define el incremento entre cada punto de la tabla a 100% RPM (Automático: {paso_auto_100} L/s)"
             )
         
+            # === MENSAJE INFORMATIVO PARA ALLIEVI ===
+            # Calcular Q objetivo para H≈0 (solo informativo)
+            try:
+                curva_inputs_temp = st.session_state.get('curva_inputs', {})
+                puntos_bomba_temp = curva_inputs_temp.get('bomba', [])
+                
+                if len(puntos_bomba_temp) >= 2:
+                    x_bom_temp = np.array([pt[0] for pt in puntos_bomba_temp])
+                    y_bom_temp = np.array([pt[1] for pt in puntos_bomba_temp])
+                    
+                    if np.all(np.isfinite(x_bom_temp)) and np.all(np.isfinite(y_bom_temp)):
+                        ajuste_tipo_temp = st.session_state.get('ajuste_tipo', 'Cuadrática (2do grado)')
+                        grado_temp = 1 if ajuste_tipo_temp == "Lineal" else 2 if ajuste_tipo_temp == "Cuadrática (2do grado)" else 3
+                        coef_temp = np.polyfit(x_bom_temp, y_bom_temp, grado_temp)
+                        
+                        # Resolver H ≈ 0
+                        if grado_temp == 2:
+                            a, b, c = coef_temp[0], coef_temp[1], coef_temp[2] # Corrected order for polyfit output
+                            discriminante = b**2 - 4*a*c
+                            if discriminante >= 0 and a != 0:
+                                q1 = (-b + np.sqrt(discriminante)) / (2*a)
+                                q2 = (-b - np.sqrt(discriminante)) / (2*a)
+                                q_para_h_cero = max(q1, q2) if q1 > 0 or q2 > 0 else q_max_100 * 1.5
+                            else:
+                                q_para_h_cero = q_max_100 * 1.5
+                        else: # Linear or Cubic (simplified for linear, cubic might need numerical solver)
+                            q_para_h_cero = -coef_temp[-1] / coef_temp[-2] if len(coef_temp) >= 2 and coef_temp[-2] != 0 else q_max_100 * 1.5
+                        
+                        # Mostrar mensaje informativo
+                        st.info(f"💡 **Para Allievi (método 'Curvas por Puntos'):** Para cubrir desde Q=0 hasta H≈0, ajustar **Q max ≈ {q_para_h_cero:.2f} L/s**")
+            except Exception as e:
+                # st.error(f"Error calculating Q for H≈0: {e}") # For debugging
+                pass
+            
+            st.markdown("---")
+            
             # Obtener datos de las curvas a 100% RPM
             curva_inputs = st.session_state.get('curva_inputs', {})
             ajuste_tipo = st.session_state.get('ajuste_tipo', 'Cuadrática (2do grado)')
             
-            # Usar Q min y Q max definidos por el usuario
+            # Usar Q max (ya ajustado si extrapolación está activa)
             caudal_max_tabla_100 = q_max_100
             punto_operacion_100 = st.session_state.get('interseccion', [0])[0] if st.session_state.get('interseccion') else 0
             
@@ -2190,6 +2199,43 @@ def render_analysis_tab():
                 key="paso_caudal_vdf_tab2",
                 help=f"Define el incremento entre cada punto de la tabla a {rpm_percentage:.2f}% RPM (Automático: {paso_auto_vdf} L/s)"
             )
+            
+            # === MENSAJE INFORMATIVO PARA ALLIEVI (VFD) ===
+            # Calcular Q objetivo para H≈0 (solo informativo)
+            try:
+                curva_inputs_temp_vfd = st.session_state.get('curva_inputs', {})
+                puntos_bomba_temp_vfd = curva_inputs_temp_vfd.get('bomba', [])
+                
+                if len(puntos_bomba_temp_vfd) >= 2 and rpm_percentage < 100:
+                    # Escalar puntos de bomba según % RPM (usando leyes de afinidad)
+                    factor_rpm = rpm_percentage / 100.0
+                    x_bom_vfd = np.array([pt[0] * factor_rpm for pt in puntos_bomba_temp_vfd])
+                    y_bom_vfd = np.array([pt[1] * (factor_rpm ** 2) for pt in puntos_bomba_temp_vfd])
+                    
+                    if np.all(np.isfinite(x_bom_vfd)) and np.all(np.isfinite(y_bom_vfd)):
+                        ajuste_tipo_vfd = st.session_state.get('ajuste_tipo', 'Cuadrática (2do grado)')
+                        grado_vfd = 1 if ajuste_tipo_vfd == "Lineal" else 2 if ajuste_tipo_vfd == "Cuadrática (2do grado)" else 3
+                        coef_vfd = np.polyfit(x_bom_vfd, y_bom_vfd, grado_vfd)
+                        
+                        # Resolver H ≈ 0
+                        if grado_vfd == 2:
+                            a, b, c = coef_vfd[0], coef_vfd[1], coef_vfd[2]
+                            discriminante = b**2 - 4*a*c
+                            if discriminante >= 0 and a != 0:
+                                q1 = (-b + np.sqrt(discriminante)) / (2*a)
+                                q2 = (-b - np.sqrt(discriminante)) / (2*a)
+                                q_para_h_cero_vfd = max(q1, q2) if q1 > 0 or q2 > 0 else q_max_vdf * 1.5
+                            else:
+                                q_para_h_cero_vfd = q_max_vdf * 1.5
+                        else:
+                            q_para_h_cero_vfd = -coef_vfd[-1] / coef_vfd[-2] if len(coef_vfd) >= 2 and coef_vfd[-2] != 0 else q_max_vdf * 1.5
+                        
+                        # Mostrar mensaje informativo
+                        st.info(f"💡 **Para Allievi (método 'Curvas por Puntos'):** Para cubrir desde Q=0 hasta H≈0 a {rpm_percentage:.2f}% RPM, ajustar **Q max ≈ {q_para_h_cero_vfd:.2f} L/s**")
+            except:
+                pass
+            
+            st.markdown("---")
             
             # Actualizar el valor automático cuando cambie Q max
             if st.session_state.get("q_max_vdf_tab2", caudal_diseno) != q_max_vdf:

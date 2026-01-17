@@ -13,7 +13,7 @@ class AppSettings:
     
     # Control de visibilidad de funciones de desarrollador
     # Cambiar a False para la versión pública
-    SHOW_DEVELOPER_SECTION = False
+    SHOW_DEVELOPER_SECTION = True
     
     # Configuración de Streamlit
     STREAMLIT_CONFIG = {

@@ -44,9 +44,13 @@ def render_data_input_tab():
         convert_pump_to_textarea_format, get_pump_summary_info
     )
     from config.constants import HAZEN_WILLIAMS_C, ACCESORIOS_DATA, PEAD_DATA, HIERRO_DUCTIL_DATA, HIERRO_FUNDIDO_DATA, PVC_DATA
+    from utils.sync_manager import sync_pipe_data
     
     def create_on_change_callback(section_suffix):
         def callback():
+            # Disparar sincronización automática
+            sync_pipe_data(section_suffix, 'data_input')
+            
             # These are the keys of the widgets themselves
             widget_keys_to_delete = [
                 f'diam_externo_{section_suffix}',
@@ -154,6 +158,34 @@ def render_data_input_tab():
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
+    
+    def get_current_system_params():
+        """Obtiene un diccionario unificado de parámetros del sistema desde el session_state."""
+        # Asegurar sincronización con los selectores detallados si existen
+        s_di = st.session_state.get('diam_succion_mm', 200.0)
+        i_di = st.session_state.get('diam_impulsion_mm', 150.0)
+        
+        return {
+            'long_succion': st.session_state.get('long_succion', 10.0),
+            'diam_succion_m': s_di / 1000.0,
+            'mat_succion': st.session_state.get('mat_succion', 'PVC'),
+            'C_succion': st.session_state.get('coeficiente_hazen_succion', 150),
+            'accesorios_succion': st.session_state.get('accesorios_succion', []),
+            'otras_perdidas_succion': st.session_state.get('otras_perdidas_succion', 0.0),
+            
+            'long_impulsion': st.session_state.get('long_impulsion', 500.0),
+            'diam_impulsion_m': i_di / 1000.0,
+            'mat_impulsion': st.session_state.get('mat_impulsion', 'PVC'),
+            'C_impulsion': st.session_state.get('coeficiente_hazen_impulsion', 150),
+            'accesorios_impulsion': st.session_state.get('accesorios_impulsion', []),
+            'otras_perdidas_impulsion': st.session_state.get('otras_perdidas_impulsion', 0.0),
+            
+            'altura_succion': st.session_state.get('altura_succion_input', 1.65),
+            'altura_descarga': st.session_state.get('altura_descarga', 80.0),
+            'bomba_inundada': st.session_state.get('bomba_inundada', False),
+            'metodo_calculo': st.session_state.get('metodo_calculo', 'Hazen-Williams'),
+            'temp_liquido': st.session_state.get('temp_liquido', 20.0)
+        }
     
     
     
@@ -716,69 +748,9 @@ def render_data_input_tab():
         st.subheader("2. Tubería y Accesorios de Succión")
         
         
-        # Botón de Migración Succión
-        if st.button("📥 Importar desde Selección de Diámetros", key="btn_mig_suc", use_container_width=True):
-            # Leer claves temporales de migración
-            if st.session_state.get('_migration_pending_suc'):
-                mat_migrated = st.session_state.get('_migrated_suc_mat')
-                di_migrated = st.session_state.get('_migrated_suc_di')
-                
-                if mat_migrated and di_migrated:
-                    # Aplicar material
-                    st.session_state['mat_succion'] = mat_migrated
-                    st.session_state['diam_succion_mm'] = di_migrated
-                    
-                    # Aplicar configuración específica por material
-                    if mat_migrated == "PVC":
-                        tipo_union = st.session_state.get('_migrated_suc_tipo_union')
-                        serie_nombre = st.session_state.get('_migrated_suc_serie_nombre')
-                        dn = st.session_state.get('_migrated_suc_dn')
-                        if tipo_union and serie_nombre and dn:
-                            st.session_state['tipo_union_pvc_succion'] = tipo_union
-                            st.session_state['serie_pvc_succion_nombre'] = serie_nombre
-                            st.session_state['dn_pvc_succion'] = dn
-                    
-                    elif mat_migrated in ["PEAD", "HDPE (Polietileno)"]:
-                        diam_ext = st.session_state.get('_migrated_suc_diam_externo')
-                        serie = st.session_state.get('_migrated_suc_serie')
-                        if diam_ext and serie:
-                            st.session_state['diam_externo_succion'] = diam_ext
-                            st.session_state['serie_succion'] = serie
-                    
-                    elif "Hierro Dúctil" in mat_migrated:
-                        clase = st.session_state.get('_migrated_suc_clase')
-                        dn = st.session_state.get('_migrated_suc_dn')
-                        if clase and dn:
-                            st.session_state['clase_hierro_succion'] = clase
-                            st.session_state['dn_succion'] = dn
-                    
-                    elif "Hierro Fundido" in mat_migrated:
-                        clase = st.session_state.get('_migrated_suc_clase_fundido')
-                        dn = st.session_state.get('_migrated_suc_dn_fundido')
-                        if clase and dn:
-                            st.session_state['clase_hierro_fundido_succion'] = clase
-                            st.session_state['dn_hierro_fundido_succion'] = dn
-                    
-                    # Limpiar flag de migración pendiente
-                    st.session_state['_migration_pending_suc'] = False
-                    
-                    st.success(f"✅ Configuración importada: {mat_migrated} DI {di_migrated:.1f} mm")
-                    st.rerun()
-                else:
-                    st.warning("⚠️ No hay datos de migración válidos.")
-            else:
-                st.warning("⚠️ No hay datos previos en la pestaña de Selección de Diámetros.")
-        
-        # Botón de Exportación a Selección de Diámetros
-        if st.button("📤 Exportar a Selección de Diámetros", key="btn_export_suc", use_container_width=True, help="Transfiere el diámetro configurado a la pestaña de Selección Técnica de Diámetros"):
-            # Obtener el diámetro interno actual de succión
-            diam_suc_mm = st.session_state.get('diam_succion_mm', 200.0)
-            
-            # Transferir a las claves usadas por diameter_selection_ui.py
-            st.session_state['diam_succion_mm'] = float(diam_suc_mm)
-            
-            st.success(f"✅ Diámetro de succión exportado: {diam_suc_mm:.1f} mm")
-            st.info("💡 Ve a la pestaña '📏 Selección Técnica de Diámetros' para analizar este diámetro")
+        # Indicador de sincronización automática
+        from utils.sync_manager import render_sync_indicator
+        render_sync_indicator('succion')
 
 
 
@@ -1201,27 +1173,9 @@ def render_data_input_tab():
     with col_imp:
         st.subheader("3. Tubería y Accesorios de Impulsión")
         
-        # Botón de Migración Impulsión
-        if st.button("📥 Importar desde Selección de Diámetros", key="btn_mig_imp", use_container_width=True):
-            m_i = st.session_state.get('last_pt_mat_imp')
-            d_i = st.session_state.get('last_pt_di_imp')
-            if m_i and d_i:
-                migrate_diameter('impulsion', m_i, d_i)
-                st.success(f"✅ Impulsión: {m_i} DI {d_i:.1f} mm importado.")
-                st.rerun()
-            else:
-                st.warning("⚠️ No hay datos previos en la pestaña de Selección de Diámetros.")
-        
-        # Botón de Exportación a Selección de Diámetros
-        if st.button("📤 Exportar a Selección de Diámetros", key="btn_export_imp", use_container_width=True, help="Transfiere el diámetro configurado a la pestaña de Selección Técnica de Diámetros"):
-            # Obtener el diámetro interno actual de impulsión
-            diam_imp_mm = st.session_state.get('diam_impulsion_mm', 150.0)
-            
-            # Transferir a las claves usadas por diameter_selection_ui.py
-            st.session_state['diam_impulsion_mm'] = float(diam_imp_mm)
-            
-            st.success(f"✅ Diámetro de impulsión exportado: {diam_imp_mm:.1f} mm")
-            st.info("💡 Ve a la pestaña '📏 Selección Técnica de Diámetros' para analizar este diámetro")
+        # Indicador de sincronización automática
+        from utils.sync_manager import render_sync_indicator
+        render_sync_indicator('impulsion')
 
         st.number_input(
             "Longitud Tubería (m)",
@@ -1719,47 +1673,47 @@ def render_data_input_tab():
                         
                         flow_unit = st.session_state.get('flow_unit', 'L/s')
                         
-                        # Obtener parámetros del sistema
-                        system_params = {
-                            'long_succion': st.session_state.get('long_succion', 10.0),
-                            'diam_succion_m': st.session_state.get('diam_succion_mm', 200.0) / 1000.0,
-                            'mat_succion': st.session_state.get('mat_succion', 'PVC'),
-                            'otras_perdidas_succion': st.session_state.get('otras_perdidas_succion', 0.0),
-                            'accesorios_succion': st.session_state.get('accesorios_succion', []),
-                            'long_impulsion': st.session_state.get('long_impulsion', 500.0),
-                            'diam_impulsion_m': st.session_state.get('diam_impulsion_mm', 150.0) / 1000.0,
-                            'mat_impulsion': st.session_state.get('mat_impulsion', 'PVC'),
-                            'otras_perdidas_impulsion': st.session_state.get('otras_perdidas_impulsion', 0.0),
-                            'accesorios_impulsion': st.session_state.get('accesorios_impulsion', []),
-                            'altura_succion': st.session_state.get('altura_succion_input', 1.65),
-                            'altura_descarga': st.session_state.get('altura_descarga', 80.0)
-                        }
+                        # Obtener parámetros del sistema unificados
+                        system_params = get_current_system_params()
+                        n_bombas = st.session_state.get('num_bombas', 1)
                         
-                        # Agregar coeficientes C de Hazen-Williams
-                        system_params['C_succion'] = HAZEN_WILLIAMS_C.get(system_params['mat_succion'], 150)
-                        system_params['C_impulsion'] = HAZEN_WILLIAMS_C.get(system_params['mat_impulsion'], 150)
+                        # --- CÁLCULO DE PUNTOS DE LA CURVA DEL SISTEMA ---
+                        # Usar caudales personalizados de ADT si existen (siempre en L/s internamente)
+                        if 'adt_caudales_personalizados' in st.session_state:
+                            flows_total = st.session_state.adt_caudales_personalizados
+                        else:
+                            flows_total = [0, st.session_state.get('caudal_lps', 51.0), st.session_state.get('caudal_lps', 51.0) * 1.3]
                         
-                        resultados_adt = calculate_adt_for_multiple_flows(flows, flow_unit, system_params)
+                        # IMPORTANTE: Forzamos 'L/s' para el motor porque los puntos están en esa unidad.
+                        resultados_adt = calculate_adt_for_multiple_flows(flows_total, 'L/s', system_params)
+                        
                         if resultados_adt:
-                            # Formatear valores en tabla con espacios según la unidad seleccionada
                             valores_adt = []
                             unidad_caudal = st.session_state.get('flow_unit', 'L/s')
                             unidad_display = get_display_unit_label(unidad_caudal)
                             
-                            for r in resultados_adt:
-                                caudal_display = r['caudal_lps']
-                                if unidad_caudal == 'm³/h':
-                                    caudal_display = r['caudal_lps'] * 3.6
-                                valores_adt.append(f"{caudal_display:.2f} {r['adt_total']:.2f}")
+                            for i, r in enumerate(resultados_adt):
+                                # Caudal TOTAL en la unidad seleccionada
+                                caudal_total_disp = flows_total[i]
+                                if unidad_caudal == 'm³/h' and flow_unit == 'L/s':
+                                    caudal_total_disp = flows_total[i] * 3.6
+                                elif unidad_caudal == 'L/s' and flow_unit == 'm³/h':
+                                    caudal_total_disp = flows_total[i] / 3.6
+                                
+                                # DIVIDIR POR N BOMBAS para el eje X de la curva del sistema
+                                caudal_por_bomba = caudal_total_disp / n_bombas if n_bombas > 0 else caudal_total_disp
+                                
+                                valores_adt.append(f"{caudal_por_bomba:.2f} {r['adt_total']:.2f}")
+                            
                             valores_texto = "\n".join(valores_adt)
                             
                             puntos_str = st.text_area(
                                 f"Puntos x y para {curva_label}",
                                 value=valores_texto,
                                 key=f"textarea_{curva_key}",
-                                help=f"Valores calculados automáticamente desde los caudales personalizados de ADT: Caudal ({unidad_display}) y ADT (m)"
+                                help=f"Puntos calculados automáticamente (Caudal por Bomba ({unidad_display}) vs ADT Total (m)). Método: {system_params['metodo_calculo']}"
                             )
-                            st.info("💡 **Valores sincronizados automáticamente con la tabla ADT personalizada**")
+                            st.info(f"💡 **Curva compensada para {n_bombas} bombas** (Total / {n_bombas})")
                         else:
                             puntos_str = st.text_area(
                                 f"Puntos x y para {curva_label}",
@@ -2283,191 +2237,68 @@ def render_data_input_tab():
         vel_succion = 0.0
     st.session_state['velocidad_succion'] = vel_succion
     
-    # Obtener material y método de cálculo
-    mat_succion = st.session_state.get('mat_succion', list(HAZEN_WILLIAMS_C.keys())[0])
-    metodo_calculo = st.session_state.get('metodo_calculo', 'Hazen-Williams')
+    # --- UNIFICACIÓN DE MOTOR DE CÁLCULO ---
+    # Preparar parámetros para el motor centralizado
+    system_params = get_current_system_params()
     
-    if metodo_calculo == 'Hazen-Williams':
-        # MÉTODO HAZEN-WILLIAMS (existente)
-        coeficiente_hazen_succion = HAZEN_WILLIAMS_C[mat_succion]
-        st.session_state['coeficiente_hazen_succion'] = coeficiente_hazen_succion
-        
-        hf_primaria_succion = calcular_hf_hazen_williams(
-            caudal_m3s_design, 
-            st.session_state.get('long_succion', 10.0), 
-            diam_succion_m, 
-            coeficiente_hazen_succion
-        )
-        
-        # Guardar detalles para visualización
-        st.session_state['detalles_calc_succion_primaria'] = {
-            'metodo': 'Hazen-Williams',
-            'C': coeficiente_hazen_succion
-        }
-    else:
-        # MÉTODO DARCY-WEISBACH (nuevo)
-        temperatura = st.session_state.get('temp_liquido', 20.0)
-        
-        resultado_darcy = calcular_perdidas_darcy_weisbach(
-            Q=caudal_m3s_design,
-            L=st.session_state.get('long_succion', 10.0),
-            D=diam_succion_m,
-            material=mat_succion,
-            temperatura=temperatura
-        )
-        
-        hf_primaria_succion = resultado_darcy['hf']
-        
-        # Guardar detalles para visualización
-        st.session_state['detalles_calc_succion_primaria'] = {
-            'metodo': 'Darcy-Weisbach',
-            'Re': resultado_darcy['Re'],
-            'regimen': resultado_darcy['regimen'],
-            'f': resultado_darcy['f'],
-            'epsilon': resultado_darcy['epsilon'],
-            'nu': resultado_darcy['nu'],
-            'V': resultado_darcy['V']
-        }
-        
-        # Mantener coeficiente Hazen para compatibilidad con reportes
-        coeficiente_hazen_succion = HAZEN_WILLIAMS_C.get(mat_succion, 120)
-        st.session_state['coeficiente_hazen_succion'] = coeficiente_hazen_succion
+    # Calcular ADT para el punto de diseño (Caudal TOTAL para pérdidas en tubería común)
+    res_diseno = calculate_adt_for_multiple_flows([q_total_lps], 'L/s', system_params)[0]
     
-    st.session_state['hf_primaria_succion'] = hf_primaria_succion
+    # Sincronizar estados desde el motor central
+    st.session_state['hf_primaria_succion'] = res_diseno['hf_primaria_succion']
+    st.session_state['hf_secundaria_succion'] = res_diseno['hf_secundaria_succion']
+    st.session_state['perdida_total_succion'] = res_diseno['perdida_succion']
     
+    st.session_state['hf_primaria_impulsion'] = res_diseno['hf_primaria_impulsion']
+    st.session_state['hf_secundaria_impulsion'] = res_diseno['hf_secundaria_impulsion']
+    st.session_state['perdida_total_impulsion'] = res_diseno['perdida_impulsion']
+    
+    st.session_state['altura_estatica_total'] = res_diseno['altura_estatica_total']
+    st.session_state['perdidas_totales_sistema'] = res_diseno['perdida_succion'] + res_diseno['perdida_impulsion']
+    st.session_state['adt_total'] = res_diseno['adt_total']
+
+    # --- RECALCULAR LONGITUDES EQUIVALENTES PARA VISUALIZACIÓN ---
     le_total_succion = 0
     for acc in st.session_state.get('accesorios_succion', []):
-        if 'lc_d' in acc and acc['lc_d'] is not None:
-            le_over_d_val = float(acc['lc_d'])
-        else:
-            le_over_d_val = 10  # Valor por defecto
-        le_total_succion += le_over_d_val * acc['cantidad'] * diam_succion_m
+        le_over_d = float(acc.get('lc_d', 10))
+        le_total_succion += le_over_d * acc.get('cantidad', 1) * diam_succion_m
     st.session_state['le_total_succion'] = le_total_succion
+
+    le_total_impulsion = 0
+    for acc in st.session_state.get('accesorios_impulsion', []):
+        le_over_d = float(acc.get('lc_d', 10))
+        le_total_impulsion += le_over_d * acc.get('cantidad', 1) * diam_impulsion_m
+    st.session_state['le_total_impulsion'] = le_total_impulsion
+
+    # Recuperar valores para visualización
+    hf_primaria_succion = st.session_state['hf_primaria_succion']
+    hf_secundaria_succion = st.session_state['hf_secundaria_succion']
+    perdida_total_succion = st.session_state['perdida_total_succion']
     
-    # Pérdidas secundarias succión (accesorios)
-    if metodo_calculo == 'Hazen-Williams':
-        hf_secundaria_succion = calcular_hf_hazen_williams(
-            caudal_m3s_design, 
-            le_total_succion, 
-            diam_succion_m, 
-            coeficiente_hazen_succion
-        )
-    else:
-        # Darcy-Weisbach para accesorios
-        temperatura = st.session_state.get('temp_liquido', 20.0)
-        resultado_darcy_sec = calcular_perdidas_darcy_weisbach(
-            Q=caudal_m3s_design,
-            L=le_total_succion,
-            D=diam_succion_m,
-            material=mat_succion,
-            temperatura=temperatura
-        )
-        hf_secundaria_succion = resultado_darcy_sec['hf']
+    hf_primaria_impulsion = st.session_state['hf_primaria_impulsion']
+    hf_secundaria_impulsion = st.session_state['hf_secundaria_impulsion']
+    perdida_total_impulsion = st.session_state['perdida_total_impulsion']
     
-    st.session_state['hf_secundaria_succion'] = hf_secundaria_succion
-    
-    perdida_total_succion = hf_primaria_succion + hf_secundaria_succion + st.session_state.get('otras_perdidas_succion', 0.0)
-    st.session_state['perdida_total_succion'] = perdida_total_succion
-    
-    altura_dinamica_succion = st.session_state.get('altura_succion_input', 1.65) + perdida_total_succion
-    st.session_state['altura_dinamica_succion'] = altura_dinamica_succion
-    
-    # Cálculos de impulsión
+    # Velocidad de impulsión (no calculada por calculate_adt_for_multiple_flows, se mantiene)
     area_impulsion = math.pi * (diam_impulsion_m / 2)**2
     if caudal_m3s_design > 0 and area_impulsion > 0:
         vel_impulsion = caudal_m3s_design / area_impulsion
     else:
         vel_impulsion = 0.0
     st.session_state['velocidad_impulsion'] = vel_impulsion
-    
-    # Obtener material impulsión
-    mat_impulsion = st.session_state.get('mat_impulsion', list(HAZEN_WILLIAMS_C.keys())[0])
-    
-    # Pérdidas primarias impulsión
-    if metodo_calculo == 'Hazen-Williams':
-        coeficiente_hazen_impulsion = HAZEN_WILLIAMS_C[mat_impulsion]
-        st.session_state['coeficiente_hazen_impulsion'] = coeficiente_hazen_impulsion
-        
-        hf_primaria_impulsion = calcular_hf_hazen_williams(
-            caudal_m3s_design, 
-            st.session_state.get('long_impulsion', 500.0), 
-            diam_impulsion_m, 
-            coeficiente_hazen_impulsion
-        )
-        
-        st.session_state['detalles_calc_impulsion_primaria'] = {
-            'metodo': 'Hazen-Williams',
-            'C': coeficiente_hazen_impulsion
-        }
-    else:
-        # Darcy-Weisbach para impulsión
-        temperatura = st.session_state.get('temp_liquido', 20.0)
-        
-        resultado_darcy_imp = calcular_perdidas_darcy_weisbach(
-            Q=caudal_m3s_design,
-            L=st.session_state.get('long_impulsion', 500.0),
-            D=diam_impulsion_m,
-            material=mat_impulsion,
-            temperatura=temperatura
-        )
-        
-        hf_primaria_impulsion = resultado_darcy_imp['hf']
-        
-        st.session_state['detalles_calc_impulsion_primaria'] = {
-            'metodo': 'Darcy-Weisbach',
-            'Re': resultado_darcy_imp['Re'],
-            'regimen': resultado_darcy_imp['regimen'],
-            'f': resultado_darcy_imp['f'],
-            'epsilon': resultado_darcy_imp['epsilon'],
-            'nu': resultado_darcy_imp['nu'],
-            'V': resultado_darcy_imp['V']
-        }
-        
-        coeficiente_hazen_impulsion = HAZEN_WILLIAMS_C.get(mat_impulsion, 120)
-        st.session_state['coeficiente_hazen_impulsion'] = coeficiente_hazen_impulsion
-    
-    st.session_state['hf_primaria_impulsion'] = hf_primaria_impulsion
-    
-    le_total_impulsion = 0
-    for acc in st.session_state.get('accesorios_impulsion', []):
-        if 'lc_d' in acc and acc['lc_d'] is not None:
-            le_over_d_val = float(acc['lc_d'])
-        else:
-            le_over_d_val = 10  # Valor por defecto
-        le_total_impulsion += le_over_d_val * acc['cantidad'] * diam_impulsion_m
-    st.session_state['le_total_impulsion'] = le_total_impulsion
-    
-    # Pérdidas secundarias impulsión
-    if metodo_calculo == 'Hazen-Williams':
-        hf_secundaria_impulsion = calcular_hf_hazen_williams(
-            caudal_m3s_design, 
-            le_total_impulsion, 
-            diam_impulsion_m, 
-            coeficiente_hazen_impulsion
-        )
-    else:
-        # Darcy-Weisbach para accesorios impulsión
-        temperatura = st.session_state.get('temp_liquido', 20.0)
-        resultado_darcy_sec_imp = calcular_perdidas_darcy_weisbach(
-            Q=caudal_m3s_design,
-            L=le_total_impulsion,
-            D=diam_impulsion_m,
-            material=mat_impulsion,
-            temperatura=temperatura
-        )
-        hf_secundaria_impulsion = resultado_darcy_sec_imp['hf']
-    
-    st.session_state['hf_secundaria_impulsion'] = hf_secundaria_impulsion
-    
-    perdida_total_impulsion = hf_primaria_impulsion + hf_secundaria_impulsion + st.session_state.get('otras_perdidas_impulsion', 0.0)
-    st.session_state['perdida_total_impulsion'] = perdida_total_impulsion
 
+    # Alturas dinámicas de succión e impulsión (se recalculan para visualización)
+    altura_dinamica_succion = st.session_state.get('altura_succion_input', 1.65) + perdida_total_succion
+    st.session_state['altura_dinamica_succion'] = altura_dinamica_succion
+    
     altura_dinamica_impulsion = st.session_state.get('altura_descarga', 80.0) + perdida_total_impulsion
     st.session_state['altura_dinamica_impulsion'] = altura_dinamica_impulsion
     
-    # Cálculo de NPSH Disponible (todo en m.c.a.)
+    # --- NPSH DISPONIBLE ---
+    # Presión de vapor y barométrica (ya calculadas o recuperar)
+    temperatura_c = st.session_state.get('temp_liquido', 20.0)
     presion_barometrica = st.session_state.get('presion_barometrica_calculada', 0)
-    presion_vapor = calcular_presion_vapor_mca(temperatura_c)
+    presion_vapor = calcular_presion_vapor_mca(temperatura_c) # Recalcular para asegurar frescura
     st.session_state['presion_vapor_calculada'] = presion_vapor
     
     # Obtener parámetros
@@ -2791,6 +2622,40 @@ def render_data_input_tab():
         </div>
         """, unsafe_allow_html=True)
         
+        # --- EXPLICACIÓN TÉCNICA DETALLADA ---
+        with st.expander("📚 Explicación Técnica de Cálculos Hidráulicos", expanded=False):
+            st.markdown("### Memoria de Cálculo Hidráulico")
+            
+            # 1. Altura Estática
+            st.markdown("#### 1. Altura Estática Total ($H_e$)")
+            if system_params['bomba_inundada']:
+                st.latex(r"H_e = Z_{descarga} - Z_{succión} = " + f"{system_params['altura_descarga']:.2f} - {system_params['altura_succion']:.2f} = {altura_estatica_total:.2f} \\text{{ m}}")
+            else:
+                st.latex(r"H_e = Z_{descarga} - (-Z_{succión}) = " + f"{system_params['altura_descarga']:.2f} - (-{system_params['altura_succion']:.2f}) = {altura_estatica_total:.2f} \\text{{ m}}")
+            
+            # 2. Pérdidas por Fricción
+            st.markdown(f"#### 2. Pérdidas por Fricción - Método: {system_params['metodo_calculo']}")
+            if system_params['metodo_calculo'] == 'Hazen-Williams':
+                st.markdown("**Ecuación de Hazen-Williams:**")
+                st.latex(r"h_f = 10.67 \cdot L_{total} \cdot \left( \frac{Q}{C} \right)^{1.852} \cdot D^{-4.87}")
+                st.markdown(f"*C_succión: {system_params['C_succion']}, C_impulsión: {system_params['C_impulsion']}*")
+            else:
+                st.markdown("**Ecuación de Darcy-Weisbach:**")
+                st.latex(r"h_f = f \cdot \frac{L_{total}}{D} \cdot \frac{v^2}{2g}")
+                st.markdown(f"*Cálculo teórico basado en el número de Reynolds y la rugosidad absoluta del material.*")
+            
+            # 3. Pérdidas Secundarias (Accesorios)
+            st.markdown("#### 3. Pérdidas en Accesorios (Secundarias)")
+            st.markdown("Se utiliza el método de la **Longitud Equivalente ($L_e$)**:")
+            st.latex(r"L_{total} = L_{tubería} + \sum \left( \frac{L_e}{D} \cdot D_{interno} \right)")
+            
+            # 4. ADT Final
+            st.markdown("#### 4. Altura Dinámica Total ($ADT$)")
+            st.latex(r"ADT = H_e + \sum h_{f,succión} + \sum h_{f,impulsión}")
+            st.latex(f"ADT = {altura_estatica_total:.2f} + {perdida_total_succion:.2f} + {perdida_total_impulsion:.2f} = {adt_total:.2f} \\text{{ m}}")
+            
+            st.info("💡 **Nota:** Todos los cálculos se realizan utilizando el caudal total del sistema para determinar las pérdidas en las tuberías comunes.")
+        
         # Tabla de ADT para múltiples caudales
         st.markdown("### 📈 ADT para Diferentes Caudales")
         
@@ -2858,28 +2723,10 @@ def render_data_input_tab():
             flows = st.session_state.adt_caudales_personalizados
             flow_unit = st.session_state.get('flow_unit', 'L/s')
             
-            # Obtener parámetros del sistema
-            system_params = {
-                'long_succion': st.session_state.get('long_succion', 10.0),
-                'diam_succion_m': st.session_state.get('diam_succion_mm', 200.0) / 1000.0,
-                'mat_succion': st.session_state.get('mat_succion', 'PVC'),
-                'otras_perdidas_succion': st.session_state.get('otras_perdidas_succion', 0.0),
-                'accesorios_succion': st.session_state.get('accesorios_succion', []),
-                'long_impulsion': st.session_state.get('long_impulsion', 500.0),
-                'diam_impulsion_m': st.session_state.get('diam_impulsion_mm', 150.0) / 1000.0,
-                'mat_impulsion': st.session_state.get('mat_impulsion', 'PVC'),
-                'otras_perdidas_impulsion': st.session_state.get('otras_perdidas_impulsion', 0.0),
-                'accesorios_impulsion': st.session_state.get('accesorios_impulsion', []),
-                'altura_succion': st.session_state.get('altura_succion_input', 1.65),
-                'altura_descarga': st.session_state.get('altura_descarga', 80.0),
-                'bomba_inundada': st.session_state.get('bomba_inundada', False)  # CRÍTICO para cálculo correcto
-            }
+            # Obtener parámetros del sistema unificados
+            system_params = get_current_system_params()
             
-            # Agregar coeficientes C de Hazen-Williams
-            system_params['C_succion'] = HAZEN_WILLIAMS_C.get(system_params['mat_succion'], 150)
-            system_params['C_impulsion'] = HAZEN_WILLIAMS_C.get(system_params['mat_impulsion'], 150)
-            
-            resultados_adt = calculate_adt_for_multiple_flows(flows, flow_unit, system_params)
+            resultados_adt = calculate_adt_for_multiple_flows(flows, 'L/s', system_params)
             
             # Crear DataFrame para la tabla
             df_adt = pd.DataFrame(resultados_adt)

@@ -203,25 +203,14 @@ def find_operating_point(pump_curve_data_m3h: List[Tuple[float, float]],
     if len(pump_q_m3h) < 2:
         return (0, 0)
 
-    # Generar puntos del sistema para diferentes caudales
-    system_flows = np.linspace(0, pump_q_m3h.max(), 100)
-    system_heads = []
+    # Generar puntos del sistema para diferentes caudales usando el motor unificado
+    system_flows = np.linspace(0, pump_q_m3h.max(), 100).tolist()
     
-    for flow in system_flows:
-        flow_display = convert_flow_unit(flow, 'm³/h', display_flow_unit)
-        head = calculate_system_head(
-            flow_display, display_flow_unit,
-            system_params['h_estatica'],
-            system_params['long_succion'], system_params['diam_succion_m'], 
-            system_params['C_succion'], system_params['accesorios_succion'], 
-            system_params['otras_perdidas_succion'],
-            system_params['long_impulsion'], system_params['diam_impulsion_m'], 
-            system_params['C_impulsion'], system_params['accesorios_impulsion'], 
-            system_params['otras_perdidas_impulsion']
-        )
-        system_heads.append(head)
+    # Convertir caudales a la unidad de visualización para el motor
+    display_flows = [convert_flow_unit(f, 'm³/h', display_flow_unit) for f in system_flows]
     
-    system_heads = np.array(system_heads)
+    resultados_adt = calculate_adt_for_multiple_flows(display_flows, display_flow_unit, system_params)
+    system_heads = np.array([r['adt_total'] for r in resultados_adt])
     
     # Encontrar intersección
     diff = pump_h_m3h - np.interp(pump_q_m3h, system_flows, system_heads)
@@ -244,7 +233,7 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
                                    system_params: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Calcula la altura total del sistema (ADT) para múltiples caudales.
-    Migrado desde ../app.py
+    Soporta Hazen-Williams y Darcy-Weisbach.
     
     Args:
         flows: Lista de caudales
@@ -254,78 +243,123 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
     Returns:
         Lista de diccionarios con resultados detallados
     """
+    from core.hydraulics import calcular_perdidas_darcy_weisbach
+    
     resultados = []
     
+    # Extraer parámetros generales
+    metodo = system_params.get('metodo_calculo', 'Hazen-Williams')
+    temp = system_params.get('temp_liquido', 20.0)
+    bomba_inundada = system_params.get('bomba_inundada', False)
+    altura_succion_val = system_params.get('altura_succion', 0.0)
+    altura_descarga_val = system_params.get('altura_descarga', 0.0)
+    
+    # Altura Estática Total (Hs = Z_descarga - Z_nivel_agua)
+    if bomba_inundada:
+        z_nivel_agua = +altura_succion_val  # Agua POR ENCIMA de la bomba
+    else:
+        z_nivel_agua = -altura_succion_val  # Agua POR DEBAJO de la bomba
+        
+    altura_estatica_total = altura_descarga_val - z_nivel_agua
+
     for flow in flows:
         # Convertir caudal a m³/s para cálculos
         caudal_m3s = convert_flow_unit(flow, flow_unit, 'm³/s')
         
-        # Calcular pérdidas en succión
-        diam_succion_m = system_params['diam_succion_m']
-        hf_primaria_succion = calcular_hf_hazen_williams(
-            caudal_m3s, 
-            system_params['long_succion'], 
-            diam_succion_m, 
-            system_params['C_succion']
-        )
-        
-        le_total_succion = 0
-        for acc in system_params['accesorios_succion']:
-            if 'lc_d' in acc and acc['lc_d'] is not None:
-                le_over_d_val = float(acc['lc_d'])
-            else:
-                diam_succion_mm = diam_succion_m * 1000
-                le_over_d_val = get_le_over_d(acc['tipo'], diam_succion_mm, acc.get('diam2_mm'))
-            le_total_succion += le_over_d_val * acc['cantidad'] * diam_succion_m
-        
-        hf_secundaria_succion = calcular_hf_hazen_williams(
-            caudal_m3s, 
-            le_total_succion, 
-            diam_succion_m, 
-            system_params['C_succion']
-        )
-        perdida_total_succion = hf_primaria_succion + hf_secundaria_succion + system_params['otras_perdidas_succion']
-        
-        # Calcular pérdidas en impulsión
-        diam_impulsion_m = system_params['diam_impulsion_m']
-        hf_primaria_impulsion = calcular_hf_hazen_williams(
-            caudal_m3s, 
-            system_params['long_impulsion'], 
-            diam_impulsion_m, 
-            system_params['C_impulsion']
-        )
-        
-        le_total_impulsion = 0
-        for acc in system_params['accesorios_impulsion']:
-            if 'lc_d' in acc and acc['lc_d'] is not None:
-                le_over_d_val = float(acc['lc_d'])
-            else:
-                diam_impulsion_mm = diam_impulsion_m * 1000
-                le_over_d_val = get_le_over_d(acc['tipo'], diam_impulsion_mm, acc.get('diam2_mm'))
-            le_total_impulsion += le_over_d_val * acc['cantidad'] * diam_impulsion_m
-        
-        hf_secundaria_impulsion = calcular_hf_hazen_williams(
-            caudal_m3s, 
-            le_total_impulsion, 
-            diam_impulsion_m, 
-            system_params['C_impulsion']
-        )
-        perdida_total_impulsion = hf_primaria_impulsion + hf_secundaria_impulsion + system_params['otras_perdidas_impulsion']
-        
-        # Calcular ADT
-        # CORRECCIÓN: Calcular altura estática considerando si la bomba está inundada
-        # H_estatica = Z_descarga - Z_nivel_agua
-        # Donde Z_nivel_agua = +altura_succion si inundada, -altura_succion si no
-        bomba_inundada = system_params.get('bomba_inundada', False)
-        altura_succion_val = system_params['altura_succion']
-        altura_descarga_val = system_params['altura_descarga']
-        
-        if bomba_inundada:
-            z_nivel_agua = +altura_succion_val  # Agua POR ENCIMA de la bomba
+        if metodo == 'Darcy-Weisbach':
+            # --- CÁLCULO POR DARCY-WEISBACH ---
+            # Succión
+            res_suc = calcular_perdidas_darcy_weisbach(
+                caudal_m3s, system_params['long_succion'], 
+                system_params['diam_succion_m'], system_params['mat_succion'], temp
+            )
+            hf_primaria_succion = res_suc['hf']
+            
+            # Longitud equivalente para accesorios
+            le_total_succion = 0
+            for acc in system_params['accesorios_succion']:
+                if 'lc_d' in acc and acc['lc_d'] is not None:
+                    le_over_d_val = float(acc['lc_d'])
+                else:
+                    diam_succion_mm = system_params['diam_succion_m'] * 1000
+                    le_over_d_val = get_le_over_d(acc['tipo'], diam_succion_mm, acc.get('diam2_mm'))
+                le_total_succion += le_over_d_val * acc['cantidad'] * system_params['diam_succion_m']
+            
+            res_sec_suc = calcular_perdidas_darcy_weisbach(
+                caudal_m3s, le_total_succion, 
+                system_params['diam_succion_m'], system_params['mat_succion'], temp
+            )
+            hf_secundaria_succion = res_sec_suc['hf']
+            
+            # Impulsión
+            res_imp = calcular_perdidas_darcy_weisbach(
+                caudal_m3s, system_params['long_impulsion'], 
+                system_params['diam_impulsion_m'], system_params['mat_impulsion'], temp
+            )
+            hf_primaria_impulsion = res_imp['hf']
+            
+            # Longitud equivalente para accesorios
+            le_total_impulsion = 0
+            for acc in system_params['accesorios_impulsion']:
+                if 'lc_d' in acc and acc['lc_d'] is not None:
+                    le_over_d_val = float(acc['lc_d'])
+                else:
+                    diam_impulsion_mm = system_params['diam_impulsion_m'] * 1000
+                    le_over_d_val = get_le_over_d(acc['tipo'], diam_impulsion_mm, acc.get('diam2_mm'))
+                le_total_impulsion += le_over_d_val * acc['cantidad'] * system_params['diam_impulsion_m']
+            
+            res_sec_imp = calcular_perdidas_darcy_weisbach(
+                caudal_m3s, le_total_impulsion, 
+                system_params['diam_impulsion_m'], system_params['mat_impulsion'], temp
+            )
+            hf_secundaria_impulsion = res_sec_imp['hf']
+            
         else:
-            z_nivel_agua = -altura_succion_val  # Agua POR DEBAJO de la bomba
+            # --- CÁLCULO POR HAZEN-WILLIAMS ---
+            # Succión
+            hf_primaria_succion = calcular_hf_hazen_williams(
+                caudal_m3s, system_params['long_succion'], 
+                system_params['diam_succion_m'], system_params['C_succion']
+            )
+            
+            le_total_succion = 0
+            for acc in system_params['accesorios_succion']:
+                if 'lc_d' in acc and acc['lc_d'] is not None:
+                    le_over_d_val = float(acc['lc_d'])
+                else:
+                    diam_succion_mm = system_params['diam_succion_m'] * 1000
+                    le_over_d_val = get_le_over_d(acc['tipo'], diam_succion_mm, acc.get('diam2_mm'))
+                le_total_succion += le_over_d_val * acc['cantidad'] * system_params['diam_succion_m']
+            
+            hf_secundaria_succion = calcular_hf_hazen_williams(
+                caudal_m3s, le_total_succion, 
+                system_params['diam_succion_m'], system_params['C_succion']
+            )
+            
+            # Impulsión
+            hf_primaria_impulsion = calcular_hf_hazen_williams(
+                caudal_m3s, system_params['long_impulsion'], 
+                system_params['diam_impulsion_m'], system_params['C_impulsion']
+            )
+            
+            le_total_impulsion = 0
+            for acc in system_params['accesorios_impulsion']:
+                if 'lc_d' in acc and acc['lc_d'] is not None:
+                    le_over_d_val = float(acc['lc_d'])
+                else:
+                    diam_impulsion_mm = system_params['diam_impulsion_m'] * 1000
+                    le_over_d_val = get_le_over_d(acc['tipo'], diam_impulsion_mm, acc.get('diam2_mm'))
+                le_total_impulsion += le_over_d_val * acc['cantidad'] * system_params['diam_impulsion_m']
+            
+            hf_secundaria_impulsion = calcular_hf_hazen_williams(
+                caudal_m3s, le_total_impulsion, 
+                system_params['diam_impulsion_m'], system_params['C_impulsion']
+            )
         
-        altura_estatica_total = altura_descarga_val - z_nivel_agua
+        # Totales
+        perdida_total_succion = hf_primaria_succion + hf_secundaria_succion + system_params.get('otras_perdidas_succion', 0.0)
+        perdida_total_impulsion = hf_primaria_impulsion + hf_secundaria_impulsion + system_params.get('otras_perdidas_impulsion', 0.0)
+        
         perdidas_totales = perdida_total_succion + perdida_total_impulsion
         adt_total = altura_estatica_total + perdidas_totales
         
@@ -338,6 +372,7 @@ def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str,
             'caudal_m3h': caudal_m3h,
             'perdida_succion': perdida_total_succion,
             'perdida_impulsion': perdida_total_impulsion,
+            'altura_estatica_total': altura_estatica_total,
             'adt_total': adt_total,
             'hf_primaria_succion': hf_primaria_succion,
             'hf_secundaria_succion': hf_secundaria_succion,

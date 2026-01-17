@@ -7,36 +7,11 @@ from .calculations import calculate_system_head, convert_flow_unit
 def calculate_adt_for_multiple_flows(flows: List[float], flow_unit: str, 
                                    system_params: Dict[str, Any]) -> List[float]:
     """
-    Calcula la altura total del sistema (ADT) para múltiples caudales.
-    
-    Args:
-        flows: Lista de caudales
-        flow_unit: Unidad de caudal
-        system_params: Parámetros del sistema
-    
-    Returns:
-        Lista de alturas totales del sistema
+    Calcula la altura total del sistema (ADT) para múltiples caudales (Wrapper).
     """
-    adt_values = []
-    
-    for flow in flows:
-        adt = calculate_system_head(
-            flow, flow_unit,
-            system_params['h_estatica'],
-            system_params['long_succion'], 
-            system_params['diam_succion_m'], 
-            system_params['C_succion'], 
-            system_params['accesorios_succion'], 
-            system_params['otras_perdidas_succion'],
-            system_params['long_impulsion'], 
-            system_params['diam_impulsion_m'], 
-            system_params['C_impulsion'], 
-            system_params['accesorios_impulsion'], 
-            system_params['otras_perdidas_impulsion']
-        )
-        adt_values.append(adt)
-    
-    return adt_values
+    from .calculations import calculate_adt_for_multiple_flows as calc_motor
+    resultados = calc_motor(flows, flow_unit, system_params)
+    return [r['adt_total'] for r in resultados]
 
 def generate_system_curve_points(min_flow: float, max_flow: float, 
                                num_points: int, flow_unit: str,
@@ -54,10 +29,10 @@ def generate_system_curve_points(min_flow: float, max_flow: float,
     Returns:
         Tupla (caudales, alturas) de la curva del sistema
     """
-    flows = np.linspace(min_flow, max_flow, num_points)
-    heights = calculate_adt_for_multiple_flows(flows.tolist(), flow_unit, system_params)
+    flows = np.linspace(min_flow, max_flow, num_points).tolist()
+    heights = calculate_adt_for_multiple_flows(flows, flow_unit, system_params)
     
-    return flows.tolist(), heights
+    return flows, heights
 
 def calculate_system_curve_coefficients(flows: List[float], heights: List[float], 
                                       degree: int = 2) -> np.ndarray:
@@ -83,32 +58,11 @@ def calculate_system_curve_coefficients(flows: List[float], heights: List[float]
     return coef
 
 def calculate_system_head_at_flow(flow: float, flow_unit: str, 
-                                system_params: Dict[str, Any]) -> float:
+                                 system_params: Dict[str, Any]) -> float:
     """
-    Calcula la altura del sistema para un caudal específico.
-    
-    Args:
-        flow: Caudal
-        flow_unit: Unidad de caudal
-        system_params: Parámetros del sistema
-    
-    Returns:
-        Altura del sistema
+    Calcula la altura del sistema para un caudal específico (Wrapper).
     """
-    return calculate_system_head(
-        flow, flow_unit,
-        system_params['h_estatica'],
-        system_params['long_succion'], 
-        system_params['diam_succion_m'], 
-        system_params['C_succion'], 
-        system_params['accesorios_succion'], 
-        system_params['otras_perdidas_succion'],
-        system_params['long_impulsion'], 
-        system_params['diam_impulsion_m'], 
-        system_params['C_impulsion'], 
-        system_params['accesorios_impulsion'], 
-        system_params['otras_perdidas_impulsion']
-    )
+    return calculate_adt_for_multiple_flows([flow], flow_unit, system_params)[0]
 
 def calculate_system_efficiency(flow: float, flow_unit: str, 
                               system_params: Dict[str, Any],

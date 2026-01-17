@@ -2044,24 +2044,31 @@ def generate_system_curve_data(session_state: Dict[str, Any]) -> pd.DataFrame:
     """
     try:
         import numpy as np
-        from core.system_head import calculate_adt_for_multiple_flows
+        from core.calculations import calculate_adt_for_multiple_flows
         
         # Generar caudales para calcular la curva del sistema
-        flows = np.linspace(0, 200, 20).tolist()  # 0 a 200 L/s
+        q_max = (session_state.get('caudal_lps', 100.0)) * 1.5
+        flows = np.linspace(0, q_max, 20).tolist()
         
-        # Obtener parámetros del sistema desde session_state
+        # Obtener parámetros del sistema desde session_state estandarizados
         system_params = {
-            'h_estatica': session_state.get('altura_estatica_total', 50.0),
             'long_succion': session_state.get('long_succion', 10.0),
             'diam_succion_m': session_state.get('diam_succion_mm', 200.0) / 1000.0,
-            'C_succion': session_state.get('C_succion', 150),
-            'accesorios_succion': session_state.get('accesorios_succion', []),
+            'mat_succion': session_state.get('mat_succion', 'PVC'),
             'otras_perdidas_succion': session_state.get('otras_perdidas_succion', 0.0),
-            'long_impulsion': session_state.get('long_impulsion', 100.0),
+            'accesorios_succion': session_state.get('accesorios_succion', []),
+            'long_impulsion': session_state.get('long_impulsion', 500.0),
             'diam_impulsion_m': session_state.get('diam_impulsion_mm', 150.0) / 1000.0,
-            'C_impulsion': session_state.get('C_impulsion', 150),
+            'mat_impulsion': session_state.get('mat_impulsion', 'PVC'),
+            'otras_perdidas_impulsion': session_state.get('otras_perdidas_impulsion', 0.0),
             'accesorios_impulsion': session_state.get('accesorios_impulsion', []),
-            'otras_perdidas_impulsion': session_state.get('otras_perdidas_impulsion', 0.0)
+            'altura_succion': session_state.get('altura_succion_input', 1.65),
+            'altura_descarga': session_state.get('altura_descarga', 80.0),
+            'bomba_inundada': session_state.get('bomba_inundada', False),
+            'metodo_calculo': session_state.get('metodo_calculo', 'Hazen-Williams'),
+            'temp_liquido': session_state.get('temp_liquido', 20.0),
+            'C_succion': session_state.get('coeficiente_hazen_succion', 150),
+            'C_impulsion': session_state.get('coeficiente_hazen_impulsion', 150)
         }
         
         adt_values = calculate_adt_for_multiple_flows(flows, 'L/s', system_params)
