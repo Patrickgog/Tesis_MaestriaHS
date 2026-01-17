@@ -2888,6 +2888,18 @@ def render_data_input_tab():
                     st.metric("Rugosidad ε (mm)", f"{detalles_prim.get('epsilon', 0)*1000:.4f}")
                     st.metric("Viscosidad ν (×10⁻⁶ m²/s)", f"{detalles_prim.get('nu', 0)*1e6:.3f}")
                     st.metric("Velocidad (m/s)", f"{detalles_prim.get('V', 0):.2f}")
+                
+                # Interpretación del régimen para SUCCIÓN
+                st.info("""
+                **Interpretación del Régimen de Flujo**:
+                - **Re < 2,000**: Flujo Laminar (poco común en sistemas de bombeo)
+                - **2,000 < Re < 4,000**: Zona de Transición (interpolación entre laminar y turbulento)
+                - **Re > 4,000**: Flujo Turbulento (típico en sistemas de bombeo de agua)
+                
+                **Factor de Fricción (f)**:
+                - Laminar: f = 64/Re (inversamente proporcional a Reynolds)
+                - Turbulento: Calculado por Swamee-Jain (depende de Re y rugosidad ε/D)
+                """)
         
         with col_imp:
             st.markdown("#### 🔴 Impulsión")
@@ -2905,16 +2917,17 @@ def render_data_input_tab():
                     st.metric("Rugosidad ε (mm)", f"{detalles_prim.get('epsilon', 0)*1000:.4f}")
                     st.metric("Viscosidad ν (×10⁻⁶ m²/s)", f"{detalles_prim.get('nu', 0)*1e6:.3f}")
                     st.metric("Velocidad (m/s)", f"{detalles_prim.get('V', 0):.2f}")
-        
-        # Explicación del régimen
-        st.info("""
-        **Interpretación del Régimen de Flujo**:
-        - **Re < 2,000**: Flujo Laminar (poco común en sistemas de bombeo)
-        - **2,000 < Re < 4,000**: Zona de Transición (interpolación entre laminar y turbulento)
-        - **Re > 4,000**: Flujo Turbulento (típico en sistemas de bombeo de agua)
-        
-        **Factor de Fricción (f)**:
-        - Laminar: f = 64/Re (inversamente proporcional a Reynolds)
-        - Turbulento: Calculado por Swamee-Jain (depende de Re y rugosidad ε/D)
-        """)
+                
+                # Interpretación del régimen para IMPULSIÓN
+                st.info("""
+                **Interpretación del Régimen de Flujo**:
+                - **Re < 2,000**: Flujo Laminar (poco común en sistemas de bombeo)
+                - **2,000 < Re < 4,000**: Zona de Transición (interpolación entre laminar y turbulento)
+                - **Re > 4,000**: Flujo Turbulento (típico en sistemas de bombeo de agua)
+                
+                **Factor de Fricción (f)**:
+                - Laminar: f = 64/Re (inversamente proporcional a Reynolds)
+                - Turbulento: Calculado por Swamee-Jain (depende de Re y rugosidad ε/D)
+                """)
+
  
