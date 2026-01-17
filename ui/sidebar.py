@@ -31,9 +31,10 @@ def render_sidebar():
     
     st.sidebar.title("Configuración General")
     
-    # Configuración de tipo de ajuste de curva
-    with st.sidebar.expander("Tipo de ajuste de curva", expanded=False):
-        # Usar valor cargado si existe, sino usar valor por defecto
+    # Consolidar todos los controles de configuración en un solo expander
+    with st.sidebar.expander("📐 Configuración del Sistema", expanded=False):
+        # Tipo de ajuste de curva
+        st.markdown("**Tipo de ajuste de curva**")
         default_ajuste = st.session_state.get('_loaded_ajuste_tipo', 'Cuadrática (2do grado)')
         ajuste_options = ["Lineal", "Cuadrática (2do grado)", "Polinomial (3er grado)"]
         default_index = ajuste_options.index(default_ajuste) if default_ajuste in ajuste_options else 1
@@ -43,19 +44,18 @@ def render_sidebar():
             ajuste_options,
             index=default_index,
             key="ajuste_tipo",
-            horizontal=False
+            horizontal=False,
+            label_visibility="collapsed"
         )
         
-        # Limpiar el valor cargado después de usarlo
         if '_loaded_ajuste_tipo' in st.session_state:
             del st.session_state['_loaded_ajuste_tipo']
-        
-        # Marcar que se ha configurado el tipo de ajuste
         st.session_state['ajuste_tipo_configured'] = True
-    
-    # Configuración de modo de curvas de bomba
-    with st.sidebar.expander("Modo de Curvas de Bomba", expanded=False):
-        # Usar valor cargado si existe, sino usar valor por defecto
+        
+        st.markdown("---")
+        
+        # Modo de Curvas de Bomba
+        st.markdown("**Modo de Curvas de Bomba**")
         default_curva_mode = st.session_state.get('_loaded_curva_mode', '3 puntos')
         curva_options = ["Excel", "3 puntos"]
         default_curva_index = curva_options.index(default_curva_mode) if default_curva_mode in curva_options else 1
@@ -65,52 +65,21 @@ def render_sidebar():
             curva_options, 
             key="curva_mode_sidebar", 
             index=default_curva_index, 
-            horizontal=True
+            horizontal=True,
+            label_visibility="collapsed"
         )
         
-        # Limpiar el valor cargado después de usarlo
         if '_loaded_curva_mode' in st.session_state:
             del st.session_state['_loaded_curva_mode']
-    
-    # Configuración de parámetros físicos y ambientales
-    with st.sidebar.expander("Parámetros físicos y ambientales", expanded=False):
-        temperatura_c = st.number_input("Temperatura del líquido (°C)", min_value=0.0, max_value=100.0, value=st.session_state.get('temp_liquido', 20.0), step=0.1, key="temp_liquido")
-        densidad_liquido = st.number_input("Densidad del líquido (g/cm³)", min_value=0.5, max_value=2.0, value=st.session_state.get('densidad_liquido', 1.0), step=0.01, key="densidad_liquido")
         
-        # Cálculo presión de vapor (solo depende de temperatura)
-        def calcular_presion_vapor_mca(temp_input):
-            from core.calculations import interpolar_propiedad
-            temp_C = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-            vapor_agua_mca = [0.06, 0.09, 0.12, 0.17, 0.25, 0.33, 0.44, 0.58, 0.76, 0.98, 1.25, 1.61, 2.03, 2.56, 3.20, 3.96, 4.85, 5.93, 7.18, 8.62, 10.33]
-            return interpolar_propiedad(temp_input, temp_C, vapor_agua_mca)
-
-        presion_vapor = calcular_presion_vapor_mca(temperatura_c)
-        st.markdown(f"<b>Presión de vapor calculada:</b> {presion_vapor:.2f} m.c.a.", unsafe_allow_html=True)
+        st.markdown("---")
         
-        # Cálculo presión barométrica (depende de elevación y densidad)
-        elevacion = st.session_state.get('elevacion_sitio', 450.0)
-        densidad_agua = densidad_liquido * 1000  # g/cm³ a kg/m³
-        G = 9.81
-        gamma = densidad_agua * G
-        from core.calculations import calcular_presion_atmosferica_mca
-        presion_barometrica = calcular_presion_atmosferica_mca(elevacion, gamma)
-        st.markdown(f"<b>Presión barométrica calculada:</b> {presion_barometrica:.2f} m.c.a.", unsafe_allow_html=True)
-        
-        # Guardar el valor calculado en session_state para uso en otras secciones
-        st.session_state['presion_barometrica_calculada'] = presion_barometrica
-        st.session_state['presion_vapor_calculada'] = presion_vapor
-    
-    # Configuración de unidades
-    with st.sidebar.expander("Unidades", expanded=False):
-        # Usar valor cargado si existe, sino usar valor por defecto
-        default_flow_unit = st.session_state.get('_loaded_flow_unit', 'L/s')  # Mantener L/s por defecto
+        # Unidades de Caudal
+        st.markdown("**Unidades de Caudal**")
+        default_flow_unit = st.session_state.get('_loaded_flow_unit', 'L/s')
         flow_options = ['L/s', 'm³/h']
-        default_flow_index = flow_options.index(default_flow_unit) if default_flow_unit in flow_options else 0  # Por defecto L/s
+        default_flow_index = flow_options.index(default_flow_unit) if default_flow_unit in flow_options else 0
         
-        # Detectar cambio de unidad
-        previous_unit = st.session_state.get('flow_unit', default_flow_unit)
-        
-        # Inicializar _last_flow_unit si no existe
         if '_last_flow_unit' not in st.session_state:
             st.session_state['_last_flow_unit'] = default_flow_unit
         
@@ -120,57 +89,60 @@ def render_sidebar():
             key='flow_unit', 
             index=default_flow_index,
             on_change=convert_units_on_change, 
-            horizontal=True
+            horizontal=True,
+            label_visibility="collapsed"
         )
         
-        # Limpiar el valor cargado después de usarlo
         if '_loaded_flow_unit' in st.session_state:
             del st.session_state['_loaded_flow_unit']
+        
+        st.markdown("---")
+        
+        # Parámetros físicos y ambientales
+        st.markdown("**Parámetros físicos y ambientales**")
+        temperatura_c = st.number_input(
+            "Temperatura del líquido (°C)", 
+            min_value=0.0, 
+            max_value=100.0, 
+            value=st.session_state.get('temp_liquido', 20.0), 
+            step=0.1, 
+            key="temp_liquido"
+        )
+        densidad_liquido = st.number_input(
+            "Densidad del líquido (g/cm³)", 
+            min_value=0.5, 
+            max_value=2.0, 
+            value=st.session_state.get('densidad_liquido', 1.0), 
+            step=0.01, 
+            key="densidad_liquido"
+        )
+        
+        # Cálculo presión de vapor
+        def calcular_presion_vapor_mca(temp_input):
+            from core.calculations import interpolar_propiedad
+            temp_C = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+            vapor_agua_mca = [0.06, 0.09, 0.12, 0.17, 0.25, 0.33, 0.44, 0.58, 0.76, 0.98, 1.25, 1.61, 2.03, 2.56, 3.20, 3.96, 4.85, 5.93, 7.18, 8.62, 10.33]
+            return interpolar_propiedad(temp_input, temp_C, vapor_agua_mca)
 
-def render_common_sidebar_options():
-    """Renderiza opciones de sidebar comunes para todos los usuarios (no requieren modo desarrollador)"""
-    
-    # 1. Resumen Proyecto
-    with st.sidebar.expander("📋 Resumen Proyecto", expanded=False):
-        if 'json_viewer_enabled' not in st.session_state:
-            st.session_state.json_viewer_enabled = False
+        presion_vapor = calcular_presion_vapor_mca(temperatura_c)
+        st.markdown(f"<b>Presión de vapor calculada:</b> {presion_vapor:.2f} m.c.a.", unsafe_allow_html=True)
         
-        json_enabled = st.checkbox(
-            "Activar Resumen", 
-            value=st.session_state.json_viewer_enabled,
-            key="json_checkbox",
-            help="Activa la pestaña de resumen del proyecto en la interfaz principal"
-        )
+        # Cálculo presión barométrica
+        elevacion = st.session_state.get('elevacion_sitio', 450.0)
+        densidad_agua = densidad_liquido * 1000
+        G = 9.81
+        gamma = densidad_agua * G
+        from core.calculations import calcular_presion_atmosferica_mca
+        presion_barometrica = calcular_presion_atmosferica_mca(elevacion, gamma)
+        st.markdown(f"<b>Presión barométrica calculada:</b> {presion_barometrica:.2f} m.c.a.", unsafe_allow_html=True)
         
-        st.session_state.json_viewer_enabled = json_enabled
+        st.session_state['presion_barometrica_calculada'] = presion_barometrica
+        st.session_state['presion_vapor_calculada'] = presion_vapor
         
-        if json_enabled:
-            st.success("✅ Resumen activado")
-        else:
-            st.info("ℹ️ Resumen desactivado")
-    
-    # 2. Reportes
-    with st.sidebar.expander("📄 Reportes", expanded=False):
-        if 'informes_enabled' not in st.session_state:
-            st.session_state.informes_enabled = False
+        st.markdown("---")
         
-        informes_enabled = st.checkbox(
-            "Activar Reportes", 
-            value=st.session_state.informes_enabled,
-            key="informes_checkbox",
-            help="Activa la pestaña de Reportes en la interfaz principal"
-        )
-        
-        st.session_state.informes_enabled = informes_enabled
-        
-        if informes_enabled:
-            st.success("✅ Reportes activado")
-        else:
-            st.info("ℹ️ Reportes desactivado")
-    
-    # 3. Método de Cálculo de Pérdidas
-    with st.sidebar.expander("🧮 Método de Cálculo de Pérdidas", expanded=False):
-        # Inicializar si no existe
+        # Método de Cálculo de Pérdidas
+        st.markdown("**Método de Cálculo de Pérdidas**")
         if 'metodo_calculo' not in st.session_state:
             st.session_state.metodo_calculo = 'Hazen-Williams'
         
@@ -182,57 +154,74 @@ def render_common_sidebar_options():
             help="""
             **Hazen-Williams**: Empírico, solo agua a 5-25°C, rápido
             **Darcy-Weisbach**: Teórico universal, más preciso, considera Reynolds y rugosidad
-            """
+            """,
+            label_visibility="collapsed"
         )
         
         st.session_state.metodo_calculo = metodo
         
-        # Indicador visual del método seleccionado
         if metodo == 'Hazen-Williams':
             st.info("📘 **Método Empírico**: Usa coef. C según material")
         else:
             st.success("📐 **Método Teórico**: Calcula factor f (Re + rugosidad)")
-            st.caption("⚙️ Requiere temperatura del fluido (ver Parámetros Físicos)")
+            st.caption("⚙️ Requiere temperatura del fluido")
+
+def render_common_sidebar_options():
+    """Renderiza opciones de sidebar comunes para todos los usuarios (no requieren modo desarrollador)"""
     
-    # 4. Tablas de Configuración
-    with st.sidebar.expander("📊 Tablas de Configuración", expanded=False):
-        if 'tables_enabled' not in st.session_state:
-            st.session_state.tables_enabled = False
+    # 1. Análisis IA (con configuración de API key)
+    with st.sidebar.expander("🤖 Análisis IA", expanded=False):
+        st.markdown("**Configuración de API Key de Gemini**")
         
-        tables_enabled = st.checkbox(
-            "Activar Tablas", 
-            value=st.session_state.tables_enabled,
-            key="tables_checkbox",
-            help="Activa la pestaña de tablas de configuración del sistema"
+        # Input para API key
+        api_key_input = st.text_input(
+            "Ingresa tu API Key de Gemini:",
+            type="password",
+            value=st.session_state.get('gemini_api_key', ''),
+            key="gemini_api_key_input",
+            help="Obtén tu API key gratuita en https://makersuite.google.com/app/apikey"
         )
         
-        st.session_state.tables_enabled = tables_enabled
+        # Botón para guardar API key
+        if st.button("💾 Guardar API Key", key="save_api_key"):
+            if api_key_input and api_key_input.strip():
+                st.session_state['gemini_api_key'] = api_key_input.strip()
+                st.success("✅ API Key guardada")
+            else:
+                st.error("❌ Por favor ingresa una API key válida")
         
-        if tables_enabled:
-            st.success("✅ Tablas activadas")
+        # Mostrar estado de configuración
+        if st.session_state.get('gemini_api_key'):
+            st.success("✅ API Key configurada")
+            
+            # Checkbox para activar análisis IA (solo habilitado si hay API key)
+            if 'ai_analysis_enabled' not in st.session_state:
+                st.session_state.ai_analysis_enabled = False
+            
+            ai_enabled = st.checkbox(
+                "Activar Análisis IA",
+                value=st.session_state.ai_analysis_enabled,
+                key="ai_analysis_checkbox",
+                help="Activa la funcionalidad de análisis con IA en la interfaz principal"
+            )
+            
+            st.session_state.ai_analysis_enabled = ai_enabled
+            
+            if ai_enabled:
+                st.info("💡 El análisis IA estará disponible en la interfaz principal")
         else:
-            st.info("ℹ️ Tablas desactivadas")
+            st.warning("⚠️ API Key no configurada")
+            st.info("ℹ️ Ingresa tu API key de Gemini para usar el análisis IA")
+            
+            # Checkbox deshabilitado si no hay API key
+            st.checkbox(
+                "Activar Análisis IA",
+                value=False,
+                disabled=True,
+                help="Primero debes configurar tu API key de Gemini"
+            )
     
-    # 5. Teoría y Fundamentos
-    with st.sidebar.expander("📚 Teoría y Fundamentos", expanded=False):
-        if 'theory_enabled' not in st.session_state:
-            st.session_state.theory_enabled = False
-        
-        theory_enabled = st.checkbox(
-            "Activar Teoría y Fundamentos", 
-            value=st.session_state.theory_enabled,
-            key="theory_checkbox",
-            help="Activa la pestaña de teoría y fundamentos hidráulicos"
-        )
-        
-        st.session_state.theory_enabled = theory_enabled
-        
-        if theory_enabled:
-            st.success("✅ Teoría activada")
-        else:
-            st.info("ℹ️ Teoría desactivada")
-    
-    # 6. Optimización IA (Genetic Algorithms)
+    # 2. Optimización IA (GA)
     with st.sidebar.expander("🎯 Optimización IA (GA)", expanded=False):
         if 'optimization_enabled' not in st.session_state:
             st.session_state.optimization_enabled = False
@@ -250,14 +239,14 @@ def render_common_sidebar_options():
             st.success("✅ Optimización activada")
         else:
             st.info("ℹ️ Optimización desactivada")
-            
-    # 7. Selección de Diámetros (Análisis Técnico)
-    with st.sidebar.expander("📏 Selección de Diámetros", expanded=False):
+    
+    # 3. Herramientas de Análisis
+    with st.sidebar.expander("🔧 Herramientas de Análisis", expanded=False):
         if 'selection_enabled' not in st.session_state:
             st.session_state.selection_enabled = True
         
         sel_enabled = st.checkbox(
-            "Activar Selección Técnica", 
+            "Activar Selección Técnica de Diámetros", 
             value=st.session_state.selection_enabled,
             key="selection_checkbox",
             help="Activa la pestaña de análisis detallado de diámetros (NPSH, Pérdidas, Cavitación)"
@@ -269,6 +258,73 @@ def render_common_sidebar_options():
             st.success("✅ Selección activada")
         else:
             st.info("ℹ️ Selección desactivada")
+    
+    # 4. Reportes y Visualización
+    with st.sidebar.expander("📊 Reportes y Visualización", expanded=False):
+        # Resumen del Proyecto
+        if 'json_viewer_enabled' not in st.session_state:
+            st.session_state.json_viewer_enabled = False
+        
+        json_enabled = st.checkbox(
+            "Activar Resumen del Proyecto", 
+            value=st.session_state.json_viewer_enabled,
+            key="json_checkbox",
+            help="Activa la pestaña de resumen del proyecto en la interfaz principal"
+        )
+        
+        st.session_state.json_viewer_enabled = json_enabled
+        
+        # Reportes
+        if 'informes_enabled' not in st.session_state:
+            st.session_state.informes_enabled = False
+        
+        informes_enabled = st.checkbox(
+            "Activar Reportes", 
+            value=st.session_state.informes_enabled,
+            key="informes_checkbox",
+            help="Activa la pestaña de Reportes (Word/Excel) en la interfaz principal"
+        )
+        
+        st.session_state.informes_enabled = informes_enabled
+        
+        # Tablas de Configuración
+        if 'tables_enabled' not in st.session_state:
+            st.session_state.tables_enabled = False
+        
+        tables_enabled = st.checkbox(
+            "Activar Tablas de Configuración", 
+            value=st.session_state.tables_enabled,
+            key="tables_checkbox",
+            help="Activa la pestaña de tablas de configuración del sistema"
+        )
+        
+        st.session_state.tables_enabled = tables_enabled
+        
+        # Mostrar estado consolidado
+        active_count = sum([json_enabled, informes_enabled, tables_enabled])
+        if active_count > 0:
+            st.success(f"✅ {active_count} de 3 opciones activadas")
+        else:
+            st.info("ℹ️ Todas las opciones desactivadas")
+    
+    # 5. Recursos
+    with st.sidebar.expander("📚 Recursos", expanded=False):
+        if 'theory_enabled' not in st.session_state:
+            st.session_state.theory_enabled = False
+        
+        theory_enabled = st.checkbox(
+            "Activar Teoría y Fundamentos", 
+            value=st.session_state.theory_enabled,
+            key="theory_checkbox",
+            help="Activa la pestaña de teoría y fundamentos hidráulicos"
+        )
+        
+        st.session_state.theory_enabled = theory_enabled
+        
+        if theory_enabled:
+            st.success("✅ Teoría activada")
+        else:
+            st.info("ℹ️ Teoría desactivada")
 
 # Funciones auxiliares para el sidebar
 def save_state():
