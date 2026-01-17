@@ -10,11 +10,12 @@ except ImportError:
 import pandas as pd
 import io
 
-def configure_gemini(api_key=None):
+def configure_gemini(api_key=None, model_name='gemini-1.5-flash'):
     """Configura Gemini para generación de análisis
     
     Args:
         api_key: API key de Gemini (opcional). Si no se proporciona, intenta leer desde archivo secrets.
+        model_name: Nombre del modelo de Gemini a usar (por defecto: gemini-1.5-flash)
     """
     if not GEMINI_AVAILABLE:
         return None
@@ -33,7 +34,7 @@ def configure_gemini(api_key=None):
         
         if api_key:
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel(model_name)
             return model
         return None
     except Exception as e:
