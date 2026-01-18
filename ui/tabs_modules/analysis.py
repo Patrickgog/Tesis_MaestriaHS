@@ -745,7 +745,7 @@ def render_analysis_tab():
             # Capturar gráfico para reportes
             try:
                 from ui.reports import capturar_grafico_plotly
-                if capturar_grafico_plotly(fig_hq, 'grupo_100', 'hq_100'):
+                if capturar_grafico_plotly(fig_hq, 'grupo_100_rpm', 'hq_100'):
                     st.session_state['hq_100_capturado'] = True
             except Exception as e:
                 pass
@@ -816,7 +816,7 @@ def render_analysis_tab():
             # Capturar gráfico para reportes
             try:
                 from ui.reports import capturar_grafico_plotly
-                if capturar_grafico_plotly(fig_pot, 'grupo_100', 'potencia_100'):
+                if capturar_grafico_plotly(fig_pot, 'grupo_100_rpm', 'potencia_100'):
                     st.session_state['pot_100_capturado'] = True
             except Exception as e:
                 pass
@@ -892,7 +892,7 @@ def render_analysis_tab():
             # Capturar gráfico para reportes
             try:
                 from ui.reports import capturar_grafico_plotly
-                if capturar_grafico_plotly(fig_rend, 'grupo_100', 'rendimiento_100'):
+                if capturar_grafico_plotly(fig_rend, 'grupo_100_rpm', 'rendimiento_100'):
                     st.session_state['rend_100_capturado'] = True
             except Exception as e:
                 pass
@@ -965,7 +965,7 @@ def render_analysis_tab():
             # Capturar gráfico para reportes
             try:
                 from ui.reports import capturar_grafico_plotly
-                if capturar_grafico_plotly(fig_npsh, 'grupo_100', 'npsh_100'):
+                if capturar_grafico_plotly(fig_npsh, 'grupo_100_rpm', 'npsh_100'):
                     st.session_state['npsh_100_capturado'] = True
             except Exception as e:
                 pass
@@ -1334,6 +1334,14 @@ def render_analysis_tab():
                     margin=dict(t=40, b=80)
                 )
                 st.plotly_chart(fig_vfd, use_container_width=True, key="vfd_hq_chart_v_fin")
+                
+                # Capturar gráfico para reportes
+                try:
+                    from ui.reports import capturar_grafico_plotly
+                    if capturar_grafico_plotly(fig_vfd, 'grupo_vfd', 'hq_vfd'):
+                        st.session_state['vfd_hq_capturado'] = True
+                except Exception:
+                    pass
                 if interseccion_vfd:
                     u_d = "m³/h" if u_flow == 'm³/h' else "L/s"
                     st.markdown(f"""<div style="background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 4px solid #0066cc;"><strong>Punto de Operación:</strong><br><strong>Caudal (Q):</strong> {q_i_disp:.2f} {u_d}<br><strong>Altura (H):</strong> {interseccion_vfd[1]:.2f} m</div>""", unsafe_allow_html=True)
@@ -1379,6 +1387,14 @@ def render_analysis_tab():
                     margin=dict(t=40, b=80)
                 )
                 st.plotly_chart(fig_pot_v, use_container_width=True, key="vfd_pot_chart_v_fin")
+                
+                # Capturar gráfico para reportes
+                try:
+                    from ui.reports import capturar_grafico_plotly
+                    if capturar_grafico_plotly(fig_pot_v, 'grupo_vfd', 'potencia_vfd'):
+                        st.session_state['vfd_pot_capturado'] = True
+                except Exception:
+                    pass
                 if interseccion_vfd:
                     st.markdown(f"""<div style="background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 4px solid #0066cc;"><strong>Punto de Operación:</strong><br><strong>Caudal (Q):</strong> {q_i_disp:.2f} {get_display_unit_label(u_flow)}<br><strong>Potencia:</strong> {p_op_v:.2f} HP</div>""", unsafe_allow_html=True)
 
@@ -1425,6 +1441,14 @@ def render_analysis_tab():
                         margin=dict(t=40, b=80)
                     )
                     st.plotly_chart(fig_rend_v, use_container_width=True, key="vfd_rend_chart_v_final")
+                    
+                    # Capturar gráfico para reportes
+                    try:
+                        from ui.reports import capturar_grafico_plotly
+                        if capturar_grafico_plotly(fig_rend_v, 'grupo_vfd', 'rendimiento_vfd'):
+                            st.session_state['vfd_rend_capturado'] = True
+                    except Exception:
+                        pass
                     if interseccion_vfd:
                         st.markdown(f"""<div style="background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 4px solid #0066cc;"><strong>Punto de Operación:</strong><br><strong>Caudal (Q):</strong> {q_i_disp:.2f} {get_display_unit_label(u_flow)}<br><strong>Rendimiento:</strong> {r_op_v:.1f}%</div>""", unsafe_allow_html=True)
 
@@ -1467,6 +1491,14 @@ def render_analysis_tab():
                         margin=dict(t=40, b=80)
                     )
                     st.plotly_chart(fig_npsh_v, use_container_width=True, key="vfd_npsh_chart_v_final")
+                    
+                    # Capturar gráfico para reportes
+                    try:
+                        from ui.reports import capturar_grafico_plotly
+                        if capturar_grafico_plotly(fig_npsh_v, 'grupo_vfd', 'npsh_vfd'):
+                            st.session_state['vfd_npsh_capturado'] = True
+                    except Exception:
+                        pass
                     if interseccion_vfd:
                         st.markdown(f"""<div style="background-color: #e6f3ff; padding: 10px; border-radius: 5px; border-left: 4px solid #0066cc;"><strong>Punto de Operación:</strong><br><strong>Caudal (Q):</strong> {q_i_disp:.2f} {get_display_unit_label(u_flow)}<br><strong>NPSH:</strong> {n_op_v:.2f} m</div>""", unsafe_allow_html=True)
 
