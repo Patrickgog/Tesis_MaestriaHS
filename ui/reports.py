@@ -950,19 +950,24 @@ def agregar_info_punto_operacion(doc, nombre_grafico):
         es_vfd = 'vfd' in nombre_grafico.lower()
         
         if es_vfd:
-            # Datos VFD específicos desde interseccion_vfd
+            # Datos VFD específicos
+            vfd_res = st.session_state.get('vfd_results', {})
             interseccion_vfd = st.session_state.get('interseccion_vfd', None)
+            
             if interseccion_vfd and len(interseccion_vfd) >= 2:
                 caudal_op = interseccion_vfd[0]
                 altura_op = interseccion_vfd[1]
+            elif vfd_res:
+                caudal_op = vfd_res.get('q_op_vfd', 0)
+                altura_op = vfd_res.get('h_op_vfd', 0)
             else:
                 caudal_op = 0
                 altura_op = 0
             
             # Calcular eficiencia en el punto de operación
-            rendimiento_op = calcular_eficiencia_en_punto_operacion(caudal_op, es_vfd=True)
-            potencia_op = st.session_state.get('op_pot_vfd', 0)
-            npsh_op = st.session_state.get('op_npsh_vfd', 0)
+            rendimiento_op = vfd_res.get('eff_vfd', calcular_eficiencia_en_punto_operacion(caudal_op, es_vfd=True))
+            potencia_op = vfd_res.get('power_vfd_hp', st.session_state.get('op_pot_vfd', 0))
+            npsh_op = vfd_res.get('npsh_vfd', st.session_state.get('op_npsh_vfd', 0))
             titulo_op = "Punto de Operación VFD:"
         else:
             # Datos 100% RPM

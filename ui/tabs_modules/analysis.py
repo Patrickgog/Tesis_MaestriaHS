@@ -1235,8 +1235,10 @@ def render_analysis_tab():
                 h_int = np.polyval(coef_bom_vfd, q_int)
                 if q_int > 0:
                     interseccion_vfd = (q_int, h_int)
+                    st.session_state['interseccion_vfd'] = interseccion_vfd
             except:
                 interseccion_vfd = None
+                st.session_state['interseccion_vfd'] = None
 
         # 3. BEP y Zona de Eficiencia VFD
         bep_q_vfd = 0
