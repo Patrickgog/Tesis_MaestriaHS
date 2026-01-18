@@ -26,9 +26,9 @@ def capturar_grafico_plotly(fig, grupo, nombre_grafico, forzar_captura=False):
     if not fig or not hasattr(fig, 'data') or not fig.data:
         return False
     
-    # Solo capturar si se fuerza o si el checkbox está activado
-    if not forzar_captura and not st.session_state.get('docx_incluir_graficos', False):
-        return False
+    # Solo capturar si se solicita
+    # Eliminada restricción de checkbox para permitir captura proactiva
+    pass
     
     try:
         # Inicializar estructura si no existe
