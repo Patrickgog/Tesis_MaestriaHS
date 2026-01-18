@@ -884,14 +884,48 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
         
         
         # Actualizar el título dinámico con la configuración completa
-        if mat == "PVC" and dn_value:
-            dn_label_display = f"PVC {tipo_union.split('(')[1].strip(')')} {serie_pvc_nombre.split('(')[0].strip()} DN{dn_value}"
-        elif mat in ["PEAD", "HDPE (Polietileno)"] and diam_externo_value:
-            dn_label_display = f"HDPE DE{diam_externo_value} {serie_key.upper() if serie_key else ''}"
-        elif "Hierro Ductil" in mat and dn_value:
-            dn_label_display = f"Hierro Dúctil {clase_value} DN{dn_value}"
-        elif "Hierro Fundido" in mat and dn_value:
-            dn_label_display = f"Hierro Fundido {clase_value} DN{dn_value}"
+        # Leer valores directamente del session_state para asegurar sincronización
+        if mat == "PVC":
+            tipo_union_actual = st.session_state.get(f'tipo_union_{prefix}_analysis', 'N/A')
+            serie_pvc_actual = st.session_state.get(f'serie_pvc_{prefix}_analysis', 'N/A')
+            dn_pvc_actual = st.session_state.get(f'dn_pvc_{prefix}_analysis', 0)
+            if dn_pvc_actual:
+                dn_label_display = f"PVC {tipo_union_actual.split('(')[1].strip(')')} {serie_pvc_actual.split('(')[0].strip()} DN{dn_pvc_actual}"
+            else:
+                dn_label_display = f"PVC DI {di_eval:.1f} mm"
+                
+        elif mat in ["PEAD", "HDPE (Polietileno)"]:
+            diam_ext_actual = st.session_state.get(f'diam_externo_{prefix}_analysis', 0)
+            serie_actual = st.session_state.get(f'serie_{prefix}_analysis', '')
+            
+            # Obtener presión nominal de la serie
+            from core.calculations import get_pead_data
+            pn_mpa = 1.6  # Valor por defecto
+            if diam_ext_actual and serie_actual:
+                pead_info = get_pead_data(diam_ext_actual)
+                if pead_info and serie_actual in pead_info:
+                    pn_mpa = pead_info[serie_actual].get('presion_nominal_mpa', 1.6)
+            
+            if diam_ext_actual:
+                dn_label_display = f"HDPE {di_eval:.1f} mm {pn_mpa} Mpa"
+            else:
+                dn_label_display = f"HDPE DI {di_eval:.1f} mm"
+                
+        elif "Hierro Ductil" in mat:
+            clase_actual = st.session_state.get(f'clase_hierro_{prefix}_analysis', 'N/A')
+            dn_hd_actual = st.session_state.get(f'dn_{prefix}_analysis', 0)
+            if dn_hd_actual:
+                dn_label_display = f"Hierro Dúctil {clase_actual} DN{dn_hd_actual}"
+            else:
+                dn_label_display = f"Hierro Dúctil DI {di_eval:.1f} mm"
+                
+        elif "Hierro Fundido" in mat:
+            clase_actual = st.session_state.get(f'clase_hierro_fundido_{prefix}_analysis', 'N/A')
+            dn_hf_actual = st.session_state.get(f'dn_hierro_fundido_{prefix}_analysis', 0)
+            if dn_hf_actual:
+                dn_label_display = f"Hierro Fundido {clase_actual} DN{dn_hf_actual}"
+            else:
+                dn_label_display = f"Hierro Fundido DI {di_eval:.1f} mm"
         else:
             dn_label_display = f"{mat} DI {di_eval:.1f} mm"
         
