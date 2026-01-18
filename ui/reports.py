@@ -454,8 +454,8 @@ def obtener_grafico_capturado(grupo, nombre_grafico):
         return None
 
 def agregar_imagen_plotly_a_doc(doc, grupo, nombre_grafico, titulo):
-    """Agrega una imagen de Plotly capturada al documento DOCX - usa directamente las imágenes capturadas"""
-    # Usar directamente las imágenes capturadas (sin recrear gráficos)
+    """Agrega una imagen de Plotly capturada al documento DOCX - con fallback a Matplotlib"""
+    # Intentar usar directamente las imágenes capturadas (sin recrear gráficos)
     imagen_bytes = obtener_grafico_capturado(grupo, nombre_grafico)
     
     if imagen_bytes:
@@ -469,12 +469,80 @@ def agregar_imagen_plotly_a_doc(doc, grupo, nombre_grafico, titulo):
             doc.add_paragraph()  # Espacio después del gráfico
             return True
         except Exception as e:
-            doc.add_paragraph(f"Error al insertar gráfico {nombre_grafico}: {e}")
-            return False
-    else:
-        # Fallback: mensaje de error
+            # Si falla la inserción, intentar fallback
+            pass
+    
+    # FALLBACK: Generar gráfico con Matplotlib si no hay captura disponible
+    try:
         doc.add_heading(titulo, level=3)
-        doc.add_paragraph(f"Gráfico {nombre_grafico} no disponible")
+        
+        # Determinar tipo de gráfico y generar con Matplotlib
+        es_vfd = 'vfd' in nombre_grafico.lower()
+        inputs = st.session_state
+        
+        # Obtener DataFrames según el tipo
+        if es_vfd:
+            rpm_vfd = inputs.get('rpm_percentage', 100)
+            df_bomba = inputs.get('df_bomba_vfd', pd.DataFrame())
+            df_sistema = inputs.get('df_sistema_vfd', pd.DataFrame())
+            df_eff = inputs.get('df_rendimiento_vfd', pd.DataFrame())
+            df_pow = inputs.get('df_potencia_vfd', pd.DataFrame())
+            df_npsh = inputs.get('df_npsh_vfd', pd.DataFrame())
+            interseccion = inputs.get('interseccion_vfd')
+        else:
+            df_bomba = inputs.get('df_bomba_100', pd.DataFrame())
+            df_sistema = inputs.get('df_sistema_100', pd.DataFrame())
+            df_eff = inputs.get('df_rendimiento_100', pd.DataFrame())
+            df_pow = inputs.get('df_potencia_100', pd.DataFrame())
+            df_npsh = inputs.get('df_npsh_100', pd.DataFrame())
+            interseccion = inputs.get('interseccion')
+        
+        # Generar gráfico según el tipo
+        plt.figure(figsize=(8, 5))
+        
+        if 'hq' in nombre_grafico.lower():
+            if not df_bomba.empty: plt.plot(df_bomba.iloc[:, 0], df_bomba.iloc[:, 1], label='Curva Bomba', linewidth=2)
+            if not df_sistema.empty: plt.plot(df_sistema.iloc[:, 0], df_sistema.iloc[:, 1], label='Curva Sistema', linewidth=2)
+            if interseccion and len(interseccion) >= 2: 
+                plt.plot(interseccion[0], interseccion[1], 'r*', markersize=15, label='Punto Operación')
+            plt.ylabel('Altura (m)')
+            
+        elif 'rendimiento' in nombre_grafico.lower() or 'eficiencia' in nombre_grafico.lower():
+            if not df_eff.empty:
+                plt.plot(df_eff.iloc[:, 0], df_eff.iloc[:, 1], '-', color='green', linewidth=2, label='Eficiencia')
+            plt.ylabel('Eficiencia (%)')
+            
+        elif 'potencia' in nombre_grafico.lower():
+            if not df_pow.empty: plt.plot(df_pow.iloc[:, 0], df_pow.iloc[:, 1], label='Potencia', linewidth=2, color='orange')
+            plt.ylabel('Potencia (HP)')
+            
+        elif 'npsh' in nombre_grafico.lower():
+            if not df_npsh.empty: plt.plot(df_npsh.iloc[:, 0], df_npsh.iloc[:, 1], label='NPSH Requerido', linewidth=2, color='purple')
+            plt.ylabel('NPSH (m)')
+        
+        plt.xlabel('Caudal (L/s)')
+        plt.title(titulo)
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        plt.tight_layout()
+        
+        # Guardar y agregar al documento
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+        plt.close()
+        buf.seek(0)
+        
+        doc.add_picture(buf, width=Inches(6.0))
+        
+        # Agregar información del punto de operación
+        agregar_info_punto_operacion(doc, nombre_grafico)
+        
+        doc.add_paragraph()
+        return True
+        
+    except Exception as e:
+        # Último recurso: mensaje de error
+        doc.add_paragraph(f"⚠️ Gráfico {nombre_grafico} no disponible")
         return False
 
 def crear_docx_con_grafico(fig, titulo_documento="Informe Pumping System", titulo_grafico="Gráfica del Sistema"):
@@ -949,11 +1017,16 @@ def agregar_info_punto_operacion(doc, nombre_grafico):
         # Determinar si es VFD o 100% RPM
         es_vfd = 'vfd' in nombre_grafico.lower()
         
+        # Detectar unidad de caudal del proyecto
+        unidad_caudal = st.session_state.get('unidad_caudal', 'L/s')
+        unidad_display = 'm³/h' if unidad_caudal == 'm³/h' else 'L/s'
+        
         if es_vfd:
-            # Datos VFD específicos
+            # Datos VFD específicos - buscar en múltiples fuentes
             vfd_res = st.session_state.get('vfd_results', {})
             interseccion_vfd = st.session_state.get('interseccion_vfd', None)
             
+            # Intentar obtener caudal y altura
             if interseccion_vfd and len(interseccion_vfd) >= 2:
                 caudal_op = interseccion_vfd[0]
                 altura_op = interseccion_vfd[1]
@@ -964,6 +1037,12 @@ def agregar_info_punto_operacion(doc, nombre_grafico):
                 caudal_op = 0
                 altura_op = 0
             
+            # Convertir unidades si es necesario
+            if unidad_caudal == 'm³/h' and caudal_op > 0:
+                caudal_display = caudal_op * 3.6
+            else:
+                caudal_display = caudal_op
+            
             # Calcular eficiencia en el punto de operación
             rendimiento_op = vfd_res.get('eff_vfd', calcular_eficiencia_en_punto_operacion(caudal_op, es_vfd=True))
             potencia_op = vfd_res.get('power_vfd_hp', st.session_state.get('op_pot_vfd', 0))
@@ -971,8 +1050,83 @@ def agregar_info_punto_operacion(doc, nombre_grafico):
             titulo_op = "Punto de Operación VFD:"
         else:
             # Datos 100% RPM
-            caudal_op = st.session_state.get('caudal_operacion', 0)
-            altura_op = st.session_state.get('altura_operacion', 0)
+            interseccion = st.session_state.get('interseccion', None)
+            
+            if interseccion and len(interseccion) >= 2:
+                caudal_op = interseccion[0]
+                altura_op = interseccion[1]
+            else:
+                caudal_op = st.session_state.get('caudal_operacion', 0)
+                altura_op = st.session_state.get('altura_operacion', 0)
+            
+            # Convertir unidades si es necesario
+            if unidad_caudal == 'm³/h' and caudal_op > 0:
+                caudal_display = caudal_op * 3.6
+            else:
+                caudal_display = caudal_op
+            
+            # Calcular eficiencia en el punto de operación
+            rendimiento_op = calcular_eficiencia_en_punto_operacion(caudal_op, es_vfd=False)
+            potencia_op = st.session_state.get('potencia_operacion', 0)
+            npsh_op = st.session_state.get('npsh_requerido', 0)
+            titulo_op = "Punto de Operación:"
+        
+        # Agregar información según el tipo de gráfico
+        if 'hq' in nombre_grafico.lower():
+            doc.add_paragraph(titulo_op)
+            doc.add_paragraph(f"Caudal (Q): {caudal_display:.2f} {unidad_display}")
+            doc.add_paragraph(f"Altura (H): {altura_op:.2f} m")
+        
+        elif 'rendimiento' in nombre_grafico.lower() or 'eficiencia' in nombre_grafico.lower():
+            doc.add_paragraph(titulo_op)
+            doc.add_paragraph(f"Caudal (Q): {caudal_display:.2f} {unidad_display}")
+            doc.add_paragraph(f"Rendimiento (η): {rendimiento_op:.2f} %")
+            
+            # Calcular y mostrar el valor de BEP
+            try:
+                import numpy as np
+                curva_inputs = st.session_state.get('curva_inputs', {})
+                puntos_rend = curva_inputs.get('rendimiento', [])
+                
+                if len(puntos_rend) >= 2:
+                    x_rend = np.array([pt[0] for pt in puntos_rend])
+                    y_rend = np.array([pt[1] for pt in puntos_rend])
+                    
+                    # Calcular BEP
+                    ajuste_tipo = st.session_state.get('ajuste_tipo', 'Cuadrática (2do grado)')
+                    grado = 3 if 'Cúbica' in ajuste_tipo else 2
+                    coef_rend = np.polyfit(x_rend, y_rend, grado)
+                    
+                    # Encontrar máximo
+                    x_scan = np.linspace(x_rend.min(), x_rend.max(), 1000)
+                    y_scan = np.polyval(coef_rend, x_scan)
+                    idx_max = np.argmax(y_scan)
+                    bep_q = x_scan[idx_max]
+                    bep_eta = y_scan[idx_max]
+                    
+                    # Convertir unidades si es necesario
+                    if unidad_caudal == 'm³/h':
+                        bep_q_display = bep_q * 3.6
+                    else:
+                        bep_q_display = bep_q
+                    
+                    doc.add_paragraph(f"BEP: Q = {bep_q_display:.2f} {unidad_display}, η = {bep_eta:.1f}%")
+            except:
+                pass
+        
+        elif 'potencia' in nombre_grafico.lower():
+            doc.add_paragraph(titulo_op)
+            doc.add_paragraph(f"Caudal (Q): {caudal_display:.2f} {unidad_display}")
+            doc.add_paragraph(f"Potencia: {potencia_op:.2f} HP")
+        
+        elif 'npsh' in nombre_grafico.lower():
+            doc.add_paragraph(titulo_op)
+            doc.add_paragraph(f"Caudal (Q): {caudal_display:.2f} {unidad_display}")
+            doc.add_paragraph(f"NPSH Requerido: {npsh_op:.2f} m")
+        
+    except Exception as e:
+        # Si hay error, no agregar información
+        pass
             
             # Calcular eficiencia en el punto de operación
             rendimiento_op = calcular_eficiencia_en_punto_operacion(caudal_op, es_vfd=False)
