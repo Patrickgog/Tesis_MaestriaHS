@@ -86,8 +86,9 @@ def calcular_caudal_por_bomba(caudal_total, n_bombas):
 
 def render_reports_tab():
     """Renderiza la pestaña de informes técnicos"""
-    from ui.reports import render_reports_tab as render_reports
-    render_reports()
+    # Importación lazy para evitar ciclos de importación
+    from ui.reports import render_reports_tab as render_reports_impl
+    render_reports_impl()
 
 def render_ai_tab():
     """Renderiza la pestaña dedicada al análisis con IA"""
