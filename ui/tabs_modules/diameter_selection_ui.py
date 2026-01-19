@@ -1007,7 +1007,14 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
                 st.session_state[f'_migrated_{prefix_key}_tipo_union'] = tipo_union
                 st.session_state[f'_migrated_{prefix_key}_serie_nombre'] = serie_pvc_nombre
                 st.session_state[f'_migrated_{prefix_key}_dn'] = dn_value
-                msg = f"PVC {tipo_union.split('(')[1].strip(')')} {serie_pvc_nombre.split('(')[0].strip()} DN{dn_value}"
+                # Parsing robusto para evitar IndexError
+                parts_union = tipo_union.split('(')
+                union_label = parts_union[1].strip(')') if len(parts_union) > 1 else tipo_union
+                
+                parts_serie = serie_pvc_nombre.split('(')
+                serie_label = parts_serie[0].strip() if len(parts_serie) > 0 else serie_pvc_nombre
+                
+                msg = f"PVC {union_label} {serie_label} DN{dn_value}"
             
             elif mat in ["PEAD", "HDPE (Polietileno)"] and diam_externo_value and serie_key:
                 st.session_state[f'_migrated_{prefix_key}_diam_externo'] = diam_externo_value
