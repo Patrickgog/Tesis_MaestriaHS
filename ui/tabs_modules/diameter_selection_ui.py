@@ -889,8 +889,16 @@ def render_analysis_section(q_sess_lps, p_atm, temp, p_vap, nr, length_sess, h_e
             tipo_union_actual = st.session_state.get(f'tipo_union_{prefix}_analysis', 'N/A')
             serie_pvc_actual = st.session_state.get(f'serie_pvc_{prefix}_analysis', 'N/A')
             dn_pvc_actual = st.session_state.get(f'dn_pvc_{prefix}_analysis', 0)
+            
             if dn_pvc_actual:
-                dn_label_display = f"PVC {tipo_union_actual.split('(')[1].strip(')')} {serie_pvc_actual.split('(')[0].strip()} DN{dn_pvc_actual}"
+                # Parsing robusto para evitar IndexError
+                parts_union = tipo_union_actual.split('(')
+                union_label = parts_union[1].strip(')') if len(parts_union) > 1 else tipo_union_actual
+                
+                parts_serie = serie_pvc_actual.split('(')
+                serie_label = parts_serie[0].strip() if len(parts_serie) > 0 else serie_pvc_actual
+                
+                dn_label_display = f"PVC {union_label} {serie_label} DN{dn_pvc_actual}"
             else:
                 dn_label_display = f"PVC DI {di_eval:.1f} mm"
                 
