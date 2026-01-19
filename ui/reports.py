@@ -1127,62 +1127,6 @@ def agregar_info_punto_operacion(doc, nombre_grafico):
     except Exception as e:
         # Si hay error, no agregar información
         pass
-            
-            # Calcular eficiencia en el punto de operación
-            rendimiento_op = calcular_eficiencia_en_punto_operacion(caudal_op, es_vfd=False)
-            potencia_op = st.session_state.get('potencia_operacion', 0)
-            npsh_op = st.session_state.get('npsh_requerido', 0)
-            titulo_op = "Punto de Operación:"
-        
-        # Agregar información según el tipo de gráfico
-        if 'hq' in nombre_grafico.lower():
-            doc.add_paragraph(titulo_op)
-            doc.add_paragraph(f"Caudal (Q): {caudal_op:.2f} L/s")
-            doc.add_paragraph(f"Altura (H): {altura_op:.2f} m")
-        
-        elif 'rendimiento' in nombre_grafico.lower() or 'eficiencia' in nombre_grafico.lower():
-            doc.add_paragraph(titulo_op)
-            doc.add_paragraph(f"Caudal (Q): {caudal_op:.2f} L/s")
-            doc.add_paragraph(f"Rendimiento (η): {rendimiento_op:.2f} %")
-            
-            # Calcular y mostrar el valor de BEP
-            try:
-                import numpy as np
-                curva_inputs = st.session_state.get('curva_inputs', {})
-                puntos_rend = curva_inputs.get('rendimiento', [])
-                
-                if len(puntos_rend) >= 2:
-                    x_rend = np.array([pt[0] for pt in puntos_rend])
-                    y_rend = np.array([pt[1] for pt in puntos_rend])
-                    
-                    # Calcular BEP
-                    ajuste_tipo = st.session_state.get('ajuste_tipo', 'Cuadrática (2do grado)')
-                    grado_rend = 1 if ajuste_tipo == "Lineal" else 2 if ajuste_tipo == "Cuadrática (2do grado)" else 3
-                    coef_rend = np.polyfit(x_rend, y_rend, grado_rend)
-                    x_fit = np.linspace(x_rend.min(), x_rend.max(), 100)
-                    y_fit = np.polyval(coef_rend, x_fit)
-                    idx_bep = np.argmax(y_fit)
-                    bep_q = x_fit[idx_bep]
-                    bep_eta = y_fit[idx_bep]
-                    
-                    doc.add_paragraph(f"BEP (Best Efficiency Point): {bep_q:.2f} L/s @ {bep_eta:.1f}%")
-            except Exception:
-                doc.add_paragraph("BEP: No disponible")
-        
-        elif 'potencia' in nombre_grafico.lower():
-            doc.add_paragraph(titulo_op)
-            doc.add_paragraph(f"Caudal (Q): {caudal_op:.2f} L/s")
-            doc.add_paragraph(f"Potencia (PBHP): {potencia_op:.2f} HP")
-        
-        elif 'npsh' in nombre_grafico.lower():
-            doc.add_paragraph(titulo_op)
-            doc.add_paragraph(f"Caudal (Q): {caudal_op:.2f} L/s")
-            doc.add_paragraph(f"NPSH Requerido: {npsh_op:.2f} m")
-        
-        doc.add_paragraph()  # Espacio adicional
-        
-    except Exception as e:
-        doc.add_paragraph(f"Información del punto de operación no disponible")
 
 def mostrar_estado_graficos():
     """
